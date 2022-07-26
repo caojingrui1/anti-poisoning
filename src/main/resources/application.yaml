@@ -1,0 +1,10 @@
+server:
+  port: 8086
+spring:
+  data:
+    mongodb:
+      host: 7.220.196.137
+      database: vms_dev
+      port: 8635
+      username: rwuser
+      password: Majun@123456
