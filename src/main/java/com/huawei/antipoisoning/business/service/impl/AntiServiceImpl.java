@@ -80,7 +80,7 @@ public class AntiServiceImpl implements AntiService {
 
         //扫描指定仓库 下载后放入文件夹 扫描 产生报告
         String[] arguments = new String[] {"/bin/sh","-c","time /usr/local/bin/python3 /opt/sscs/SoftwareSupplyChainSecurity-release-openeuler/openeuler_scan.py "
-                +"/usr/test/"+ repoName + "/usr/result/openeuler-os-build-new.json " +
+                +"/usr/test/"+ repoName + "/usr/result/" + repoName + ".json " +
                 "--enable-" + language};
         System.out.println(AntiMainUtil.execute(arguments));
         String result = AntiMainUtil.getJsonContent(repoName, workspace);
