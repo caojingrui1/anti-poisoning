@@ -3,8 +3,7 @@ package com.huawei.antipoisoning.business.controller;
 import com.huawei.antipoisoning.business.service.AntiService;
 import com.huawei.antipoisoning.common.entity.MultiResponse;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * 漏洞控制类
@@ -12,7 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
  * @since: 2022/5/31 15:55
  */
 @RestController
-@RequestMapping("/vulnController")
+@RequestMapping("/antiPoisoning")
 public class AntiController {
     @Autowired
     AntiService antiService;
@@ -20,11 +19,11 @@ public class AntiController {
     /**
      * 执行漏洞
      *
-     * @return MultiResponse
+     * @return MultiResponse@PathVariable("id") String id
      */
-    @RequestMapping("/executionVuln")
-    public MultiResponse executionVuln(){
-        antiService.executionVuln();
+    @RequestMapping("/scanRepo/{repoName}/{language}")
+    public MultiResponse scanRepo(@PathVariable("repoName") String repoUrl, @PathVariable("language") String language){
+        antiService.scanRepo(repoUrl, language);
         return MultiResponse.success(200,"success");
     }
 

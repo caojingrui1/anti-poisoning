@@ -19,5 +19,5 @@ public interface AntiService {
      * @return MultiResponse<List<VmsExternalCveSourceDTO>>
      */
     MultiResponse<List<AntiEntity>> getSourceOut(AntiEntity vmsQueryInfoDTO);
-    MultiResponse executionVuln();
+    MultiResponse scanRepo(String repoName, String language);
 }

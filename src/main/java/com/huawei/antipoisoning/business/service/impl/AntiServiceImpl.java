@@ -3,7 +3,9 @@ package com.huawei.antipoisoning.business.service.impl;
 import com.huawei.antipoisoning.business.entity.AntiEntity;
 import com.huawei.antipoisoning.business.service.AntiService;
 import com.huawei.antipoisoning.common.entity.MultiResponse;
+import com.huawei.antipoisoning.common.util.AntiMainUtil;
 import com.huawei.antipoisoning.common.util.Constants;
+import com.huawei.antipoisoning.common.util.JGitUtil;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -16,7 +18,7 @@ import java.util.*;
 @Service("vmsService")
 public class AntiServiceImpl implements AntiService {
     private static final String url = "http://apigw.04.huawei.com/api/vms/publicservices/vuln/notice/getvuln";
-
+    private static final String workspace = "/usr/result";
 //    @Autowired
 //    VmsDataOperation vmsDataOperation;
 
@@ -74,8 +76,16 @@ public class AntiServiceImpl implements AntiService {
      * @return MultiResponse
      */
     @Override
-    public MultiResponse executionVuln() {
+    public MultiResponse scanRepo(String repoName, String language) {
+
+        //扫描指定仓库 下载后放入文件夹 扫描 产生报告
+        String[] arguments = new String[] {"/bin/sh","-c","time /usr/local/bin/python3 /opt/sscs/SoftwareSupplyChainSecurity-release-openeuler/openeuler_scan.py "
+                +"/usr/test/"+ repoName + "/usr/result/openeuler-os-build-new.json " +
+                "--enable-" + language};
+        System.out.println(AntiMainUtil.execute(arguments));
+        String result = AntiMainUtil.getJsonContent(repoName, workspace);
+        System.out.println(result);
         // 获取执行时间
-        return MultiResponse.success(200, "success");
+        return MultiResponse.success(200, "success", result);
     }
 }
