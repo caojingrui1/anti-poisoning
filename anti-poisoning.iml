@@ -100,5 +100,8 @@
     <orderEntry type="library" name="Maven: org.projectlombok:lombok:1.18.16" level="project" />
     <orderEntry type="library" name="Maven: com.alibaba:fastjson:1.2.41" level="project" />
     <orderEntry type="library" name="Maven: commons-lang:commons-lang:2.6" level="project" />
+    <orderEntry type="library" name="Maven: com.github.ulisesbocchio:jasypt-spring-boot-starter:3.0.1" level="project" />
+    <orderEntry type="library" name="Maven: com.github.ulisesbocchio:jasypt-spring-boot:3.0.1" level="project" />
+    <orderEntry type="library" name="Maven: org.jasypt:jasypt:1.9.3" level="project" />
   </component>
 </module>
