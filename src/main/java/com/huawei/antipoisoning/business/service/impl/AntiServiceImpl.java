@@ -110,7 +110,7 @@ public class AntiServiceImpl implements AntiService {
 
     @Override
     public MultiResponse downloadRepo(AntiEntity antiEntity) {
-        String gitUrl = antiEntity.getRepoUrl().split("/")[2]; //ci-backend-service.git
+        String gitUrl = antiEntity.getRepoUrl().split("/")[4]; //ci-backend-service.git
         String module = gitUrl.substring(0,gitUrl.length()-4);//"openeuler-os-build";
         antiEntity.setRepoName(module);
         if (null == antiEntity.getBranch() || "".equals(antiEntity.getBranch())) // String branch = "master";
