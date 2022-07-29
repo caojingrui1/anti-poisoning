@@ -118,7 +118,7 @@ public class AntiServiceImpl implements AntiService {
             antiEntity.setBranch("master");
         }
         String revision = "7c2f9fa05ec24426a289d881814745d8f2482f4b";
-        String workspace = REPOPATH + File.separator + module;
+        String workspace = REPOPATH + "/" + module;
         antiEntity.setBranch(antiEntity.getBranch());
         antiEntity.setLanguage(antiEntity.getLanguage());
         antiEntity.setRepoName(module);
