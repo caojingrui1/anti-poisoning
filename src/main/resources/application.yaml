@@ -8,3 +8,6 @@ spring:
       port: 8635
       username: rwuser
       password: Majun@123456
+git:
+  username: openlibing@163.com
+  password: Jszb2022h1

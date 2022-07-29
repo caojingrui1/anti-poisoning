@@ -13,11 +13,25 @@ import java.util.List;
  */
 public interface AntiService {
     /**
-     * 查询外部源漏洞
+     * 扫描仓库
      *
-     * @param vmsQueryInfoDTO 查询主体
+     * @param uuid 任务id
      * @return MultiResponse<List<VmsExternalCveSourceDTO>>
      */
-    MultiResponse<List<AntiEntity>> getSourceOut(AntiEntity vmsQueryInfoDTO);
-    MultiResponse scanRepo(String repoName, String language);
+    MultiResponse scanRepo(String uuid);
+
+    /**
+     * 查询外部源漏洞
+     *
+     * @return MultiResponse<List<VmsExternalCveSourceDTO>>
+     */
+    MultiResponse setEnv();
+
+    /**
+     * 下载仓库
+     *
+     * @param antiEntity 扫描任务实体
+     * @return MultiResponse<List<VmsExternalCveSourceDTO>>
+     */
+    MultiResponse downloadRepo(AntiEntity antiEntity);
 }

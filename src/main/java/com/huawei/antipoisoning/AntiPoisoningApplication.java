@@ -8,10 +8,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @SpringBootApplication
 public class AntiPoisoningApplication {
     public static void main(String[] args) {
-//        JGitUtil.main(args);
         SpringApplication.run(AntiPoisoningApplication.class, args);
-//        AntiMainUtil.main(args);
-
     }
 
 }

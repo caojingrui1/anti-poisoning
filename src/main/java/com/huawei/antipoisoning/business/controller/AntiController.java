@@ -1,5 +1,6 @@
 package com.huawei.antipoisoning.business.controller;
 
+import com.huawei.antipoisoning.business.entity.AntiEntity;
 import com.huawei.antipoisoning.business.service.AntiService;
 import com.huawei.antipoisoning.common.entity.MultiResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,14 +18,47 @@ public class AntiController {
     AntiService antiService;
 
     /**
-     * 执行漏洞
+     * 扫描已下载的仓库
+     *
+     * @return MultiResponse
+     */
+    @RequestMapping("/scanRepo/{uuid}")
+    public MultiResponse scanRepo(@PathVariable("uuid") String uuid){
+        MultiResponse multiResponse =  antiService.scanRepo(uuid);
+        return multiResponse;
+    }
+
+    /**
+     * 下载仓库
+     * @param  antiEntity 参数
+     * @return MultiResponse
+     */
+    @RequestMapping(value = "/downloadRepo", method = RequestMethod.POST)
+    public MultiResponse downloadRepo(@RequestBody AntiEntity antiEntity){
+        if (null == antiEntity.getScanId() || "".equals(antiEntity.getScanId()))
+        {
+            return MultiResponse.error(400,"error: no scanId detected!");
+        }
+        if (null == antiEntity.getRepoUrl() || "".equals(antiEntity.getRepoUrl()))
+        {
+            return MultiResponse.error(400,"error: no repoUrl detected!");
+        }
+        if (null == antiEntity.getLanguage() || "".equals(antiEntity.getLanguage()))
+        {
+            return MultiResponse.error(400,"error: no language detected!");
+        }
+        MultiResponse multiResponse =  antiService.downloadRepo(antiEntity);
+        return multiResponse;
+    }
+
+    /**
+     * 测试
      *
      * @return MultiResponse@PathVariable("id") String id
      */
-    @RequestMapping("/scanRepo/{repoName}/{language}")
-    public MultiResponse scanRepo(@PathVariable("repoName") String repoUrl, @PathVariable("language") String language){
-        antiService.scanRepo(repoUrl, language);
-        return MultiResponse.success(200,"success");
+    @RequestMapping(value = "/setEnv")
+    public MultiResponse scanRepo1(){
+        MultiResponse multiResponse =  antiService.setEnv();
+        return multiResponse;
     }
-
 }
