@@ -1,14 +1,19 @@
 package com.huawei.antipoisoning.business.service.impl;
 
-import com.huawei.releasepoison.entity.RepoInfo;
-import com.huawei.releasepoison.service.PoisonService;
-import com.huawei.releasepoison.utils.MultiResponse;
+
+import com.huawei.antipoisoning.business.entity.AntiEntity;
+import com.huawei.antipoisoning.business.entity.RepoInfo;
+import com.huawei.antipoisoning.business.operation.PoisonScanOperation;
+import com.huawei.antipoisoning.business.service.AntiService;
+import com.huawei.antipoisoning.business.service.PoisonService;
+import com.huawei.antipoisoning.common.entity.MultiResponse;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicNameValuePair;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -27,29 +32,58 @@ public class PoisonServiceImpl implements PoisonService {
      * */
     private static final String urlAntiPoisoning = "http://10.244.34.89:8086/antiPoisoning/scanRepo";
 
+    @Autowired
+    private AntiService antiService;
+    @Autowired
+    private PoisonScanOperation poisonScanOperation;
+
     @Override
     public MultiResponse poisonScan(RepoInfo repoInfo) {
         //1.生成scanId
-        String scanId = ScanidGenerate();
+        String scanId = ScanidGenerate(repoInfo.getCommunity(), repoInfo.getRepoName(), repoInfo.getBranch());
         //请求下载目标仓地址参数
-        Map<String, String> paramDownload = new HashMap<>();
-        paramDownload.put("scanId", scanId);
-        paramDownload.put("repoUrl", repoInfo.getRepoUrl());
-        paramDownload.put("language", repoInfo.getLanguage());
-        //请求防投毒扫描地址参数
-        Map<String, String> paramAntiPoisoning = new HashMap<>();
-        paramAntiPoisoning.put("scanId", scanId);
-        //2.请求下载目标仓
-        requestUrl(urlDownload, paramDownload);
-        //3.请求放投毒扫描
-        requestUrl(urlAntiPoisoning, paramAntiPoisoning);
+        AntiEntity antiEntity = new AntiEntity();
+        antiEntity.setScanId(scanId);
+        antiEntity.setBranch(repoInfo.getBranch());
+        antiEntity.setLanguage(repoInfo.getLanguage());
+        antiEntity.setIsScan(true);
+        // 下载目标仓库代码
+        antiService.downloadRepo(antiEntity);
+//        Map<String, String> paramDownload = new HashMap<>();
+//        paramDownload.put("scanId", scanId);
+//        paramDownload.put("repoUrl", repoInfo.getRepoUrl());
+//        paramDownload.put("language", repoInfo.getLanguage());
+        // 防投毒扫描
+        antiService.scanRepo(scanId);
+//        Map<String, String> paramAntiPoisoning = new HashMap<>();
+//        paramAntiPoisoning.put("scanId", scanId);
+//        //2.请求下载目标仓
+////        requestUrl(urlDownload, paramDownload);
+//        //3.请求放投毒扫描
+//        requestUrl(urlAntiPoisoning, paramAntiPoisoning);
         //4.查询扫描结果
         return new MultiResponse().code(200).result("6");
     }
 
-    public String ScanidGenerate(){
+    @Override
+    public MultiResponse queryResults(RepoInfo repoInfo) {
+        List<AntiEntity> list = poisonScanOperation.queryResults();
+        return new MultiResponse().code(200).result(list);
+    }
 
-        return "";
+
+    /**
+     * 随机码生成。
+     *
+     * @param community 社区名称
+     * @param repoName 仓库名称
+     * @param branch 分支名称
+     * @return String 随机码
+     */
+    public String ScanidGenerate(String community, String repoName, String branch){
+        long time = System.currentTimeMillis();
+        String scanId = community + "-" + repoName + "-" + branch + "-" + time;
+        return scanId;
     }
 
     public void requestUrl(String url, Map<String, String> param){
