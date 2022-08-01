@@ -4,6 +4,9 @@ import lombok.Data;
 import lombok.ToString;
 import org.springframework.data.mongodb.core.mapping.Field;
 
+/**
+ * @author zhangshengjie
+ */
 @Data
 @ToString
 public class ResultEntity {

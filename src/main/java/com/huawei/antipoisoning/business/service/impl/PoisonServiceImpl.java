@@ -3,6 +3,7 @@ package com.huawei.antipoisoning.business.service.impl;
 
 import com.huawei.antipoisoning.business.entity.AntiEntity;
 import com.huawei.antipoisoning.business.entity.RepoInfo;
+import com.huawei.antipoisoning.business.entity.vo.PageVo;
 import com.huawei.antipoisoning.business.operation.PoisonScanOperation;
 import com.huawei.antipoisoning.business.service.AntiService;
 import com.huawei.antipoisoning.business.service.PoisonService;
@@ -17,23 +18,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 @Service
 public class PoisonServiceImpl implements PoisonService {
-    /**
-     * 请求下载目标仓地址
-     * */
-    private static final String urlDownload = "http://10.244.34.89:8086/downloadRepo";
-    /**
-     * 请求下载目标仓地址
-     * */
-    private static final String urlAntiPoisoning = "http://10.244.34.89:8086/antiPoisoning/scanRepo";
 
     @Autowired
     private AntiService antiService;
+
     @Autowired
     private PoisonScanOperation poisonScanOperation;
 
@@ -49,26 +42,15 @@ public class PoisonServiceImpl implements PoisonService {
         antiEntity.setIsScan(true);
         // 下载目标仓库代码
         antiService.downloadRepo(antiEntity);
-//        Map<String, String> paramDownload = new HashMap<>();
-//        paramDownload.put("scanId", scanId);
-//        paramDownload.put("repoUrl", repoInfo.getRepoUrl());
-//        paramDownload.put("language", repoInfo.getLanguage());
         // 防投毒扫描
         antiService.scanRepo(scanId);
-//        Map<String, String> paramAntiPoisoning = new HashMap<>();
-//        paramAntiPoisoning.put("scanId", scanId);
-//        //2.请求下载目标仓
-////        requestUrl(urlDownload, paramDownload);
-//        //3.请求放投毒扫描
-//        requestUrl(urlAntiPoisoning, paramAntiPoisoning);
-        //4.查询扫描结果
         return new MultiResponse().code(200).result("6");
     }
 
     @Override
     public MultiResponse queryResults(RepoInfo repoInfo) {
-        List<AntiEntity> list = poisonScanOperation.queryResults();
-        return new MultiResponse().code(200).result(list);
+        PageVo summaryVos = poisonScanOperation.queryResults(repoInfo);
+        return new MultiResponse().code(200).result(summaryVos);
     }
 
 

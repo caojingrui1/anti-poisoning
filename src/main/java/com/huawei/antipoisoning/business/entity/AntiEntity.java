@@ -10,6 +10,7 @@ import java.util.List;
 /**
  * vms:外部漏洞源-漏洞修复版本
  *
+ * @author zhangshengjie
  * @since: 2022-05-20 11:35
  */
 @Data
