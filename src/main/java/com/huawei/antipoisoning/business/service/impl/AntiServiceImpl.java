@@ -28,6 +28,8 @@ public class AntiServiceImpl implements AntiService {
 
     private static final String SCANTOOLPATH = "/opt/sscs/SoftwareSupplyChainSecurity-release-openeuler/openeuler_scan.py";
 
+    private static final String SCANTOOLFILE = "/opt/sscs/SoftwareSupplyChainSecurity-release-openeuler/";
+
     private static final String REPOPATH = "/usr/test/download";
 
     @Value("${git.username}")
@@ -50,6 +52,8 @@ public class AntiServiceImpl implements AntiService {
         if (null != antiEntity) {
             try {
                 if (antiEntity.getIsDownloaded() == true) {
+                    // 设置环境变量
+                    setEnv();
                     String[] arguments = new String[]{"/bin/sh", "-c", "time /usr/local/bin/python3"
                             + " " + SCANTOOLPATH // 工具地址
                             + " " + REPOPATH + "/" + antiEntity.getRepoName() + // 仓库下载后存放地址
@@ -93,14 +97,12 @@ public class AntiServiceImpl implements AntiService {
     public MultiResponse setEnv(){
         System.out.println("开始 start");
         try {
+            String command0 = "cd";
             String command1 = "export JOERN_HOME=/opt/sscs/joern-cli/" ;
             String command2 = "export JAVA_HOME=/usr/lib/jvm/java-1.11.0-openjdk-amd64 ";
-            Runtime.getRuntime().exec(command1);
-            Runtime.getRuntime().exec(command2);
-            Runtime.getRuntime().exec(new String[] {"/bin/sh","-c",command1});
-            Runtime.getRuntime().exec(new String[] {"/bin/sh","-c",command2});
-            Runtime.getRuntime().exec(new String[] {command1});
-            Runtime.getRuntime().exec(new String[] {command2});
+            Runtime.getRuntime().exec(new String[] {"/bin/sh","-c", command0, SCANTOOLFILE});
+            Runtime.getRuntime().exec(new String[] {"/bin/sh","-c", command1});
+            Runtime.getRuntime().exec(new String[] {"/bin/sh","-c", command2});
         } catch (IOException e)
         {
             e.printStackTrace();
@@ -124,38 +126,43 @@ public class AntiServiceImpl implements AntiService {
         antiEntity.setRepoName(module);
         antiEntity.setRepoUrl(antiEntity.getRepoUrl());
         antiOperation.insertScanResult(antiEntity);
-        JGitUtil gfxly = new JGitUtil(module, gitUser, gitPassword, antiEntity.getBranch(), revision, workspace);
-        int getPullCode = gfxly.pull(antiEntity.getRepoUrl());
-        if (getPullCode == 0) {
-            System.out.println("检出代码成功===0");
-            antiEntity.setIsDownloaded(true);
-            antiOperation.updateScanResult(antiEntity);
-            return MultiResponse.success(200, "success");
-        } else if (getPullCode == 1) {
-            antiEntity.setTips("检出代码未知异常===1");
-            antiEntity.setIsDownloaded(false);
-            antiOperation.updateScanResult(antiEntity);
-            return MultiResponse.error(400,"downloadRepo error");
-        } else if (getPullCode == 2) {
-            antiEntity.setTips("检出代码未知异常===2");
-            antiEntity.setIsDownloaded(false);
-            antiOperation.updateScanResult(antiEntity);
-            return MultiResponse.error(400,"downloadRepo error");
-        } else if (getPullCode == 3) {
-            antiEntity.setTips("检出代码未知异常===3");
-            antiEntity.setIsDownloaded(false);
-            antiOperation.updateScanResult(antiEntity);
-            return MultiResponse.error(400,"downloadRepo error");
-        } else if (getPullCode == 4) {
-            antiEntity.setTips("检出代码未知异常===4");
-            antiEntity.setIsDownloaded(false);
-            antiOperation.updateScanResult(antiEntity);
-            return MultiResponse.error(400,"downloadRepo error");
-        } else {
-            antiEntity.setTips("检出代码未知异常===5");
-            antiEntity.setIsDownloaded(false);
-            antiOperation.updateScanResult(antiEntity);
-            return MultiResponse.error(400,"downloadRepo error");
-        }
+//        JGitUtil gfxly = new JGitUtil(module, gitUser, gitPassword, antiEntity.getBranch(), revision, workspace);
+//        int getPullCode = gfxly.pull(antiEntity.getRepoUrl());
+//        if (getPullCode == 0) {
+//            System.out.println("检出代码成功===0");
+//            antiEntity.setIsDownloaded(true);
+//            antiOperation.updateScanResult(antiEntity);
+//            return MultiResponse.success(200, "success");
+//        } else if (getPullCode == 1) {
+//            antiEntity.setTips("检出代码未知异常===1");
+//            antiEntity.setIsDownloaded(false);
+//            antiOperation.updateScanResult(antiEntity);
+//            return MultiResponse.error(400,"downloadRepo error");
+//        } else if (getPullCode == 2) {
+//            antiEntity.setTips("检出代码未知异常===2");
+//            antiEntity.setIsDownloaded(false);
+//            antiOperation.updateScanResult(antiEntity);
+//            return MultiResponse.error(400,"downloadRepo error");
+//        } else if (getPullCode == 3) {
+//            antiEntity.setTips("检出代码未知异常===3");
+//            antiEntity.setIsDownloaded(false);
+//            antiOperation.updateScanResult(antiEntity);
+//            return MultiResponse.error(400,"downloadRepo error");
+//        } else if (getPullCode == 4) {
+//            antiEntity.setTips("检出代码未知异常===4");
+//            antiEntity.setIsDownloaded(false);
+//            antiOperation.updateScanResult(antiEntity);
+//            return MultiResponse.error(400,"downloadRepo error");
+//        } else {
+//            antiEntity.setTips("检出代码未知异常===5");
+//            antiEntity.setIsDownloaded(false);
+//            antiOperation.updateScanResult(antiEntity);
+//            return MultiResponse.error(400,"downloadRepo error");
+//        }
+
+        // todo 黄区暂无法使用git拉取代码
+        antiEntity.setIsDownloaded(true);
+        antiOperation.updateScanResult(antiEntity);
+        return MultiResponse.success(200, "success");
     }
 }
