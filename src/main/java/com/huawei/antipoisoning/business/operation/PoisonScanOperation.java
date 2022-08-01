@@ -35,8 +35,8 @@ public class PoisonScanOperation {
         long count = mongoTemplate.count(commonQuery, AntiEntity.class,
                 SCAN_RESULTS);
         commonQuery.with(Sort.by(Sort.Direction.DESC, "repo_name"));
-        if (repoInfo.getPageSize() != null && repoInfo.getPageSize() != null) {
-            commonQuery.skip((repoInfo.getPageSize() - 1) * repoInfo.getPageSize()).limit(repoInfo.getPageSize());
+        if (repoInfo.getPageSize() != null && repoInfo.getCurrentPage() != null) {
+            commonQuery.skip((repoInfo.getCurrentPage() - 1) * repoInfo.getPageSize()).limit(repoInfo.getPageSize());
         }
         List<AntiEntity> summaryVos= mongoTemplate.find(commonQuery, AntiEntity.class, SCAN_RESULTS);
 
