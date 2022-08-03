@@ -54,7 +54,7 @@ public class AntiServiceImpl implements AntiService {
             try {
                 if (antiEntity.getIsDownloaded() == true) {
                     // 设置环境变量
-                    setEnv();
+//                    setEnv();
                     String[] arguments = new String[]{"/bin/sh", "-c", "time python"
                             + " " + SCANTOOLPATH // 工具地址
                             + " " + REPOPATH + "/" + antiEntity.getRepoName() + // 仓库下载后存放地址
