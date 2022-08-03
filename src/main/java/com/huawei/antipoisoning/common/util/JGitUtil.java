@@ -19,7 +19,7 @@ import java.util.List;
  * @author zyx
  */
 public class JGitUtil implements Serializable {
-    private String module;
+    private String repo;
     private String user;
     private String pass;
     private String branch;
@@ -27,8 +27,8 @@ public class JGitUtil implements Serializable {
     private String git_config;
     private String workspace;
 
-    public JGitUtil(String module, String user, String pass, String branch, String revision, String workspace){
-        this.module = module;
+    public JGitUtil(String repo, String user, String pass, String branch, String revision, String workspace){
+        this.repo = repo;
         this.user = user;
         this.pass = pass;
         this.branch = branch;
@@ -36,20 +36,14 @@ public class JGitUtil implements Serializable {
         this.workspace = workspace;
         this.git_config = workspace + "/.git";
     }
-    public JGitUtil(String user, String pass, String branch, String workspace){
-        this.user = user;
-        this.pass = pass;
-        this.branch = branch;
-        this.workspace = workspace;
-        this.git_config = workspace + "/.git";
-    }
 
     /**
-     * 通过url拉取代码
+     * 通过url拉取全量代码。版本级扫描使用
+     *
      * @param gitUrl
      * @return
      */
-    public int pull(String gitUrl){
+    public int pullVersion(String gitUrl){
         String pullMsg = "";
         // 标记拉取代码的标志
         int pullFlag = 0;
@@ -67,12 +61,8 @@ public class JGitUtil implements Serializable {
         try {
             git = Git.cloneRepository().setURI(gitUrl)
                     .setDirectory(dir).setCredentialsProvider(provider).call();
-            RefSpec spec1 = new RefSpec("refs/heads/*:refs/remotes/origin/*");
-            RefSpec spec2 = new RefSpec("refs/pull/*/MERGE:refs/pull/*/MERGE");
-            git.fetch().setRefSpecs(spec1).setRefSpecs(spec2).setCredentialsProvider(provider).call();
-            git.checkout().setName(module).setCreateBranch(true).call();
             pullMsg = "检出代码成功 success";
-        } catch (org.eclipse.jgit.api.errors.TransportException e){
+        } catch (org.eclipse.jgit.api.errors.TransportException e) {
             e.printStackTrace();
             pullMsg = "用户名NAME或密码PASSWORD错误或远程链接URL错误 failed";
             pullFlag = 1;
@@ -88,20 +78,73 @@ public class JGitUtil implements Serializable {
             e.printStackTrace();
             pullMsg = "未找到相应的类文件异常，failed";
             pullFlag = 4;
-        } catch (Exception e) {
-            e.printStackTrace();
         } finally {
-            System.out.println(pullMsg +"--code--"+ pullFlag);
+//            LOGGER.info("{} --code-- {}", pullMsg, pullFlag);
             if (git != null) {
                 git.close();
             }
         }
-
         return pullFlag;
     }
+
+    /**
+     * 通过url拉取PR代码.门禁级扫描使用
+     *
+     * @param gitUrl gitee clone url
+     * @return int
+     */
+    public int pullPr(String gitUrl) {
+        String pullMsg = "";
+        // 标记拉取代码的标志
+        int pullFlag = 0;
+        // 提供用户名和密码的验证
+        UsernamePasswordCredentialsProvider provider = new UsernamePasswordCredentialsProvider(this.user, this.pass);
+        // 指定要加载的代码路径
+        File dir = new File(workspace);
+        // 判断代码路径下是否有内容，如果有就删除
+        if (dir.exists()) {
+            deleteFolder(dir);
+        }
+        Git git = null;
+        try {
+            git = Git.cloneRepository().setURI(gitUrl)
+                    .setDirectory(dir).setCredentialsProvider(provider).call();
+            RefSpec spec1 = new RefSpec("refs/heads/*:refs/remotes/origin/*");
+            RefSpec spec2 = new RefSpec("refs/pull/*/MERGE:refs/pull/*/MERGE");
+            git.fetch().setRefSpecs(spec1).setRefSpecs(spec2).setCredentialsProvider(provider).call();
+            git.checkout().setName(repo).call();
+            pullMsg = "检出代码成功 success";
+
+        } catch (org.eclipse.jgit.api.errors.TransportException e) {
+            e.printStackTrace();
+            pullMsg = "用户名NAME或密码PASSWORD错误或远程链接URL错误 failed";
+            pullFlag = 1;
+        } catch (org.eclipse.jgit.api.errors.JGitInternalException e) {
+            e.printStackTrace();
+            pullMsg = "已经存在了项目的下载目录，并且目录正在被操作 failed";
+            pullFlag = 2;
+        } catch (GitAPIException e) {
+            e.printStackTrace();
+            pullMsg = "调用GitAPI异常，failed";
+            pullFlag = 3;
+        } catch (NoClassDefFoundError e) {
+            e.printStackTrace();
+            pullMsg = "未找到相应的类文件异常，failed";
+            pullFlag = 4;
+        } finally {
+//            LOGGER.info("{} --code-- {}", pullMsg, pullFlag);
+            if (git != null) {
+                git.close();
+            }
+        }
+        return pullFlag;
+    }
+
+
     /**
      * 检出分支
-     * @return
+     *
+     * @return int
      */
     public int checkoutBranch(){
         String checkoutMsg = "";
@@ -139,7 +182,8 @@ public class JGitUtil implements Serializable {
     }
     /**
      * 检出代码
-     * @return
+     *
+     * @return int
      */
     public int checkoutRevision(){
         String checkoutMsg = "";
@@ -194,7 +238,7 @@ public class JGitUtil implements Serializable {
 //        String baseUrl = "https://gitee.com/openlookeng/";
 //        String module = args[0];
 //        String module = "scanoss-pr";
-        String module = "openeuler-os-build";
+        String repo = "A-Ops";
 //        String module = "hetu-core";
         String user = "openlibing@163.com";
         String pass = "Jszb2022h1";
@@ -203,14 +247,14 @@ public class JGitUtil implements Serializable {
 //        String branch = args[1];
 //        String revision = "e87e01a5c77d29ad340a5e7e1c771dd64d9ad9c2";
         String revision = "7c2f9fa05ec24426a289d881814745d8f2482f4b";
-//        String workspace = "c:/Temp/build/test";
+        String workspace = "c:/Temp/build/" + repo;
 //        String workspace = "c:/Temp/build1/"+module;
-        String workspace = "/usr/test/down/"+module;
+//        String workspace = "/usr/test/down/" + repo;
 //        String revision = args[2];
 //        JGitUtil gfxly = new JGitUtil(user, pass, branch, workspace);
-        JGitUtil gfxly = new JGitUtil(module, user, pass, branch, revision, workspace);
+        JGitUtil gfxly = new JGitUtil(repo, user, pass, branch, revision, workspace);
 
-        int getPullCode = gfxly.pull(baseUrl  + module + ".git");
+        int getPullCode = gfxly.pullVersion(baseUrl  + repo + ".git");
         if (getPullCode == 0) {
             System.out.println("检出代码成功===0");
         } else if (getPullCode == 1) {
@@ -225,15 +269,15 @@ public class JGitUtil implements Serializable {
             System.out.println("检出代码未知异常===5");
             System.exit(5);
         }
-//        int getBranchCode = gfxly.checkoutBranch();
-//        if (getBranchCode == 0) {
-//            System.out.println("检出分支成功===0");
-//        } else if (getBranchCode == 6) {
-//            System.exit(6);
-//        } else {
-//            System.out.println("检出分支未知异常===7");
-//            System.exit(7);
-//        }
+        int getBranchCode = gfxly.checkoutBranch();
+        if (getBranchCode == 0) {
+            System.out.println("检出分支成功===0");
+        } else if (getBranchCode == 6) {
+            System.exit(6);
+        } else {
+            System.out.println("检出分支未知异常===7");
+            System.exit(7);
+        }
 //        int getRevisionCode = gfxly.checkoutRevision();
 //        if (getRevisionCode == 0) {
 //            System.out.println("检出版本成功===0");

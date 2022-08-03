@@ -35,16 +35,13 @@ public class AntiController {
      */
     @RequestMapping(value = "/downloadRepo", method = RequestMethod.POST)
     public MultiResponse downloadRepo(@RequestBody AntiEntity antiEntity){
-        if (null == antiEntity.getScanId() || "".equals(antiEntity.getScanId()))
-        {
+        if (null == antiEntity.getScanId() || "".equals(antiEntity.getScanId())) {
             return MultiResponse.error(400,"error: no scanId detected!");
         }
-        if (null == antiEntity.getRepoUrl() || "".equals(antiEntity.getRepoUrl()))
-        {
+        if (null == antiEntity.getRepoUrl() || "".equals(antiEntity.getRepoUrl())) {
             return MultiResponse.error(400,"error: no repoUrl detected!");
         }
-        if (null == antiEntity.getLanguage() || "".equals(antiEntity.getLanguage()))
-        {
+        if (null == antiEntity.getLanguage() || "".equals(antiEntity.getLanguage())) {
             return MultiResponse.error(400,"error: no language detected!");
         }
         MultiResponse multiResponse =  antiService.downloadRepo(antiEntity);

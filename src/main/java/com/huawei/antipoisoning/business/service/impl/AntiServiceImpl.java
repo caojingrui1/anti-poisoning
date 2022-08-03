@@ -8,6 +8,7 @@ import com.huawei.antipoisoning.business.service.AntiService;
 import com.huawei.antipoisoning.common.entity.MultiResponse;
 import com.huawei.antipoisoning.common.util.AntiMainUtil;
 import com.huawei.antipoisoning.common.util.JGitUtil;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -24,13 +25,13 @@ import java.util.*;
 @Service("vmsService")
 public class AntiServiceImpl implements AntiService {
 
-    private static final String SCANRESULTPATH = "/usr/result";
+    private static final String SCANRESULTPATH = "/root/softwareFile/report/";
 
-    private static final String SCANTOOLPATH = "/opt/sscs/SoftwareSupplyChainSecurity-release-openeuler/openeuler_scan.py";
+    private static final String SCANTOOLPATH = "/root/opt/SoftwareSupplyChainSecurity-v1/openeuler_scan.py";
 
-    private static final String SCANTOOLFILE = "/opt/sscs/SoftwareSupplyChainSecurity-release-openeuler/";
+    private static final String SCANTOOLFILE = "/root/opt/SoftwareSupplyChainSecurity-v1/";
 
-    private static final String REPOPATH = "/usr/test/download";
+    private static final String REPOPATH = "/root/softwareFile/download/";
 
     @Value("${git.username}")
     private String gitUser;
@@ -54,7 +55,7 @@ public class AntiServiceImpl implements AntiService {
                 if (antiEntity.getIsDownloaded() == true) {
                     // 设置环境变量
                     setEnv();
-                    String[] arguments = new String[]{"/bin/sh", "-c", "time /usr/local/bin/python3"
+                    String[] arguments = new String[]{"/bin/sh", "-c", "time python"
                             + " " + SCANTOOLPATH // 工具地址
                             + " " + REPOPATH + "/" + antiEntity.getRepoName() + // 仓库下载后存放地址
                             " " + SCANRESULTPATH + "/" + antiEntity.getRepoName() + ".json " +  // 扫描完成后结果存放地址   /usr/result/openeuler-os-build
@@ -115,7 +116,7 @@ public class AntiServiceImpl implements AntiService {
         String gitUrl = antiEntity.getRepoUrl().split("/")[4]; //ci-backend-service.git
         String module = gitUrl.substring(0,gitUrl.length()-4);//"openeuler-os-build";
         antiEntity.setRepoName(module);
-        if (null == antiEntity.getBranch() || "".equals(antiEntity.getBranch())) // String branch = "master";
+        if (StringUtils.isEmpty(antiEntity.getBranch())) // String branch = "master";
         {
             antiEntity.setBranch("master");
         }
@@ -126,43 +127,38 @@ public class AntiServiceImpl implements AntiService {
         antiEntity.setRepoName(module);
         antiEntity.setRepoUrl(antiEntity.getRepoUrl());
         antiOperation.insertScanResult(antiEntity);
-//        JGitUtil gfxly = new JGitUtil(module, gitUser, gitPassword, antiEntity.getBranch(), revision, workspace);
-//        int getPullCode = gfxly.pull(antiEntity.getRepoUrl());
-//        if (getPullCode == 0) {
-//            System.out.println("检出代码成功===0");
-//            antiEntity.setIsDownloaded(true);
-//            antiOperation.updateScanResult(antiEntity);
-//            return MultiResponse.success(200, "success");
-//        } else if (getPullCode == 1) {
-//            antiEntity.setTips("检出代码未知异常===1");
-//            antiEntity.setIsDownloaded(false);
-//            antiOperation.updateScanResult(antiEntity);
-//            return MultiResponse.error(400,"downloadRepo error");
-//        } else if (getPullCode == 2) {
-//            antiEntity.setTips("检出代码未知异常===2");
-//            antiEntity.setIsDownloaded(false);
-//            antiOperation.updateScanResult(antiEntity);
-//            return MultiResponse.error(400,"downloadRepo error");
-//        } else if (getPullCode == 3) {
-//            antiEntity.setTips("检出代码未知异常===3");
-//            antiEntity.setIsDownloaded(false);
-//            antiOperation.updateScanResult(antiEntity);
-//            return MultiResponse.error(400,"downloadRepo error");
-//        } else if (getPullCode == 4) {
-//            antiEntity.setTips("检出代码未知异常===4");
-//            antiEntity.setIsDownloaded(false);
-//            antiOperation.updateScanResult(antiEntity);
-//            return MultiResponse.error(400,"downloadRepo error");
-//        } else {
-//            antiEntity.setTips("检出代码未知异常===5");
-//            antiEntity.setIsDownloaded(false);
-//            antiOperation.updateScanResult(antiEntity);
-//            return MultiResponse.error(400,"downloadRepo error");
-//        }
-
-        // todo 黄区暂无法使用git拉取代码
-        antiEntity.setIsDownloaded(true);
-        antiOperation.updateScanResult(antiEntity);
-        return MultiResponse.success(200, "success");
+        JGitUtil gfxly = new JGitUtil(module, gitUser, gitPassword, antiEntity.getBranch(), revision, workspace);
+        int getPullCode = gfxly.pullVersion(antiEntity.getRepoUrl());
+        if (getPullCode == 0) {
+            System.out.println("检出代码成功===0");
+            antiEntity.setIsDownloaded(true);
+            antiOperation.updateScanResult(antiEntity);
+            return MultiResponse.success(200, "success");
+        } else if (getPullCode == 1) {
+            antiEntity.setTips("检出代码未知异常===1");
+            antiEntity.setIsDownloaded(false);
+            antiOperation.updateScanResult(antiEntity);
+            return MultiResponse.error(400,"downloadRepo error");
+        } else if (getPullCode == 2) {
+            antiEntity.setTips("检出代码未知异常===2");
+            antiEntity.setIsDownloaded(false);
+            antiOperation.updateScanResult(antiEntity);
+            return MultiResponse.error(400,"downloadRepo error");
+        } else if (getPullCode == 3) {
+            antiEntity.setTips("检出代码未知异常===3");
+            antiEntity.setIsDownloaded(false);
+            antiOperation.updateScanResult(antiEntity);
+            return MultiResponse.error(400,"downloadRepo error");
+        } else if (getPullCode == 4) {
+            antiEntity.setTips("检出代码未知异常===4");
+            antiEntity.setIsDownloaded(false);
+            antiOperation.updateScanResult(antiEntity);
+            return MultiResponse.error(400,"downloadRepo error");
+        } else {
+            antiEntity.setTips("检出代码未知异常===5");
+            antiEntity.setIsDownloaded(false);
+            antiOperation.updateScanResult(antiEntity);
+            return MultiResponse.error(400,"downloadRepo error");
+        }
     }
 }
