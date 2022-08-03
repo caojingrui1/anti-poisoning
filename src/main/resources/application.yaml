@@ -9,11 +9,11 @@ spring:
 #      username: rwuser
 #      password: Majun@123456
     mongodb:
-      host: 192.168.0.5
+      host: 192.168.0.180
       database: vms_dev
       port: 8635
       username: rwuser
-      password: mindSpore#1234
+      password: openMajun@1234
 git:
   username: openlibing@163.com
   password: Jszb2022h1
