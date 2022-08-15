@@ -42,11 +42,12 @@ public class PoisonServiceImpl implements PoisonService {
         antiEntity.setRepoUrl(repoInfo.getRepoUrl());
         antiEntity.setRepoName(repoInfo.getRepoName());
         antiEntity.setIsScan(true);
+        antiEntity.setCommunity(repoInfo.getCommunity());
         // 下载目标仓库代码
         antiService.downloadRepo(antiEntity);
         // 防投毒扫描
         antiService.scanRepo(scanId);
-        return new MultiResponse().code(200).result("6");
+        return new MultiResponse().code(200).result("poisonScan start");
     }
 
     @Override
@@ -68,25 +69,5 @@ public class PoisonServiceImpl implements PoisonService {
         long time = System.currentTimeMillis();
         String scanId = community + "-" + repoName + "-" + branch + "-" + time;
         return scanId;
-    }
-
-    public void requestUrl(String url, Map<String, String> param){
-        try {
-            //请求发起客户端
-            CloseableHttpClient httpclient = HttpClients.createDefault();
-            List postParams = new ArrayList();
-            if (param != null){
-                for(Map.Entry<String, String> entry:param.entrySet()){
-                    postParams.add(new BasicNameValuePair(entry.getKey(), entry.getValue()));
-                }
-            }
-            //通过post方式访问
-            HttpPost post = new HttpPost(url);
-            HttpEntity paramEntity = new UrlEncodedFormEntity(postParams,"UTF-8");
-            post.setEntity(paramEntity);
-            httpclient.execute(post);
-        } catch (Exception e){
-            e.printStackTrace();
-        }
     }
 }

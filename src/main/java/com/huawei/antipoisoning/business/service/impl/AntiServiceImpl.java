@@ -3,7 +3,9 @@ package com.huawei.antipoisoning.business.service.impl;
 import com.alibaba.fastjson.JSONArray;
 import com.huawei.antipoisoning.business.entity.AntiEntity;
 import com.huawei.antipoisoning.business.entity.ResultEntity;
+import com.huawei.antipoisoning.business.entity.TaskEntity;
 import com.huawei.antipoisoning.business.operation.AntiOperation;
+import com.huawei.antipoisoning.business.operation.PoisonTaskOperation;
 import com.huawei.antipoisoning.business.service.AntiService;
 import com.huawei.antipoisoning.common.entity.MultiResponse;
 import com.huawei.antipoisoning.common.util.AntiMainUtil;
@@ -15,6 +17,7 @@ import org.springframework.stereotype.Service;
 
 import java.io.File;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -41,6 +44,9 @@ public class AntiServiceImpl implements AntiService {
 
     @Autowired
     private AntiOperation antiOperation;
+
+    @Autowired
+    private PoisonTaskOperation poisonTaskOperation;
     /**
      * 执行漏洞
      *
@@ -49,6 +55,9 @@ public class AntiServiceImpl implements AntiService {
     @Override
     public MultiResponse scanRepo(String uuid) {
         AntiEntity antiEntity = antiOperation.queryAntiEntity(uuid);
+        TaskEntity taskEntity = poisonTaskOperation.queryTaskEntity(uuid);
+        taskEntity.setLastExecuteStartTime(taskEntity.getExecuteStartTime());
+        taskEntity.setLastExecuteEndTime(taskEntity.getExecuteEndTime());
         //扫描指定仓库 下载后放入文件夹 扫描 产生报告
         if (null != antiEntity) {
             try {
@@ -60,23 +69,36 @@ public class AntiServiceImpl implements AntiService {
                             + " " + REPOPATH + "/" + antiEntity.getRepoName() + // 仓库下载后存放地址
                             " " + SCANRESULTPATH + "/" + antiEntity.getRepoName() + ".json " +  // 扫描完成后结果存放地址   /usr/result/openeuler-os-build
                             "--enable-" + antiEntity.getLanguage()}; // 语言
+                    SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss:SSS");
+                    String taskStartTime = df.format(System.currentTimeMillis());
+                    taskEntity.setExecuteStartTime(taskStartTime);
                     String sb = AntiMainUtil.execute(arguments);
+                    String taskEndTime = df.format(System.currentTimeMillis());
+                    taskEntity.setExecuteStartTime(taskEndTime);
                     System.out.println("sb ==== :" + sb);
                     String result = AntiMainUtil.getJsonContent(SCANRESULTPATH, antiEntity.getRepoName());
                     System.out.println(result);
                     List<ResultEntity> results = JSONArray.parseArray(result, ResultEntity.class);
-                    antiEntity.setIsScan(true); // 是否执行扫描
-                    antiEntity.setStatus(true); // 扫描是否成功
-                    antiEntity.setScanResult(results);  // 扫描结果
-                    antiEntity.setResultCount(results.size()); //结果计数
+                    // 是否执行扫描
+                    antiEntity.setIsScan(true);
+                    // 扫描是否成功
+                    antiEntity.setStatus(true);
+                    // 扫描结果
+                    antiEntity.setScanResult(results);
+                    //结果计数
+                    antiEntity.setResultCount(results.size());
                     antiOperation.updateScanResult(antiEntity);
+                    poisonTaskOperation.updateTask(taskEntity);
                     // 获取执行时间
                     return MultiResponse.success(200, "success", results);
                 } else //这里可以重试下载 后期优化
                 {
-                    antiEntity.setIsScan(false); // 是否执行扫描
-                    antiEntity.setStatus(false); // 扫描是否陈工
-                    antiEntity.setTips("repo not Downloaded."); // 原因
+                    // 是否执行扫描
+                    antiEntity.setIsScan(false);
+                    // 扫描是否陈工
+                    antiEntity.setStatus(false);
+                    // 原因
+                    antiEntity.setTips("repo not Downloaded.");
                     antiOperation.updateScanResult(antiEntity);
                     return MultiResponse.error(400, "repoNotDownloaded error");
                 }
@@ -127,6 +149,9 @@ public class AntiServiceImpl implements AntiService {
         antiEntity.setRepoName(module);
         antiEntity.setRepoUrl(antiEntity.getRepoUrl());
         antiOperation.insertScanResult(antiEntity);
+        //生成任务id
+        String taskId = taskIdGenerate(antiEntity);
+        poisonTaskOperation.insertTaskResult(antiEntity, taskId);
         JGitUtil gfxly = new JGitUtil(module, gitUser, gitPassword, antiEntity.getBranch(), revision, workspace);
         int getPullCode = gfxly.pullVersion(antiEntity.getRepoUrl());
         if (getPullCode == 0) {
@@ -160,5 +185,14 @@ public class AntiServiceImpl implements AntiService {
             antiOperation.updateScanResult(antiEntity);
             return MultiResponse.error(400,"downloadRepo error");
         }
+    }
+
+    public String taskIdGenerate(AntiEntity antiEntity){
+        List<TaskEntity> taskEntity = poisonTaskOperation.queryTaskId(antiEntity);
+        if(null != taskEntity && taskEntity.size() == 1){
+            return taskEntity.get(0).getTaskId();
+        }
+        String taskId = antiEntity.getCommunity() + "-" + antiEntity.getRepoUrl() + "-" + antiEntity.getRepoName();
+        return taskId;
     }
 }

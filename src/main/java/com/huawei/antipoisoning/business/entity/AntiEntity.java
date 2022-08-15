@@ -78,4 +78,10 @@ public class AntiEntity {
      */
     @Field("scan_result")
     private List<ResultEntity> scanResult;
+
+    /**
+     * 社区
+     */
+    @Field("community")
+    private String community;
 }
