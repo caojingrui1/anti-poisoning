@@ -21,7 +21,7 @@ pipeline {
         stage('编译构建') {
             steps {
                 sh "pwd"
-                sh label: '', script: 'mvn  -gs ./setting-new.xml -f ${project_path} clean install -Dmaven.test.skip=true'
+                sh label: '', script: 'mvn  -gs ./setting-new.xml clean install -Dmaven.test.skip=true'
             }
         }
 
