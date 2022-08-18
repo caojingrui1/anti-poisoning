@@ -27,7 +27,7 @@ pipeline {
 
         stage('镜像制作上传') {
             steps {
-                dir("${project_path}"){
+                dir(""){
                     sh "pwd"
                     echo "image name: ${image_name}"
                     withCredentials(
@@ -44,7 +44,7 @@ pipeline {
 
         stage('部署') {
             steps {
-                dir("${project_path}"){
+                dir(""){
                     sh "pwd"
                     withCredentials([string(credentialsId: "${k8s_auth}", variable: 'k8s_auth_token')]) {
                         sh """
