@@ -1,0 +1,52 @@
+def registry_url = "192.168.0.42:5000"
+def repository = "openmajun"
+def registry_auth = "57386086-c8ac-4dd4-a2ae-900e3328e3e9"
+def API_SERVER = "https://192.168.0.42:6443"
+def deploy_name = "majun-poisoning"
+def project_name = "anti-poisoning"
+def image_name = "${registry_url}/${repository}/${project_name}:${BUILD_TIMESTAMP}"
+def namespace = "devops"
+def k8s_auth = "k8s_auth_token"
+def deploy_replicas=1
+
+pipeline {
+    stages {
+        stage('编译构建') {
+            steps {
+                sh "pwd"
+                sh label: '', script: 'mvn  -gs ./setting-new.xml -f ${project_path} clean install -Dmaven.test.skip=true'
+            }
+        }
+
+        stage('镜像制作上传') {
+            steps {
+                dir("${project_path}"){
+                    sh "pwd"
+                    echo "image name: ${image_name}"
+                    withCredentials(
+                        [usernamePassword(credentialsId: "${registry_auth}", usernameVariable: 'username', passwordVariable: 'password')]
+                    ){
+                        sh "docker build -t ${image_name} ."
+                        sh "docker login -u ${username} -p ${password} ${registry_url}"
+                        sh "docker push ${image_name}"
+                        sh "echo 镜像 ${image_name} 上传成功"
+                    }
+                }
+            }
+        }
+
+        stage('部署') {
+            steps {
+                dir("${project_path}"){
+                    sh "pwd"
+                    withCredentials([string(credentialsId: "${k8s_auth}", variable: 'k8s_auth_token')]) {
+                        sh """
+                        curl -i -k -X PATCH -H "Authorization: Bearer ${k8s_auth_token}" -H "Content-Type: application/strategic-merge-patch+json" --data '{"spec":{"replicas": '${deploy_replicas}', "template":{"spec":{"containers":[{"name":"'${deploy_name}'","image":"'${image_name}'"}]}}}}'  ${API_SERVER}/apis/apps/v1/namespaces/${namespace}/deployments/${deploy_name}
+                        """
+                    }
+                    sh "echo 镜像 ${image_name} 部署成功"
+                }
+            }
+        }
+    }
+}
