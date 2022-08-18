@@ -10,6 +10,13 @@ def k8s_auth = "k8s_auth_token"
 def deploy_replicas=1
 
 pipeline {
+//     agent any
+        agent {
+            node{
+                label "master"
+            }
+        }
+
     stages {
         stage('编译构建') {
             steps {
