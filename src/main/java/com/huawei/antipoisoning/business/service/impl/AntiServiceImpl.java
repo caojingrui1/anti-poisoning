@@ -5,6 +5,7 @@ import com.huawei.antipoisoning.business.entity.AntiEntity;
 import com.huawei.antipoisoning.business.entity.ResultEntity;
 import com.huawei.antipoisoning.business.entity.TaskEntity;
 import com.huawei.antipoisoning.business.operation.AntiOperation;
+import com.huawei.antipoisoning.business.operation.PoisonResultOperation;
 import com.huawei.antipoisoning.business.operation.PoisonTaskOperation;
 import com.huawei.antipoisoning.business.service.AntiService;
 import com.huawei.antipoisoning.common.entity.MultiResponse;
@@ -47,6 +48,11 @@ public class AntiServiceImpl implements AntiService {
 
     @Autowired
     private PoisonTaskOperation poisonTaskOperation;
+
+    @Autowired
+    private PoisonResultOperation poisonResultOperation;
+
+
     /**
      * 执行漏洞
      *
@@ -79,6 +85,9 @@ public class AntiServiceImpl implements AntiService {
                     String result = AntiMainUtil.getJsonContent(SCANRESULTPATH, antiEntity.getRepoName());
                     System.out.println(result);
                     List<ResultEntity> results = JSONArray.parseArray(result, ResultEntity.class);
+                    for (ResultEntity resultEntity : results){
+                        poisonResultOperation.insertResultDetails(resultEntity, uuid);
+                    }
                     // 是否执行扫描
                     antiEntity.setIsScan(true);
                     // 扫描是否成功
@@ -104,7 +113,7 @@ public class AntiServiceImpl implements AntiService {
                 }
             } catch (IOException e) {
                 antiEntity.setStatus(false);
-                antiEntity.setTips(e.getCause().toString());
+                 antiEntity.setTips(e.getCause().toString());
                 antiOperation.updateScanResult(antiEntity);
                 e.printStackTrace();
                 return MultiResponse.error(400, "scan error : "+ e.getCause());
@@ -135,10 +144,16 @@ public class AntiServiceImpl implements AntiService {
 
     @Override
     public MultiResponse downloadRepo(AntiEntity antiEntity) {
-        String gitUrl = antiEntity.getRepoUrl().split("/")[4]; //ci-backend-service.git
-        String module = gitUrl.substring(0,gitUrl.length()-4);//"openeuler-os-build";
+        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss:SSS");
+        String createTime = df.format(System.currentTimeMillis());
+        antiEntity.setCreateTime(createTime);
+        //ci-backend-service.git
+        String gitUrl = antiEntity.getRepoUrl().split("/")[4];
+        //"openeuler-os-build";
+        String module = gitUrl.substring(0,gitUrl.length()-4);
         antiEntity.setRepoName(module);
-        if (StringUtils.isEmpty(antiEntity.getBranch())) // String branch = "master";
+        // String branch = "master";
+        if (StringUtils.isEmpty(antiEntity.getBranch()))
         {
             antiEntity.setBranch("master");
         }
@@ -150,8 +165,7 @@ public class AntiServiceImpl implements AntiService {
         antiEntity.setRepoUrl(antiEntity.getRepoUrl());
         antiOperation.insertScanResult(antiEntity);
         //生成任务id
-        String taskId = taskIdGenerate(antiEntity);
-        poisonTaskOperation.insertTaskResult(antiEntity, taskId);
+        taskIdGenerate(antiEntity);
         JGitUtil gfxly = new JGitUtil(module, gitUser, gitPassword, antiEntity.getBranch(), revision, workspace);
         int getPullCode = gfxly.pullVersion(antiEntity.getRepoUrl());
         if (getPullCode == 0) {
@@ -187,12 +201,13 @@ public class AntiServiceImpl implements AntiService {
         }
     }
 
-    public String taskIdGenerate(AntiEntity antiEntity){
+    public void taskIdGenerate(AntiEntity antiEntity){
         List<TaskEntity> taskEntity = poisonTaskOperation.queryTaskId(antiEntity);
-        if(null != taskEntity && taskEntity.size() == 1){
-            return taskEntity.get(0).getTaskId();
+        if(null != taskEntity && taskEntity.size() != 0){
+            poisonTaskOperation.updateTaskResult(antiEntity, taskEntity.get(0).getTaskId());
+            return;
         }
         String taskId = antiEntity.getCommunity() + "-" + antiEntity.getRepoUrl() + "-" + antiEntity.getRepoName();
-        return taskId;
+        poisonTaskOperation.insertTaskResult(antiEntity, taskId);
     }
 }

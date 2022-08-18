@@ -64,7 +64,7 @@ public class TaskEntity {
      * 扫描文件名
      */
     @Field("create_time")
-    private Date createTime;
+    private String createTime;
 
     /**
      * 扫描文件名

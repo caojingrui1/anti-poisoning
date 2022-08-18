@@ -84,4 +84,16 @@ public class AntiEntity {
      */
     @Field("community")
     private String community;
+
+    /**
+     * 社区
+     */
+    @Field("creator")
+    private String creator;
+
+    /**
+     * 社区
+     */
+    @Field("create_time")
+    private String createTime;
 }

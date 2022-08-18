@@ -1,6 +1,7 @@
 package com.huawei.antipoisoning.business.operation;
 
 import com.huawei.antipoisoning.business.entity.AntiEntity;
+import com.huawei.antipoisoning.business.entity.ResultEntity;
 import com.huawei.antipoisoning.business.entity.TaskEntity;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -10,7 +11,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.ObjectUtils;
 
 import javax.annotation.Resource;
-import java.text.SimpleDateFormat;
 import java.util.List;
 
 /**
@@ -19,11 +19,11 @@ import java.util.List;
  * @since: 2022/5/31 17:01
  */
 @Component
-public class PoisonTaskOperation {
+public class PoisonResultOperation {
     /**
      * 外部源接口返回任务数据
      */
-    private static final String POISON_VERSION_TASK = "poison_version_task";
+    private static final String SCAN_RESULT_DETAILS = "scan_result_details";
 
     @Resource
     private MongoTemplate mongoTemplate;
@@ -31,21 +31,14 @@ public class PoisonTaskOperation {
     /**
      * 保存扫描结果
      *
-     * @param antiScan 扫描数据
+     * @param resultEntity 扫描数据
      */
-    public void insertTaskResult(AntiEntity antiScan, String taskId){
-        if (ObjectUtils.isEmpty(antiScan)){
+    public void insertResultDetails(ResultEntity resultEntity, String id){
+        if (ObjectUtils.isEmpty(resultEntity)){
             return ;
         }
-        TaskEntity taskEntity = new TaskEntity();
-        taskEntity.setTaskId(taskId);
-        taskEntity.setBranch(antiScan.getBranch());
-        taskEntity.setRepoName(antiScan.getRepoName());
-        taskEntity.setRepoUrl(antiScan.getRepoUrl());
-        taskEntity.setScanId(antiScan.getScanId());
-        taskEntity.setCommunity(antiScan.getCommunity());
-        taskEntity.setCreateTime(antiScan.getCreateTime());
-        mongoTemplate.insert(taskEntity, POISON_VERSION_TASK);
+        resultEntity.setScanId(id);
+        mongoTemplate.insert(resultEntity, SCAN_RESULT_DETAILS);
     }
 
     /**
@@ -77,7 +70,7 @@ public class PoisonTaskOperation {
         if(antiEntity.getCommunity() != null) {
             update.set("create_time", antiEntity.getCreateTime());
         }
-        return mongoTemplate.updateFirst(query, update, POISON_VERSION_TASK).getModifiedCount();
+        return mongoTemplate.updateFirst(query, update, SCAN_RESULT_DETAILS).getModifiedCount();
     }
 
     /**
@@ -86,7 +79,7 @@ public class PoisonTaskOperation {
      * @param query 查询参数
      */
     public AntiEntity queryScanResult(Query query) { //查询入库结果
-        return mongoTemplate.findOne(query, AntiEntity.class, POISON_VERSION_TASK);
+        return mongoTemplate.findOne(query, AntiEntity.class, SCAN_RESULT_DETAILS);
     }
 
     /**
@@ -104,7 +97,7 @@ public class PoisonTaskOperation {
         if(taskEntity.getExecuteEndTime() != null) {
             update.set("execute_end_time", taskEntity.getExecuteEndTime());
         }
-        return mongoTemplate.updateFirst(query, update, POISON_VERSION_TASK).getModifiedCount();
+        return mongoTemplate.updateFirst(query, update, SCAN_RESULT_DETAILS).getModifiedCount();
     }
 
     /**
@@ -114,7 +107,7 @@ public class PoisonTaskOperation {
      */
     public TaskEntity queryTaskEntity(String uuid){
         Query query=Query.query(new Criteria("scan_id").is(uuid));
-        return mongoTemplate.findOne(query, TaskEntity.class, POISON_VERSION_TASK);
+        return mongoTemplate.findOne(query, TaskEntity.class, SCAN_RESULT_DETAILS);
     }
 
     /**
@@ -126,6 +119,6 @@ public class PoisonTaskOperation {
         Query query=Query.query(new Criteria("repo_name").is(antiEntity.getRepoName()));
         query.addCriteria(new Criteria("branch").is(antiEntity.getBranch()));
         query.addCriteria(new Criteria("community").is(antiEntity.getCommunity()));
-        return mongoTemplate.find(query, TaskEntity.class, POISON_VERSION_TASK);
+        return mongoTemplate.find(query, TaskEntity.class, SCAN_RESULT_DETAILS);
     }
 }

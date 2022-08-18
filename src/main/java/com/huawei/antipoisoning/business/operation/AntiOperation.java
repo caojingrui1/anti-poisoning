@@ -64,9 +64,6 @@ public class AntiOperation {
         if(antiEntity.getIsDownloaded() != null) {
             update.set("is_downloaded",antiEntity.getIsDownloaded());
         }
-        if(antiEntity.getScanResult() != null) {
-            update.set("scan_result",antiEntity.getScanResult());
-        }
         if(antiEntity.getResultCount() != null) {
             update.set("result_count",antiEntity.getResultCount());
         }

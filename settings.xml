@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<settings xmlns="http://maven.apache.org/SETTINGS/1.0.0"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.0.0 http://maven.apache.org/xsd/settings-1.0.0.xsd">
+    <pluginGroups>
+    </pluginGroups>
+
+    <proxies>
+    </proxies>
+
+    <!-- servers
+     | This is a list of authentication profiles, keyed by the server-id used within the system.
+     | Authentication profiles can be used whenever maven must make a connection to a remote server.
+     |-->
+    <servers>
+        <server>
+            <id>releases</id>
+            <username>081f8aba80800f0f0fcec015bd66c7e0_0ab58a940100f3a31fd0c015ef890d10</username>
+            <password>vP0[1=vI9N</password>
+        </server>
+        <server>
+            <id>snapshots</id>
+            <username>ee23073a7dfc4c4f9cdc1b056c24217b_0cd1b20fdd80f34c1fb1c0018f716748</username>
+            <password>K9u-=Kv10_</password>
+        </server>
+<!--        <server>-->
+<!--            <id>z_mirrors</id>-->
+<!--        </server>-->
+    </servers>
+
+
+<!--    <mirrors>-->
+<!--        <mirror>-->
+<!--            <id>z_mirrors</id>-->
+<!--            <mirrorOf>*,!releases,!snapshots</mirrorOf>-->
+<!--            <url>https://repo.huaweicloud.com/repository/maven/</url>-->
+<!--        </mirror>-->
+<!--        <mirror>-->
+<!--            <id>huaweicloud</id>-->
+<!--            <mirrorOf>*,!HuaweiCloudSDK</mirrorOf>-->
+<!--            <url>https://mirrors.huaweicloud.com/repository/maven/huaweicloudsdk</url>-->
+<!--        </mirror>-->
+<!--    </mirrors>-->
+
+    <profiles>
+        <profile>
+            <id>MyProfile2</id>
+            <repositories>
+                <repository>
+                    <id>HuaweiCloudSDK</id>
+                    <url>https://mirrors.huaweicloud.com/repository/maven/huaweicloudsdk</url>
+                    <releases>
+                        <enabled>true</enabled>
+                    </releases>
+                    <snapshots>
+                        <enabled>false</enabled>
+                    </snapshots>
+                </repository>
+            </repositories>
+            <pluginRepositories>
+                <pluginRepository>
+                    <id>HuaweiCloudSDK</id>
+                    <url>https://mirrors.huaweicloud.com/repository/maven/huaweicloudsdk</url>
+                    <releases>
+                        <enabled>true</enabled>
+                    </releases>
+                    <snapshots>
+                        <enabled>false</enabled>
+                    </snapshots>
+                </pluginRepository>
+            </pluginRepositories>
+        </profile>
+
+        <profile>
+            <id>MyProfile</id>
+            <repositories>
+                <repository>
+                    <id>releases</id>
+                    <url>https://devrepo.devcloud.cn-north-4.huaweicloud.com/07/nexus/content/repositories/081f8aba80800f0f0fcec015bd66c7e0_1_0/</url>
+                    <releases>
+                        <enabled>true</enabled>
+                    </releases>
+                    <snapshots>
+                        <enabled>false</enabled>
+                    </snapshots>
+                </repository>
+                <repository>
+                    <id>snapshots</id>
+                    <url>https://devrepo.devcloud.cn-north-4.huaweicloud.com/07/nexus/content/repositories/081f8aba80800f0f0fcec015bd66c7e0_2_0/</url>
+                    <releases>
+                        <enabled>false</enabled>
+                    </releases>
+                    <snapshots>
+                        <enabled>true</enabled>
+                    </snapshots>
+                </repository>
+            </repositories>
+        </profile>
+    </profiles>
+
+    <activeProfiles>
+        <activeProfile>MyProfile</activeProfile>
+        <activeProfile>MyProfile2</activeProfile>
+    </activeProfiles>
+    <localRepository>C:\Users\zhangshengjie\.m2\repository</localRepository>
+</settings>

@@ -11,6 +11,12 @@ import org.springframework.data.mongodb.core.mapping.Field;
 @ToString
 public class ResultEntity {
     /**
+     * id
+     */
+    @Field("scan_id")
+    private String scanId;
+
+    /**
      * 扫描文件名
      */
     @Field("suspicious_file_name")
