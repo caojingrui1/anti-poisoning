@@ -3,7 +3,7 @@
 # 基础参数
 envS=$APP_ENV
 SHUTDOWN_WAIT=20
-platform='openmajun'
+platform='cloudsca'
 # 时间戳
 TMS=$(date '+%S')
 
