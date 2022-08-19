@@ -5,7 +5,7 @@ def API_SERVER = "https://192.168.0.42:6443"
 def deploy_name = "anti-poisoning"
 def project_name = "openmajun-poisoning"
 def image_name = "${registry_url}/${repository}/${project_name}:${BUILD_TIMESTAMP}"
-def namespace = "openmajun"
+def namespace = "devops"
 def k8s_auth = "k8s_auth_token"
 def deploy_replicas=1
 
