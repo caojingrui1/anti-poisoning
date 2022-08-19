@@ -3,9 +3,9 @@ def repository = "cloudsca"
 def registry_auth = "57386086-c8ac-4dd4-a2ae-900e3328e3e9"
 def API_SERVER = "https://192.168.0.42:6443"
 def deploy_name = "anti-poisoning"
-def project_name = "anti-poisoning"
+def project_name = "openmajun-poisoning"
 def image_name = "${registry_url}/${repository}/${project_name}:${BUILD_TIMESTAMP}"
-def namespace = "devops"
+def namespace = "openmajun"
 def k8s_auth = "k8s_auth_token"
 def deploy_replicas=1
 
