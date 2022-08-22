@@ -74,7 +74,7 @@ public class AntiServiceImpl implements AntiService {
                             + " " + SCANTOOLPATH // 工具地址
                             + " " + REPOPATH + "/" + antiEntity.getRepoName() + // 仓库下载后存放地址
                             " " + SCANRESULTPATH + "/" + antiEntity.getRepoName() + ".json " +  // 扫描完成后结果存放地址   /usr/result/openeuler-os-build
-                            "--enable-" + antiEntity.getLanguage()}; // 语言
+                            "--enable-" + antiEntity.getLanguage() + "> poison_logs/" + uuid + ".txt"}; // 语言
                     SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss:SSS");
                     String taskStartTime = df.format(System.currentTimeMillis());
                     taskEntity.setExecuteStartTime(taskStartTime);
@@ -86,7 +86,11 @@ public class AntiServiceImpl implements AntiService {
                     System.out.println(result);
                     List<ResultEntity> results = JSONArray.parseArray(result, ResultEntity.class);
                     for (ResultEntity resultEntity : results){
-                        poisonResultOperation.insertResultDetails(resultEntity, uuid);
+                        resultEntity.setCommunity(antiEntity.getCommunity());
+                        resultEntity.setRepoName(antiEntity.getRepoName());
+                        resultEntity.setBranch(antiEntity.getBranch());
+                        resultEntity.setScanId(uuid);
+                        poisonResultOperation.insertResultDetails(resultEntity);
                     }
                     // 是否执行扫描
                     antiEntity.setIsScan(true);

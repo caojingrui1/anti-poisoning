@@ -33,11 +33,10 @@ public class PoisonResultOperation {
      *
      * @param resultEntity 扫描数据
      */
-    public void insertResultDetails(ResultEntity resultEntity, String id){
+    public void insertResultDetails(ResultEntity resultEntity){
         if (ObjectUtils.isEmpty(resultEntity)){
             return ;
         }
-        resultEntity.setScanId(id);
         mongoTemplate.insert(resultEntity, SCAN_RESULT_DETAILS);
     }
 

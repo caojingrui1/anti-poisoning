@@ -11,6 +11,24 @@ import org.springframework.data.mongodb.core.mapping.Field;
 @ToString
 public class ResultEntity {
     /**
+     * 社区
+     */
+    @Field("community")
+    private String community;
+
+    /**
+     * 仓名
+     */
+    @Field("repo_name")
+    private String repoName;
+
+    /**
+     * 分支
+     */
+    @Field("branch")
+    private String branch;
+
+    /**
      * id
      */
     @Field("scan_id")
