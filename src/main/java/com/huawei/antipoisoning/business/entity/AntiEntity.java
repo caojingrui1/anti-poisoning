@@ -96,4 +96,10 @@ public class AntiEntity {
      */
     @Field("create_time")
     private String createTime;
+
+    /**
+     * 耗时
+     */
+    @Field("time_consuming")
+    private String timeConsuming;
 }
