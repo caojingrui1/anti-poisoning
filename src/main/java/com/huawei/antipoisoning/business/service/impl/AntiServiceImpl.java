@@ -76,11 +76,15 @@ public class AntiServiceImpl implements AntiService {
                             " " + SCANRESULTPATH + "/" + antiEntity.getRepoName() + ".json " +  // 扫描完成后结果存放地址   /usr/result/openeuler-os-build
                             "--enable-" + antiEntity.getLanguage() + "> poison_logs/" + uuid + ".txt"}; // 语言
                     SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss:SSS");
-                    String taskStartTime = df.format(System.currentTimeMillis());
+                    long startTime = System.currentTimeMillis();
+                    String taskStartTime = df.format(startTime);
                     taskEntity.setExecuteStartTime(taskStartTime);
                     String sb = AntiMainUtil.execute(arguments);
-                    String taskEndTime = df.format(System.currentTimeMillis());
+                    long endTime = System.currentTimeMillis();
+                    String taskEndTime = df.format(endTime);
                     taskEntity.setExecuteStartTime(taskEndTime);
+                    String timeConsuming = df.format(startTime - endTime);
+                    antiEntity.setTimeConsuming(timeConsuming);
                     System.out.println("sb ==== :" + sb);
                     String result = AntiMainUtil.getJsonContent(SCANRESULTPATH, antiEntity.getRepoName());
                     System.out.println(result);

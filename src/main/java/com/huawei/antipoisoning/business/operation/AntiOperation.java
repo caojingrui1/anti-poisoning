@@ -73,6 +73,9 @@ public class AntiOperation {
         if(antiEntity.getTips() != null) {
             update.set("tips",antiEntity.getTips());
         }
+        if(antiEntity.getTimeConsuming() != null) {
+            update.set("time_consuming",antiEntity.getTimeConsuming());
+        }
         return mongoTemplate.updateFirst(query, update, SCAN_RESULTS).getModifiedCount();
     }
 
