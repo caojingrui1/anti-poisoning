@@ -13,12 +13,10 @@ spring:
       database: vms_dev
       port: 8635
       username: rwuser
-#      password: openMajun@1234
       password: ENC(I/jdfB8DCY1ic4K49SKJkBj5hrWGs4Qc)
 git:
   username: openlibing@163.com
   password: ENC(ac2sDLzYl/zj9MFEwF7wmZsYjn7V1B5J)
-#  password: Jszb2022h1
 jasypt:
   encryptor:
     algorithm: PBEWithMD5AndDES
