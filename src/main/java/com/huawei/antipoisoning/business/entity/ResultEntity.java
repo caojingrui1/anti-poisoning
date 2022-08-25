@@ -29,6 +29,11 @@ public class ResultEntity {
     private String branch;
 
     /**
+     * 问题状态（0：未屏蔽 1：屏蔽中 2：已屏蔽）
+     */
+    private String status;
+
+    /**
      * id
      */
     @Field("scan_id")

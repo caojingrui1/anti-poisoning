@@ -93,6 +93,7 @@ public class AntiServiceImpl implements AntiService {
                         resultEntity.setCommunity(antiEntity.getCommunity());
                         resultEntity.setRepoName(antiEntity.getRepoName());
                         resultEntity.setBranch(antiEntity.getBranch());
+                        resultEntity.setStatus("0");
                         resultEntity.setScanId(uuid);
                         poisonResultOperation.insertResultDetails(resultEntity);
                     }
