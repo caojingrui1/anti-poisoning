@@ -80,17 +80,39 @@ public class AntiMainUtil {
      */
     public static String getJsonContent(String resultPath, String fileName) throws NoSuchObjectException,IOException {
         String jsonStr = "";
-            File file = new File(resultPath + File.separator + fileName + ".json");
-            FileReader fileReader = new FileReader(file);
-            Reader reader = new InputStreamReader(new FileInputStream(file),"Utf-8");
-            int ch = 0;
-            StringBuffer sb = new StringBuffer();
-            while ((ch = reader.read()) != -1) {
-                sb.append((char) ch);
-            }
-            fileReader.close();
-            reader.close();
-            jsonStr = sb.toString();
-            return jsonStr;
+        File file = new File(resultPath + File.separator + fileName + ".json");
+        FileReader fileReader = new FileReader(file);
+        Reader reader = new InputStreamReader(new FileInputStream(file), "Utf-8");
+        int ch = 0;
+        StringBuffer sb = new StringBuffer();
+        while ((ch = reader.read()) != -1) {
+            sb.append((char) ch);
+        }
+        fileReader.close();
+        reader.close();
+        jsonStr = sb.toString();
+        return jsonStr;
+    }
+
+    /**
+     * 获取py文件生成的json文件信息.
+     *
+     * @param fileName json文件名称
+     * @param resultPath json文件位置
+     */
+    public static String getTxtContent(String resultPath, String fileName) throws NoSuchObjectException,IOException {
+        String jsonStr = "";
+        File file = new File(resultPath + fileName + ".txt");
+        FileReader fileReader = new FileReader(file);
+        Reader reader = new InputStreamReader(new FileInputStream(file),"Utf-8");
+        int ch = 0;
+        StringBuffer sb = new StringBuffer();
+        while ((ch = reader.read()) != -1) {
+            sb.append((char) ch);
+        }
+        fileReader.close();
+        reader.close();
+        jsonStr = sb.toString();
+        return jsonStr;
     }
 }

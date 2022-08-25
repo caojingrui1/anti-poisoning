@@ -17,9 +17,7 @@ class InputStreamRunnable implements Runnable {
         }
     }
 
-
-
-
+    @Override
     public void run() {
         String line;
         int num = 0;

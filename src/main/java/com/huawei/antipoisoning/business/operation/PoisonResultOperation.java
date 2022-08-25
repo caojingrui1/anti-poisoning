@@ -104,9 +104,9 @@ public class PoisonResultOperation {
      *
      * @return AntiEntity
      */
-    public TaskEntity queryTaskEntity(String uuid){
+    public List<ResultEntity> queryResultEntity(String uuid){
         Query query=Query.query(new Criteria("scan_id").is(uuid));
-        return mongoTemplate.findOne(query, TaskEntity.class, SCAN_RESULT_DETAILS);
+        return mongoTemplate.find(query, ResultEntity.class, SCAN_RESULT_DETAILS);
     }
 
     /**

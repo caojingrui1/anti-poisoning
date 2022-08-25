@@ -3,11 +3,14 @@ package com.huawei.antipoisoning.business.service.impl;
 
 import com.huawei.antipoisoning.business.entity.AntiEntity;
 import com.huawei.antipoisoning.business.entity.RepoInfo;
+import com.huawei.antipoisoning.business.entity.ResultEntity;
 import com.huawei.antipoisoning.business.entity.vo.PageVo;
+import com.huawei.antipoisoning.business.operation.PoisonResultOperation;
 import com.huawei.antipoisoning.business.operation.PoisonScanOperation;
 import com.huawei.antipoisoning.business.service.AntiService;
 import com.huawei.antipoisoning.business.service.PoisonService;
 import com.huawei.antipoisoning.common.entity.MultiResponse;
+import com.huawei.antipoisoning.common.util.AntiMainUtil;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpPost;
@@ -17,6 +20,11 @@ import org.apache.http.message.BasicNameValuePair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -29,6 +37,9 @@ public class PoisonServiceImpl implements PoisonService {
 
     @Autowired
     private PoisonScanOperation poisonScanOperation;
+
+    @Autowired
+    private PoisonResultOperation poisonResultOperation;
 
     @Override
     public MultiResponse poisonScan(RepoInfo repoInfo) {
@@ -56,6 +67,17 @@ public class PoisonServiceImpl implements PoisonService {
         return new MultiResponse().code(200).result(summaryVos);
     }
 
+    @Override
+    public MultiResponse queryResultsDetail(AntiEntity antiEntity) {
+        List<ResultEntity> resultEntity = poisonResultOperation.queryResultEntity(antiEntity.getScanId());
+        return new MultiResponse().code(200).result(resultEntity);
+    }
+
+    @Override
+    public MultiResponse selectLog(AntiEntity antiEntity) throws IOException {
+        String url = "/root/opt/SoftwareSupplyChainSecurity-v1/poison_logs/";
+        return new MultiResponse().code(200).result(AntiMainUtil.getTxtContent(url, antiEntity.getScanId()));
+    }
 
     /**
      * 随机码生成。
@@ -69,5 +91,26 @@ public class PoisonServiceImpl implements PoisonService {
         long time = System.currentTimeMillis();
         String scanId = community + "-" + repoName + "-" + branch + "-" + time;
         return scanId;
+    }
+
+    public String readUrl(String uuid){
+        String read;
+        String readStr ="";
+        try{
+            URL url =new URL("/root/opt/SoftwareSupplyChainSecurity-v1/poison_logs/" + uuid + ".txt");
+            HttpURLConnection urlCon = (HttpURLConnection)url.openConnection();
+            urlCon.setConnectTimeout(5000);
+            urlCon.setReadTimeout(5000);
+            BufferedReader br =new BufferedReader(new InputStreamReader( urlCon.getInputStream()));
+            while ((read = br.readLine()) !=null) {
+                readStr = readStr + read;
+            }
+            br.close();
+        }
+        catch (IOException e) {
+            // TODO Auto-generated catch block
+            readStr = e.toString();
+        }
+        return readStr;
     }
 }

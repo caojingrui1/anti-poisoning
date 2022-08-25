@@ -1,14 +1,14 @@
 package com.huawei.antipoisoning.business.controller;
 
 
+import com.huawei.antipoisoning.business.entity.AntiEntity;
 import com.huawei.antipoisoning.business.entity.RepoInfo;
 import com.huawei.antipoisoning.business.service.PoisonService;
 import com.huawei.antipoisoning.common.entity.MultiResponse;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.io.IOException;
 
 /**
  * @author zhangshengjie
@@ -34,5 +34,21 @@ public class PoisonController {
             method = RequestMethod.POST)
     public MultiResponse queryResults(@RequestBody RepoInfo repoInfo){
         return poisonService.queryResults(repoInfo);
+    }
+
+    @RequestMapping(value = "/query-results-detail",
+            produces = { "application/json" },
+            consumes = { "application/json" },
+            method = RequestMethod.POST)
+    public MultiResponse queryResultsDetail(@RequestBody AntiEntity antiEntity){
+        return poisonService.queryResultsDetail(antiEntity);
+    }
+
+    @RequestMapping(value = "/selectLog",
+            produces = { "application/json" },
+            consumes = { "application/json" },
+            method = RequestMethod.POST)
+    public MultiResponse selectLog(@RequestBody AntiEntity antiEntity) throws IOException {
+        return poisonService.selectLog(antiEntity);
     }
 }
