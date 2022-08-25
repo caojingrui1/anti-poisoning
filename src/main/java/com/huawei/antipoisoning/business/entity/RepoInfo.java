@@ -33,6 +33,11 @@ public class RepoInfo {
     private String language;
 
     /**
+     * 规则集名称
+     */
+    private String rulesName;
+
+    /**
      * 一页的数量
      */
     private Integer pageSize = null;

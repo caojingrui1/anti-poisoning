@@ -68,13 +68,15 @@ public class AntiServiceImpl implements AntiService {
         if (null != antiEntity) {
             try {
                 if (antiEntity.getIsDownloaded() == true) {
-                    // 设置环境变量
-//                    setEnv();
                     String[] arguments = new String[]{"/bin/sh", "-c", "time python"
-                            + " " + SCANTOOLPATH // 工具地址
-                            + " " + REPOPATH + "/" + antiEntity.getRepoName() + // 仓库下载后存放地址
-                            " " + SCANRESULTPATH + "/" + antiEntity.getRepoName() + ".json " +  // 扫描完成后结果存放地址   /usr/result/openeuler-os-build
-                            "--enable-" + antiEntity.getLanguage() + "> poison_logs/" + uuid + ".txt"}; // 语言
+                            // 工具地址
+                            + " " + SCANTOOLPATH
+                            // 仓库下载后存放地址
+                            + " " + REPOPATH + "/" + antiEntity.getRepoName() +
+                            // 扫描完成后结果存放地址   /usr/result/openeuler-os-build
+                            " " + SCANRESULTPATH + "/" + antiEntity.getRepoName() + ".json " +
+                            // 支持多语言规则扫描
+                            "--custom-yaml " + antiEntity.getRulesName() + ".yaml > poison_logs/" + uuid + ".txt"};
                     SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss:SSS");
                     long startTime = System.currentTimeMillis();
                     String taskStartTime = df.format(startTime);

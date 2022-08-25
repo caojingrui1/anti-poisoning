@@ -50,6 +50,7 @@ public class PoisonServiceImpl implements PoisonService {
         antiEntity.setScanId(scanId);
         antiEntity.setBranch(repoInfo.getBranch());
         antiEntity.setLanguage(repoInfo.getLanguage());
+        antiEntity.setRulesName(repoInfo.getRulesName());
         antiEntity.setRepoUrl(repoInfo.getRepoUrl());
         antiEntity.setRepoName(repoInfo.getRepoName());
         antiEntity.setIsScan(true);

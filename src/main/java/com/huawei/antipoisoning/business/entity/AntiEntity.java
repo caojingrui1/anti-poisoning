@@ -102,4 +102,10 @@ public class AntiEntity {
      */
     @Field("time_consuming")
     private String timeConsuming;
+
+    /**
+     * 规则集名称
+     */
+    @Field("rules_name")
+    private String rulesName;
 }
