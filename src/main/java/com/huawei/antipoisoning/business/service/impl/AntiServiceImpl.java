@@ -76,7 +76,7 @@ public class AntiServiceImpl implements AntiService {
                             // 扫描完成后结果存放地址   /usr/result/openeuler-os-build
                             " " + SCANRESULTPATH + "/" + antiEntity.getRepoName() + ".json " +
                             // 支持多语言规则扫描
-                            "--custom-yaml " + antiEntity.getRulesName() + ".yaml > poison_logs/" + uuid + ".txt"};
+                            "--custom-yaml password_scan.yaml > poison_logs/" + uuid + ".txt"};
                     SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss:SSS");
                     long startTime = System.currentTimeMillis();
                     String taskStartTime = df.format(startTime);
@@ -159,25 +159,21 @@ public class AntiServiceImpl implements AntiService {
         String createTime = df.format(System.currentTimeMillis());
         antiEntity.setCreateTime(createTime);
         //ci-backend-service.git
-        String gitUrl = antiEntity.getRepoUrl().split("/")[4];
         //"openeuler-os-build";
-        String module = gitUrl.substring(0,gitUrl.length()-4);
-        antiEntity.setRepoName(module);
         // String branch = "master";
         if (StringUtils.isEmpty(antiEntity.getBranch()))
         {
             antiEntity.setBranch("master");
         }
         String revision = "7c2f9fa05ec24426a289d881814745d8f2482f4b";
-        String workspace = REPOPATH + "/" + module;
+        String workspace = REPOPATH + "/" + antiEntity.getRepoName();
         antiEntity.setBranch(antiEntity.getBranch());
         antiEntity.setLanguage(antiEntity.getLanguage());
-        antiEntity.setRepoName(module);
         antiEntity.setRepoUrl(antiEntity.getRepoUrl());
         antiOperation.insertScanResult(antiEntity);
         //生成任务id
         taskIdGenerate(antiEntity);
-        JGitUtil gfxly = new JGitUtil(module, gitUser, gitPassword, antiEntity.getBranch(), revision, workspace);
+        JGitUtil gfxly = new JGitUtil(antiEntity.getRepoName(), gitUser, gitPassword, antiEntity.getBranch(), revision, workspace);
         int getPullCode = gfxly.pullVersion(antiEntity.getRepoUrl());
         if (getPullCode == 0) {
             System.out.println("检出代码成功===0");
@@ -211,6 +207,65 @@ public class AntiServiceImpl implements AntiService {
             return MultiResponse.error(400,"downloadRepo error");
         }
     }
+
+//    @Override
+//    public MultiResponse downloadRepo(AntiEntity antiEntity) {
+//        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss:SSS");
+//        String createTime = df.format(System.currentTimeMillis());
+//        antiEntity.setCreateTime(createTime);
+//        //ci-backend-service.git
+//        String gitUrl = antiEntity.getRepoUrl().split("/")[4];
+//        //"openeuler-os-build";
+//        String module = gitUrl.substring(0,gitUrl.length()-4);
+//        antiEntity.setRepoName(module);
+//        // String branch = "master";
+//        if (StringUtils.isEmpty(antiEntity.getBranch()))
+//        {
+//            antiEntity.setBranch("master");
+//        }
+//        String revision = "7c2f9fa05ec24426a289d881814745d8f2482f4b";
+//        String workspace = REPOPATH + "/" + module;
+//        antiEntity.setBranch(antiEntity.getBranch());
+//        antiEntity.setLanguage(antiEntity.getLanguage());
+//        antiEntity.setRepoName(module);
+//        antiEntity.setRepoUrl(antiEntity.getRepoUrl());
+//        antiOperation.insertScanResult(antiEntity);
+//        //生成任务id
+//        taskIdGenerate(antiEntity);
+//        JGitUtil gfxly = new JGitUtil(module, gitUser, gitPassword, antiEntity.getBranch(), revision, workspace);
+//        int getPullCode = gfxly.pullVersion(antiEntity.getRepoUrl());
+//        if (getPullCode == 0) {
+//            System.out.println("检出代码成功===0");
+//            antiEntity.setIsDownloaded(true);
+//            antiOperation.updateScanResult(antiEntity);
+//            return MultiResponse.success(200, "success");
+//        } else if (getPullCode == 1) {
+//            antiEntity.setTips("检出代码未知异常===1");
+//            antiEntity.setIsDownloaded(false);
+//            antiOperation.updateScanResult(antiEntity);
+//            return MultiResponse.error(400,"downloadRepo error");
+//        } else if (getPullCode == 2) {
+//            antiEntity.setTips("检出代码未知异常===2");
+//            antiEntity.setIsDownloaded(false);
+//            antiOperation.updateScanResult(antiEntity);
+//            return MultiResponse.error(400,"downloadRepo error");
+//        } else if (getPullCode == 3) {
+//            antiEntity.setTips("检出代码未知异常===3");
+//            antiEntity.setIsDownloaded(false);
+//            antiOperation.updateScanResult(antiEntity);
+//            return MultiResponse.error(400,"downloadRepo error");
+//        } else if (getPullCode == 4) {
+//            antiEntity.setTips("检出代码未知异常===4");
+//            antiEntity.setIsDownloaded(false);
+//            antiOperation.updateScanResult(antiEntity);
+//            return MultiResponse.error(400,"downloadRepo error");
+//        } else {
+//            antiEntity.setTips("检出代码未知异常===5");
+//            antiEntity.setIsDownloaded(false);
+//            antiOperation.updateScanResult(antiEntity);
+//            return MultiResponse.error(400,"downloadRepo error");
+//        }
+//    }
 
     public void taskIdGenerate(AntiEntity antiEntity){
         List<TaskEntity> taskEntity = poisonTaskOperation.queryTaskId(antiEntity);
