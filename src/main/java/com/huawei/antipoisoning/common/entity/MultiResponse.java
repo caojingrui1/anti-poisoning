@@ -1,7 +1,7 @@
 package com.huawei.antipoisoning.common.entity;
 import org.apache.commons.lang.StringUtils;
 
-public class MultiResponse<T> {
+public class MultiResponse {
     /**
      * 编码
      */
@@ -15,9 +15,9 @@ public class MultiResponse<T> {
     /**
      * 数据
      */
-    private T result;
+    private Object result;
 
-    public MultiResponse result(T result) {
+    public MultiResponse result(Object result) {
         this.result = result;
         return this;
     }
@@ -49,11 +49,11 @@ public class MultiResponse<T> {
         this.message = message;
     }
 
-    public T getResult() {
+    public Object getResult() {
         return result;
     }
 
-    public void setResult(T result) {
+    public void setResult(Object result) {
         this.result = result;
     }
 
@@ -75,9 +75,9 @@ public class MultiResponse<T> {
      * @param <T>     类型
      * @return <T>
      */
-    public static <T> MultiResponse<T> success(Integer code, String message, T result) {
+    public static <T> MultiResponse success(Integer code, String message, T result) {
         String msg = StringUtils.isBlank(message) ? "success" : message;
-        return new MultiResponse<>().code(200).message(msg).result(result);
+        return new MultiResponse().code(200).message(msg).result(result);
     }
     /**
 
@@ -89,7 +89,7 @@ public class MultiResponse<T> {
      */
     public static MultiResponse success(Integer code, String message) {
         String msg = StringUtils.isBlank(message) ? "success" : message;
-        return new MultiResponse<>().code(200).message(msg);
+        return new MultiResponse().code(200).message(msg);
     }
 
     /**
@@ -101,7 +101,7 @@ public class MultiResponse<T> {
      */
     public static MultiResponse error(Integer code, String message) {
         String msg = StringUtils.isBlank(message) ? "error" : message;
-        return new MultiResponse<>().code(code).message(msg);
+        return new MultiResponse().code(code).message(msg);
     }
 }
 
