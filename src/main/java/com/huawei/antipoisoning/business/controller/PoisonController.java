@@ -20,6 +20,12 @@ public class PoisonController {
     @Autowired(required = false)
     private PoisonService poisonService;
 
+    /**
+     * 启动扫描任务
+     *
+     * @param repoInfo 检查仓库
+     * @return MultiResponse
+     */
     @RequestMapping(value = "/poisonScan",
             produces = { "application/json" },
             consumes = { "application/json" },
