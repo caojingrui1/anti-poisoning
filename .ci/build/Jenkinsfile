@@ -1,3 +1,5 @@
+def git_address = "https://gitee.com/openMajun_enterprise/anti-poisoning.git "
+def git_auth = "0ecab2a3-034c-4b18-9464-190dcbb7c149"
 //def registry_url = "192.168.0.42:5000"
 def registry_url = "192.168.0.81:18080"
 //def repository = "cloudsca"
@@ -13,14 +15,22 @@ def namespace = "openmajun"
 def deploy_replicas=1
 
 pipeline {
-     agent any
-        //agent {
-        //    node{
-         //       label "jenkins-slave"
-        //    }
-        //}
+     // agent any
+        agent {
+            node{
+                label "poisoning-slave"
+            }
+        }
 
     stages {
+
+        stage('下载代码') {
+            steps {
+                echo "branch = ${branch}"
+                checkout([$class: 'GitSCM', branches: [[name: '${branch}']],
+                userRemoteConfigs: [[credentialsId: "${git_auth}", url: "${git_address}"]]])
+            }
+        }
         stage('编译构建') {
             steps {
                 sh "pwd"
