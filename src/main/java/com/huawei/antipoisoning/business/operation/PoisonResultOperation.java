@@ -3,6 +3,7 @@ package com.huawei.antipoisoning.business.operation;
 import com.huawei.antipoisoning.business.entity.AntiEntity;
 import com.huawei.antipoisoning.business.entity.ResultEntity;
 import com.huawei.antipoisoning.business.entity.TaskEntity;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -12,6 +13,8 @@ import org.springframework.util.ObjectUtils;
 
 import javax.annotation.Resource;
 import java.util.List;
+
+import static com.huawei.antipoisoning.business.enmu.CollectionTableName.POISON_VERSION_TASK;
 
 /**
  * 扫描结果包裹数据存档
@@ -115,9 +118,16 @@ public class PoisonResultOperation {
      * @return AntiEntity
      */
     public List<TaskEntity> queryTaskId(AntiEntity antiEntity) {
-        Query query = Query.query(new Criteria("repo_name").is(antiEntity.getRepoName()));
-        query.addCriteria(new Criteria("branch").is(antiEntity.getBranch()));
-        query.addCriteria(new Criteria("project_name").is(antiEntity.getProjectName()));
-        return mongoTemplate.find(query, TaskEntity.class, SCAN_RESULT_DETAILS);
+        Criteria criteria = new Criteria();
+        if (StringUtils.isNotBlank(antiEntity.getRepoName())) {
+            criteria.and("repo_name").is(antiEntity.getRepoName());
+        }
+        if (StringUtils.isNotBlank(antiEntity.getBranch())) {
+            criteria.and("branch").is(antiEntity.getBranch());
+        }
+        if (StringUtils.isNotBlank(antiEntity.getProjectName())) {
+            criteria.and("project_name").is(antiEntity.getProjectName());
+        }
+        return mongoTemplate.find(Query.query(criteria), TaskEntity.class, POISON_VERSION_TASK);
     }
 }
