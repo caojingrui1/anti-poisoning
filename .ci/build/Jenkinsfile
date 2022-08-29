@@ -12,7 +12,10 @@ pipeline {
         stage('编译构建') {
             steps {
                 sh "pwd"
-                sh label: '', script: 'sudo mvn  -gs ./setting-new.xml clean install -Dmaven.test.skip=true'
+                sh "export M2_HOME=/usr/local/maven/apache-maven-3.8.6 "
+                sh "export PATH=$PATH:$M2_HOME/bin"
+                sh "mvn --version"
+                sh label: '', script: 'mvn  -gs ./setting-new.xml clean install -Dmaven.test.skip=true'
             }
         }
 
