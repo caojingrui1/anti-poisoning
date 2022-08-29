@@ -12,9 +12,7 @@ pipeline {
         stage('编译构建') {
             steps {
                 sh "pwd"
-                sh label: '', script: 'who am i'
-                sh label: '', script: 'source etc/profile'
-                sh label: '', script: 'mvn  -gs ./setting-new.xml clean install -Dmaven.test.skip=true'
+                sh label: '', script: 'sudo mvn  -gs ./setting-new.xml clean install -Dmaven.test.skip=true'
             }
         }
 
