@@ -43,7 +43,7 @@ public class PoisonTaskOperation {
         taskEntity.setRepoName(antiScan.getRepoName());
         taskEntity.setRepoUrl(antiScan.getRepoUrl());
         taskEntity.setScanId(antiScan.getScanId());
-        taskEntity.setCommunity(antiScan.getCommunity());
+        taskEntity.setCommunity(antiScan.getProjectName());
         taskEntity.setCreateTime(antiScan.getCreateTime());
         mongoTemplate.insert(taskEntity, POISON_VERSION_TASK);
     }
@@ -71,10 +71,10 @@ public class PoisonTaskOperation {
         if(antiEntity.getScanId() != null) {
             update.set("scan_id", antiEntity.getScanId());
         }
-        if(antiEntity.getCommunity() != null) {
-            update.set("community", antiEntity.getCommunity());
+        if(antiEntity.getProjectName() != null) {
+            update.set("project_name", antiEntity.getProjectName());
         }
-        if(antiEntity.getCommunity() != null) {
+        if(antiEntity.getProjectName() != null) {
             update.set("create_time", antiEntity.getCreateTime());
         }
         return mongoTemplate.updateFirst(query, update, POISON_VERSION_TASK).getModifiedCount();
@@ -125,7 +125,7 @@ public class PoisonTaskOperation {
     public List<TaskEntity> queryTaskId(AntiEntity antiEntity){
         Query query=Query.query(new Criteria("repo_name").is(antiEntity.getRepoName()));
         query.addCriteria(new Criteria("branch").is(antiEntity.getBranch()));
-        query.addCriteria(new Criteria("community").is(antiEntity.getCommunity()));
+        query.addCriteria(new Criteria("project_name").is(antiEntity.getProjectName()));
         return mongoTemplate.find(query, TaskEntity.class, POISON_VERSION_TASK);
     }
 }
