@@ -82,8 +82,8 @@ public class AntiEntity {
     /**
      * 社区
      */
-    @Field("community")
-    private String community;
+    @Field("project_name")
+    private String projectName;
 
     /**
      * 社区
