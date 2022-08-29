@@ -4,7 +4,7 @@ spring:
   data:
     mongodb:
       host: 192.168.0.180
-      database: test_ci__dev
+      database: test_ci_info
       port: 8635
       username: rwuser
       password: mindspore#1234
