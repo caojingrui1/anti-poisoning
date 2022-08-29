@@ -91,8 +91,8 @@ public class AntiServiceImpl implements AntiService {
                     String result = AntiMainUtil.getJsonContent(SCANRESULTPATH, antiEntity.getRepoName());
                     System.out.println(result);
                     List<ResultEntity> results = JSONArray.parseArray(result, ResultEntity.class);
-                    for (ResultEntity resultEntity : results){
-                        resultEntity.setCommunity(antiEntity.getCommunity());
+                    for (ResultEntity resultEntity : results) {
+                        resultEntity.setCommunity(antiEntity.getProjectName());
                         resultEntity.setRepoName(antiEntity.getRepoName());
                         resultEntity.setBranch(antiEntity.getBranch());
                         resultEntity.setStatus("0");
@@ -124,30 +124,28 @@ public class AntiServiceImpl implements AntiService {
                 }
             } catch (IOException e) {
                 antiEntity.setStatus(false);
-                 antiEntity.setTips(e.getCause().toString());
+                antiEntity.setTips(e.getCause().toString());
                 antiOperation.updateScanResult(antiEntity);
                 e.printStackTrace();
-                return MultiResponse.error(400, "scan error : "+ e.getCause());
+                return MultiResponse.error(400, "scan error : " + e.getCause());
             }
-        }
-        else {
+        } else {
             return MultiResponse.error(400, "scan error , task not exist!");
         }
     }
 
     //设置环境变量，暂时黄区演示需要
     @Override
-    public MultiResponse setEnv(){
+    public MultiResponse setEnv() {
         System.out.println("开始 start");
         try {
             String command0 = "cd";
-            String command1 = "export JOERN_HOME=/opt/sscs/joern-cli/" ;
+            String command1 = "export JOERN_HOME=/opt/sscs/joern-cli/";
             String command2 = "export JAVA_HOME=/usr/lib/jvm/java-1.11.0-openjdk-amd64 ";
-            Runtime.getRuntime().exec(new String[] {"/bin/sh","-c", command0, SCANTOOLFILE});
-            Runtime.getRuntime().exec(new String[] {"/bin/sh","-c", command1});
-            Runtime.getRuntime().exec(new String[] {"/bin/sh","-c", command2});
-        } catch (IOException e)
-        {
+            Runtime.getRuntime().exec(new String[]{"/bin/sh", "-c", command0, SCANTOOLFILE});
+            Runtime.getRuntime().exec(new String[]{"/bin/sh", "-c", command1});
+            Runtime.getRuntime().exec(new String[]{"/bin/sh", "-c", command2});
+        } catch (IOException e) {
             e.printStackTrace();
         }
         return MultiResponse.success(200, "success");
@@ -161,8 +159,7 @@ public class AntiServiceImpl implements AntiService {
         //ci-backend-service.git
         //"openeuler-os-build";
         // String branch = "master";
-        if (StringUtils.isEmpty(antiEntity.getBranch()))
-        {
+        if (StringUtils.isEmpty(antiEntity.getBranch())) {
             antiEntity.setBranch("master");
         }
         String revision = "7c2f9fa05ec24426a289d881814745d8f2482f4b";
@@ -184,27 +181,27 @@ public class AntiServiceImpl implements AntiService {
             antiEntity.setTips("检出代码未知异常===1");
             antiEntity.setIsDownloaded(false);
             antiOperation.updateScanResult(antiEntity);
-            return MultiResponse.error(400,"downloadRepo error");
+            return MultiResponse.error(400, "downloadRepo error");
         } else if (getPullCode == 2) {
             antiEntity.setTips("检出代码未知异常===2");
             antiEntity.setIsDownloaded(false);
             antiOperation.updateScanResult(antiEntity);
-            return MultiResponse.error(400,"downloadRepo error");
+            return MultiResponse.error(400, "downloadRepo error");
         } else if (getPullCode == 3) {
             antiEntity.setTips("检出代码未知异常===3");
             antiEntity.setIsDownloaded(false);
             antiOperation.updateScanResult(antiEntity);
-            return MultiResponse.error(400,"downloadRepo error");
+            return MultiResponse.error(400, "downloadRepo error");
         } else if (getPullCode == 4) {
             antiEntity.setTips("检出代码未知异常===4");
             antiEntity.setIsDownloaded(false);
             antiOperation.updateScanResult(antiEntity);
-            return MultiResponse.error(400,"downloadRepo error");
+            return MultiResponse.error(400, "downloadRepo error");
         } else {
             antiEntity.setTips("检出代码未知异常===5");
             antiEntity.setIsDownloaded(false);
             antiOperation.updateScanResult(antiEntity);
-            return MultiResponse.error(400,"downloadRepo error");
+            return MultiResponse.error(400, "downloadRepo error");
         }
     }
 
@@ -267,13 +264,13 @@ public class AntiServiceImpl implements AntiService {
 //        }
 //    }
 
-    public void taskIdGenerate(AntiEntity antiEntity){
+    public void taskIdGenerate(AntiEntity antiEntity) {
         List<TaskEntity> taskEntity = poisonTaskOperation.queryTaskId(antiEntity);
-        if(null != taskEntity && taskEntity.size() != 0){
+        if (null != taskEntity && taskEntity.size() != 0) {
             poisonTaskOperation.updateTaskResult(antiEntity, taskEntity.get(0).getTaskId());
             return;
         }
-        String taskId = antiEntity.getCommunity() + "-" + antiEntity.getRepoUrl() + "-" + antiEntity.getRepoName();
+        String taskId = antiEntity.getProjectName() + "-" + antiEntity.getRepoUrl() + "-" + antiEntity.getRepoName();
         poisonTaskOperation.insertTaskResult(antiEntity, taskId);
     }
 }
