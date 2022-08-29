@@ -12,6 +12,8 @@ pipeline {
         stage('编译构建') {
             steps {
                 sh "pwd"
+                sh "whereis maven"
+                sh "source /etc/profile"
                 sh label: '', script: 'mvn  -gs ./setting-new.xml clean install -Dmaven.test.skip=true'
             }
         }
