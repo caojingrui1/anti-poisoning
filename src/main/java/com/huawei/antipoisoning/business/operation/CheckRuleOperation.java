@@ -193,9 +193,9 @@ public class CheckRuleOperation {
         if (StringUtils.isNotBlank(ruleSetModel.getLanguage())) {
             criteria.and("rule_language").is(ruleSetModel.getLanguage());
         }
-        if (StringUtils.isNotBlank(ruleSetModel.getTemplateName())) {
+        if (StringUtils.isNotBlank(ruleSetModel.getRuleName())) {
             Pattern pattern = Pattern
-                    .compile("^.*" + escapeSpecialWord(ruleSetModel.getTemplateName()) + ".*$", Pattern.CASE_INSENSITIVE);
+                    .compile("^.*" + escapeSpecialWord(ruleSetModel.getRuleName()) + ".*$", Pattern.CASE_INSENSITIVE);
             criteria.and("rule_name").regex(pattern);
         }
         Query query = Query.query(criteria);
@@ -221,5 +221,14 @@ public class CheckRuleOperation {
         }
         List<RuleModel> ruleModelList = mongoTemplate.find(query, RuleModel.class, ANTI_CHECK_RULE);
         return new RuleResultDetailsVo(Long.valueOf(ruleVosCount.size()).intValue(), enableCount, ruleModelList);
+    }
+
+    /**
+     * 修改自定义规则集
+     *
+     * @param ruleSetModel updateRuleSet
+     */
+    public void updateRuleSet(RuleSetModel ruleSetModel) {
+        mongoTemplate.findAndReplace(Query.query(Criteria.where("_id").is(ruleSetModel.getId())), ruleSetModel, ANTI_CHECK_RULE_SET);
     }
 }

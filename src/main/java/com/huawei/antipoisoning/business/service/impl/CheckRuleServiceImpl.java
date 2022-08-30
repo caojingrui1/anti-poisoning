@@ -47,14 +47,22 @@ public class CheckRuleServiceImpl implements CheckRuleService {
     public MultiResponse createRuleSet(RuleSetModel ruleSetModel) {
         if (StringUtils.isNotBlank(ruleSetModel.getId())) {
             // 修改规则集
-            checkRuleOperation.delRuleSet(ruleSetModel.getId());
+            checkRuleOperation.updateRuleSet(ruleSetModel);
         } else {
             // 新增规则集
             SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             ruleSetModel.setTemplateCreateTime(dateFormat.format(new Date()));
             ruleSetModel.setDefaultTemplate(1);
+            // 根据规则集社区和名称判断是否重复
+            RuleSetModel ruleSet = new RuleSetModel();
+            ruleSet.setProjectName(ruleSetModel.getProjectName());
+            ruleSet.setTemplateName(ruleSet.getTemplateName());
+            List<RuleSetModel> models = checkRuleOperation.queryRuleSet(ruleSet);
+            if (models.size() != 0) {
+                return new MultiResponse().code(400).message("templateName is repeat");
+            }
+            checkRuleOperation.createRuleSet(ruleSetModel);
         }
-        checkRuleOperation.createRuleSet(ruleSetModel);
         return new MultiResponse().code(200).message("success");
     }
 

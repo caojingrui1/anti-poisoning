@@ -81,5 +81,7 @@ public class RuleSetModel {
     private Integer pageNum;
 
     private long count;
+
+    private String ruleName;
 }
 
