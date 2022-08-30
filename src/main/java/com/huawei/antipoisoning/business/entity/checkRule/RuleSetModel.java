@@ -1,9 +1,12 @@
 package com.huawei.antipoisoning.business.entity.checkRule;
 
+import com.huawei.antipoisoning.business.enmu.CollectionTableName;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Transient;
+import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
 import java.util.List;
@@ -17,7 +20,9 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@Document(collection = CollectionTableName.ANTI_CHECK_RULE_SET)
 public class RuleSetModel {
+    @Id
     private String id;
 
     // 所属社区
