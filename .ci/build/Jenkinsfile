@@ -5,7 +5,11 @@ def project_name = "openmajun-poisoning"
 def image_name = "${project_name}:slave"
 
 pipeline {
-    agent any
+    agent {
+        node{
+          label "jenkins-slave"
+        }
+    }
     stages {
         stage('编译构建') {
             steps {
