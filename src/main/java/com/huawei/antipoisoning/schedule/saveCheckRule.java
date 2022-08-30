@@ -60,6 +60,12 @@ public class saveCheckRule {
                 String language = Objects.toString(row.getCell(0), null);
                 if ("JS".equals(language)) {
                     language = "JavaScript";
+                } else if ("C".equals(language)) {
+                    language = "cpp";
+                } else if ("JAVA".equals(language)) {
+                    language = "Java";
+                } else if ("PYTHON".equals(language)) {
+                    language = "Python";
                 }
                 ruleModel.setRuleLanguage(language);
                 ruleModel.setRuleName(Objects.toString(row.getCell(1)));
