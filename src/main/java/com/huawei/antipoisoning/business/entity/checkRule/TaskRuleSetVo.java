@@ -25,6 +25,6 @@ public class TaskRuleSetVo {
     @Field("project_name")
     private String projectName;
 
-    @Field("languages")
-    private List<CheckRuleSet> languages;
+    @Field("anti_check_rules")
+    private List<CheckRuleSet> antiCheckRules;
 }

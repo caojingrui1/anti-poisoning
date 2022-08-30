@@ -92,7 +92,7 @@ public class CheckRuleOperation {
      * @param ruleSetModel 规则集参数
      */
     public void createRuleSet(RuleSetModel ruleSetModel) {
-        mongoTemplate.save(ruleSetModel, ANTI_CHECK_RULE_SET).getId();
+        mongoTemplate.insert(ruleSetModel, ANTI_CHECK_RULE_SET);
     }
 
     /**
@@ -147,7 +147,7 @@ public class CheckRuleOperation {
      * @param id 主键id
      */
     public void delRuleSet(String id) {
-        mongoTemplate.remove(Query.query(Criteria.where("_id").is(id)), ANTI_CHECK_RULE);
+        mongoTemplate.remove(Query.query(Criteria.where("_id").is(id)), ANTI_CHECK_RULE_SET);
     }
 
     /**
@@ -161,7 +161,7 @@ public class CheckRuleOperation {
     public List<TaskRuleSetVo> getTaskRuleSet(String id, String projectName, String repoName) {
         Criteria criteria = new Criteria();
         if (StringUtils.isNotBlank(id)) {
-            criteria.and("_id").is(id);
+            criteria.and("anti_check_rules.ruleSetId").in(id);
         }
         if (StringUtils.isNotBlank(projectName)) {
             criteria.and("project_name").is(projectName);

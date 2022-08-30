@@ -45,7 +45,7 @@ public class CheckRuleServiceImpl implements CheckRuleService {
      */
     @Override
     public MultiResponse createRuleSet(RuleSetModel ruleSetModel) {
-        if (StringUtils.isNotBlank(ruleSetModel.getDefaultTemplateId())) {
+        if (StringUtils.isNotBlank(ruleSetModel.getId())) {
             // 修改规则集
             checkRuleOperation.delRuleSet(ruleSetModel.getId());
         } else {
@@ -114,5 +114,19 @@ public class CheckRuleServiceImpl implements CheckRuleService {
     public MultiResponse queryRuleSetConfig(RuleSetModel ruleSetModel) {
         RuleResultDetailsVo ruleResultDetailsVo = checkRuleOperation.queryRuleSetConfig(ruleSetModel);
         return new MultiResponse().code(200).message("success").result(ruleResultDetailsVo);
+    }
+
+    /**
+     * 删除自定义规则集
+     *
+     * @param ruleSetModel 删除参数
+     */
+    @Override
+    public MultiResponse delRuleSet(RuleSetModel ruleSetModel) {
+        if (StringUtils.isBlank(ruleSetModel.getId())) {
+            return new MultiResponse().code(400).message("ruleSet is error");
+        }
+        checkRuleOperation.delRuleSet(ruleSetModel.getId());
+        return new MultiResponse().code(200).message("success");
     }
 }
