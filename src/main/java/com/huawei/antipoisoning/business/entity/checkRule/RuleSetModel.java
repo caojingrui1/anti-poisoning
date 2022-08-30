@@ -80,6 +80,7 @@ public class RuleSetModel {
 
     private Integer pageNum;
 
+    @Transient
     private long count;
 
     private String ruleName;

@@ -56,7 +56,7 @@ public class CheckRuleServiceImpl implements CheckRuleService {
             // 根据规则集社区和名称判断是否重复
             RuleSetModel ruleSet = new RuleSetModel();
             ruleSet.setProjectName(ruleSetModel.getProjectName());
-            ruleSet.setTemplateName(ruleSet.getTemplateName());
+            ruleSet.setTemplateName(ruleSetModel.getTemplateName());
             List<RuleSetModel> models = checkRuleOperation.queryRuleSet(ruleSet);
             if (models.size() != 0) {
                 return new MultiResponse().code(400).message("templateName is repeat");
