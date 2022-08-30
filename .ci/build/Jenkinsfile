@@ -1,5 +1,3 @@
-def git_address = "https://gitee.com/openMajun_enterprise/anti-poisoning.git"
-def git_auth = "0ecab2a3-034c-4b18-9464-190dcbb7c149"
 def registry_url = "192.168.0.81:18080"
 def repository = "openmajun"
 def registry_auth = "dc837f6d-704e-4e69-99ac-180fd3ec98f2"
@@ -7,18 +5,31 @@ def project_name = "openmajun-poisoning"
 def image_name = "${project_name}:slave"
 
 pipeline {
-    //agent any
     agent {
         node{
-        label "jenkins-slave"
-      }
+           label "node01"
+        }
     }
     stages {
         stage('编译构建') {
             steps {
-                sh "pwd"
-                sh "mvn --version"
-                sh label: '', script: 'mvn  -gs ./setting-new.xml clean install -Dmaven.test.skip=true'
+                sh '''
+                pwd
+                apt update  && apt install wget maven git -y
+                wget --no-cookies --no-check-certificate --header "Cookie: gpw_e24=http%3A%2F%2Fwww.oracle.com%2F; oraclelicense=accept-securebackup-cookie" "http://download.oracle.com/otn-pub/java/jdk/8u141-b15/336fa29ff2bb4ef291e347e091f7f4a7/jdk-8u141-linux-x64.tar.gz"
+                mkdir /usr/local/java
+                tar zxvf jdk-8u141-linux-x64.tar.gz -C /usr/local/java
+                ln -s /usr/local/java/jdk1.8.0_141 /usr/local/java/jdk
+                export JAVA_HOME /usr/local/java/jdk
+                export JRE_HOME ${JAVA_HOME}/jre
+                export CLASSPATH .:${JAVA_HOME}/lib:${JRE_HOME}/lib
+                export PATH ${JAVA_HOME}/bin:$PATH
+                mvn --version
+                mvn  -gs ./setting-new.xml clean install -Dmaven.test.skip=true
+                touch entrypoint.sh
+                echo "#!/bin/bash\n nohup java -jar /root/.m2/repository/anti-poisoning-0.0.1-SNAPSHOT.jar &" >>  /usr/local/entrypoint.sh
+                chmod u+x /usr/local/entrypoint.sh
+                '''
             }
         }
 
