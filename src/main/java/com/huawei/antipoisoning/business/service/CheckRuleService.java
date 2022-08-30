@@ -19,4 +19,6 @@ public interface CheckRuleService {
     MultiResponse queryRuleSet(RuleSetModel ruleSetModel);
 
     MultiResponse queryRuleSetConfig(RuleSetModel ruleSetModel);
+
+    MultiResponse delRuleSet(RuleSetModel ruleSetModel);
 }

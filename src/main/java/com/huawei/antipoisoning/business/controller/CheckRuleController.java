@@ -58,6 +58,18 @@ public class CheckRuleController {
     }
 
     /**
+     * 删除自定义创建规则集
+     *
+     * @param ruleSetModel 规则集实体类
+     * @return createRuleSet
+     */
+    @PostMapping(value = "/del/rule/set")
+    public MultiResponse delRuleSet(@RequestBody RuleSetModel ruleSetModel) {
+        checkRuleService.delRuleSet(ruleSetModel);
+        return new MultiResponse().code(200).message("success");
+    }
+
+    /**
      * 获取社区的所有的规则集（主界面）
      *
      * @param ruleSetModel 查询参数

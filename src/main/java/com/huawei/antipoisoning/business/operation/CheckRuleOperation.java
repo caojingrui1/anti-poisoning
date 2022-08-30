@@ -147,7 +147,7 @@ public class CheckRuleOperation {
      * @param id 主键id
      */
     public void delRuleSet(String id) {
-        mongoTemplate.remove(Query.query(Criteria.where("_id").is(id)), ANTI_CHECK_RULE);
+        mongoTemplate.remove(Query.query(Criteria.where("_id").is(id)), ANTI_CHECK_RULE_SET);
     }
 
     /**
