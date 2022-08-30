@@ -84,7 +84,7 @@ public class CheckRuleController {
      * 获取规则集详情（配置界面）
      *
      * @param ruleSetModel 查询参数
-     * @return
+     * @return queryRuleSetConfig
      */
     @PostMapping(value = "/query/rule/set/config")
     public MultiResponse queryRuleSetConfig(@RequestBody RuleSetModel ruleSetModel) {
