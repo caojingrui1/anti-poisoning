@@ -24,15 +24,6 @@ pipeline {
             steps {
                 sh '''
                 pwd
-                apt update  && apt install wget maven git -y
-                wget --no-cookies --no-check-certificate --header "Cookie: gpw_e24=http%3A%2F%2Fwww.oracle.com%2F; oraclelicense=accept-securebackup-cookie" "http://download.oracle.com/otn-pub/java/jdk/8u141-b15/336fa29ff2bb4ef291e347e091f7f4a7/jdk-8u141-linux-x64.tar.gz"
-                mkdir /usr/local/java
-                tar zxvf jdk-8u141-linux-x64.tar.gz -C /usr/local/java
-                ln -s /usr/local/java/jdk1.8.0_141 /usr/local/java/jdk
-                export JAVA_HOME /usr/local/java/jdk
-                export JRE_HOME ${JAVA_HOME}/jre
-                export CLASSPATH .:${JAVA_HOME}/lib:${JRE_HOME}/lib
-                export PATH ${JAVA_HOME}/bin:$PATH
                 mvn --version
                 mvn  -gs ./setting-new.xml clean install -Dmaven.test.skip=true
                 touch entrypoint.sh
