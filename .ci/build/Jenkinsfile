@@ -5,11 +5,7 @@ def project_name = "openmajun-poisoning"
 def image_name = "${project_name}:slave"
 
 pipeline {
-    agent {
-        node{
-          label "jenkins-slave"
-        }
-    }
+    agent any
     stages {
         stage('编译构建') {
             steps {
@@ -26,7 +22,6 @@ pipeline {
                 export JRE_HOME ${JAVA_HOME}/jre
                 export CLASSPATH .:${JAVA_HOME}/lib:${JRE_HOME}/lib
                 export PATH ${JAVA_HOME}/bin:$PATH
-
                 mvn --version
                 mvn  -gs ./setting-new.xml clean install -Dmaven.test.skip=true
                 touch entrypoint.sh
