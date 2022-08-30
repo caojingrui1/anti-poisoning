@@ -138,6 +138,9 @@ public class CheckRuleOperation {
         if (StringUtils.isNotBlank(ruleSetModel.getLanguage())) {
             criteria.and("language").is(ruleSetModel.getLanguage());
         }
+        if (StringUtils.isNotBlank(ruleSetModel.getProjectName())) {
+            criteria.and("project_name").is(ruleSetModel.getProjectName());
+        }
         return mongoTemplate.find(Query.query(criteria), RuleSetModel.class, ANTI_CHECK_RULE_SET);
     }
 

@@ -89,6 +89,12 @@ public class PoisonServiceImpl implements PoisonService {
         if (ruleModelList.size() == 0) {
             return new MultiResponse().code(400).message("rules is error");
         }
+        // 加入通用规则
+        RuleModel ruleModel = new RuleModel();
+        ruleModel.setRuleLanguage("COMMON");
+        PageVo commRules = checkRuleOperation.getAllRules(ruleModel, new ArrayList<>());
+        List<RuleModel> commList = commRules.getList();
+        ruleModelList.addAll(commList);
         if (YamlUtil.getRulesMap(ruleModelList)) {
             //1.生成scanId
             String scanId = ScanIdGenerate(repoInfo.getProjectName(), repoInfo.getRepoName(), repoInfo.getRepoBranchName());
