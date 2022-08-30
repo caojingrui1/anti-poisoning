@@ -45,7 +45,7 @@ public class CheckRuleServiceImpl implements CheckRuleService {
      */
     @Override
     public MultiResponse createRuleSet(RuleSetModel ruleSetModel) {
-        if (StringUtils.isNotBlank(ruleSetModel.getDefaultTemplateId())) {
+        if (StringUtils.isNotBlank(ruleSetModel.getId())) {
             // 修改规则集
             checkRuleOperation.delRuleSet(ruleSetModel.getId());
         } else {

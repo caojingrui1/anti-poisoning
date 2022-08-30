@@ -92,7 +92,7 @@ public class CheckRuleOperation {
      * @param ruleSetModel 规则集参数
      */
     public void createRuleSet(RuleSetModel ruleSetModel) {
-        mongoTemplate.save(ruleSetModel, ANTI_CHECK_RULE_SET).getId();
+        mongoTemplate.insert(ruleSetModel, ANTI_CHECK_RULE_SET);
     }
 
     /**
