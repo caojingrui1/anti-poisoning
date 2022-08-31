@@ -13,8 +13,8 @@ public class ResultEntity {
     /**
      * 社区
      */
-    @Field("community")
-    private String community;
+    @Field("project_name")
+    private String projectName;
 
     /**
      * 仓名

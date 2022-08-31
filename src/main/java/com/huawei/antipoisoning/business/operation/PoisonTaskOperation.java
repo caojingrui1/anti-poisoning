@@ -43,7 +43,7 @@ public class PoisonTaskOperation {
         taskEntity.setRepoName(antiScan.getRepoName());
         taskEntity.setRepoUrl(antiScan.getRepoUrl());
         taskEntity.setScanId(antiScan.getScanId());
-        taskEntity.setCommunity(antiScan.getProjectName());
+        taskEntity.setProjectName(antiScan.getProjectName());
         taskEntity.setCreateTime(antiScan.getCreateTime());
         mongoTemplate.insert(taskEntity, POISON_VERSION_TASK);
     }

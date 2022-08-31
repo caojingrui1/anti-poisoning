@@ -13,61 +13,61 @@ import java.util.Date;
 @ToString
 public class TaskEntity {
     /**
-     * 扫描文件名
+     * 任务id
      */
     @Field("task_id")
     private String taskId;
 
     /**
-     * 扫描文件名
+     * 唯一性id
      */
     @Field("scan_id")
     private String scanId;
 
     /**
-     * 扫描文件名
+     * 社区名称
      */
-    @Field("community")
-    private String community;
+    @Field("project_name")
+    private String projectName;
 
     /**
-     * 扫描文件名
+     * 仓库
      */
     @Field("repo_name")
     private String repoName;
 
     /**
-     * 扫描文件名
+     * 分支
      */
     @Field("branch")
     private String branch;
 
     /**
-     * 扫描文件名
+     * 代码路径
      */
     @Field("repo_url")
     private String repoUrl;
 
     /**
-     * 扫描文件名
+     * 开始时间
      */
     @Field("execute_start_time")
     private String executeStartTime;
 
     /**
-     * 扫描文件名
+     * 结束时间
      */
     @Field("execute_end_time")
     private String executeEndTime;
 
     /**
-     * 扫描文件名
+     * 创建时间
      */
     @Field("create_time")
     private String createTime;
 
     /**
-     * 扫描文件名
+     * 创建者
      */
     @Field("creator")
     private String creator;
@@ -79,13 +79,13 @@ public class TaskEntity {
     private String reportId;
 
     /**
-     * 扫描文件名
+     * 上一次开始执行时间
      */
     @Field("last_execute_start_time")
     private String lastExecuteStartTime;
 
     /**
-     * 扫描文件名
+     * 上一次结束执行时间
      */
     @Field("last_execute_end_time")
     private String lastExecuteEndTime;

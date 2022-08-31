@@ -92,7 +92,7 @@ public class AntiServiceImpl implements AntiService {
                     System.out.println(result);
                     List<ResultEntity> results = JSONArray.parseArray(result, ResultEntity.class);
                     for (ResultEntity resultEntity : results) {
-                        resultEntity.setCommunity(antiEntity.getProjectName());
+                        resultEntity.setProjectName(antiEntity.getProjectName());
                         resultEntity.setRepoName(antiEntity.getRepoName());
                         resultEntity.setBranch(antiEntity.getBranch());
                         resultEntity.setStatus("0");
