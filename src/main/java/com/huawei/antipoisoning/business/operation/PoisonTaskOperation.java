@@ -33,9 +33,9 @@ public class PoisonTaskOperation {
      *
      * @param antiScan 扫描数据
      */
-    public void insertTaskResult(AntiEntity antiScan, String taskId){
-        if (ObjectUtils.isEmpty(antiScan)){
-            return ;
+    public void insertTaskResult(AntiEntity antiScan, String taskId) {
+        if (ObjectUtils.isEmpty(antiScan)) {
+            return;
         }
         TaskEntity taskEntity = new TaskEntity();
         taskEntity.setTaskId(taskId);
@@ -53,28 +53,28 @@ public class PoisonTaskOperation {
      *
      * @param antiEntity 扫描数据
      */
-    public long updateTaskResult(AntiEntity antiEntity, String taskId){
-        if (ObjectUtils.isEmpty(antiEntity)){
+    public long updateTaskResult(AntiEntity antiEntity, String taskId) {
+        if (ObjectUtils.isEmpty(antiEntity)) {
             return Long.valueOf(null);
         }
         Query query = Query.query(Criteria.where("task_id").is(taskId));
         Update update = new Update();
-        if(antiEntity.getBranch() != null) {
+        if (antiEntity.getBranch() != null) {
             update.set("branch", antiEntity.getBranch());
         }
-        if(antiEntity.getRepoName() != null) {
+        if (antiEntity.getRepoName() != null) {
             update.set("repo_name", antiEntity.getRepoName());
         }
-        if(antiEntity.getRepoUrl() != null) {
+        if (antiEntity.getRepoUrl() != null) {
             update.set("repo_url", antiEntity.getRepoUrl());
         }
-        if(antiEntity.getScanId() != null) {
+        if (antiEntity.getScanId() != null) {
             update.set("scan_id", antiEntity.getScanId());
         }
-        if(antiEntity.getProjectName() != null) {
+        if (antiEntity.getProjectName() != null) {
             update.set("project_name", antiEntity.getProjectName());
         }
-        if(antiEntity.getProjectName() != null) {
+        if (antiEntity.getProjectName() != null) {
             update.set("create_time", antiEntity.getCreateTime());
         }
         return mongoTemplate.updateFirst(query, update, POISON_VERSION_TASK).getModifiedCount();
@@ -93,15 +93,15 @@ public class PoisonTaskOperation {
      * ID更新扫描结果
      *
      * @param taskEntity 参数
-     * @@return   结果
+     * @@return 结果
      */
     public long updateTask(TaskEntity taskEntity) {
         Query query = Query.query(Criteria.where("scan_id").is(taskEntity.getTaskId()));
         Update update = new Update();
-        if(taskEntity.getExecuteStartTime() != null) {
+        if (taskEntity.getExecuteStartTime() != null) {
             update.set("execute_start_time", taskEntity.getExecuteStartTime());
         }
-        if(taskEntity.getExecuteEndTime() != null) {
+        if (taskEntity.getExecuteEndTime() != null) {
             update.set("execute_end_time", taskEntity.getExecuteEndTime());
         }
         return mongoTemplate.updateFirst(query, update, POISON_VERSION_TASK).getModifiedCount();
@@ -112,8 +112,8 @@ public class PoisonTaskOperation {
      *
      * @return AntiEntity
      */
-    public TaskEntity queryTaskEntity(String uuid){
-        Query query=Query.query(new Criteria("scan_id").is(uuid));
+    public TaskEntity queryTaskEntity(String uuid) {
+        Query query = Query.query(new Criteria("scan_id").is(uuid));
         return mongoTemplate.findOne(query, TaskEntity.class, POISON_VERSION_TASK);
     }
 
@@ -122,8 +122,8 @@ public class PoisonTaskOperation {
      *
      * @return AntiEntity
      */
-    public List<TaskEntity> queryTaskId(AntiEntity antiEntity){
-        Query query=Query.query(new Criteria("repo_name").is(antiEntity.getRepoName()));
+    public List<TaskEntity> queryTaskId(AntiEntity antiEntity) {
+        Query query = Query.query(new Criteria("repo_name").is(antiEntity.getRepoName()));
         query.addCriteria(new Criteria("branch").is(antiEntity.getBranch()));
         query.addCriteria(new Criteria("project_name").is(antiEntity.getProjectName()));
         return mongoTemplate.find(query, TaskEntity.class, POISON_VERSION_TASK);
