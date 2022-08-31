@@ -3,12 +3,11 @@ server:
 spring:
   data:
     mongodb:
-      host: 192.168.0.180
-      database: test_ci_info
+      host: 192.168.0.81
+      database: dev_ci_info
       port: 8635
       username: rwuser
-      password: mindspore#1234
-#      password: ENC(I/jdfB8DCY1ic4K49SKJkBj5hrWGs4Qc)
+      password: ENC(X1c9rQ0E+CfNc4DfZuyMOdBhQmdTPMKZ)
 git:
   username: openlibing@163.com
   password: ENC(ac2sDLzYl/zj9MFEwF7wmZsYjn7V1B5J)

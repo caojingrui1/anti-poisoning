@@ -7,11 +7,7 @@ def project_name = "openmajun-poisoning"
 def image_name = "${project_name}:slave"
 
 pipeline {
-    agent {
-        node{
-           label "node01"
-        }
-    }
+    agent none
     stages {
         stage('下载代码') {
             steps {
@@ -27,7 +23,7 @@ pipeline {
                 mvn --version
                 mvn  -gs ./setting-new.xml clean install -Dmaven.test.skip=true
                 touch entrypoint.sh
-                echo "#!/bin/bash\n nohup java -jar /root/.m2/repository/anti-poisoning-0.0.1-SNAPSHOT.jar &" >>  /usr/local/entrypoint.sh
+                echo "#!/bin/bash\n nohup java -jar ./target/anti-poisoning-0.0.1-SNAPSHOT.jar &" >>  /usr/local/entrypoint.sh
                 chmod u+x /usr/local/entrypoint.sh
                 '''
             }
