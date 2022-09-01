@@ -4,8 +4,6 @@ import lombok.Data;
 import lombok.ToString;
 import org.springframework.data.mongodb.core.mapping.Field;
 
-import java.util.Date;
-
 /**
  * @author zhangshengjie
  */
@@ -89,4 +87,51 @@ public class TaskEntity {
      */
     @Field("last_execute_end_time")
     private String lastExecuteEndTime;
+
+    /**
+     * 是否下载
+     */
+    @Field("is_downloaded")
+    private Boolean isDownloaded;
+
+    /**
+     * 是否扫描
+     */
+    @Field("is_scan")
+    private Boolean isScan;
+
+    /**
+     * 扫描是否成功状态
+     */
+    @Field("status")
+    private Boolean status;
+
+    /**
+     * 提示信息
+     */
+    @Field("tips")
+    private String tips;
+
+    /**
+     * 语言
+     */
+    private String language;
+
+    /**
+     * 问题数
+     */
+    @Field("result_count")
+    private Integer resultCount;
+
+    /**
+     * 耗时
+     */
+    @Field("time_consuming")
+    private String timeConsuming;
+
+    /**
+     * 规则集名称
+     */
+    @Field("rules_name")
+    private String rulesName;
 }

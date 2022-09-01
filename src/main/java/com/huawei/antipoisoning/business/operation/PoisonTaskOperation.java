@@ -95,9 +95,30 @@ public class PoisonTaskOperation {
      * @param taskEntity 参数
      * @@return 结果
      */
-    public long updateTask(TaskEntity taskEntity) {
+    public long updateTask(AntiEntity antiEntity, TaskEntity taskEntity) {
         Query query = Query.query(Criteria.where("scan_id").is(taskEntity.getTaskId()));
         Update update = new Update();
+        if (antiEntity.getIsScan() != null) {
+            update.set("is_scan", antiEntity.getIsScan());
+        }
+        if (antiEntity.getCreateTime() != null) {
+            update.set("create_time", antiEntity.getCreateTime());
+        }
+        if (antiEntity.getRulesName() != null) {
+            update.set("rules_name", antiEntity.getRulesName());
+        }
+        if (antiEntity.getIsScan() != null) {
+            update.set("is_scan", antiEntity.getIsScan());
+        }
+        if (antiEntity.getIsDownloaded() != null) {
+            update.set("is_download", antiEntity.getIsDownloaded());
+        }
+        if (antiEntity.getResultCount() != null) {
+            update.set("result_count", antiEntity.getResultCount());
+        }
+        if (antiEntity.getTimeConsuming() != null) {
+            update.set("time_consuming", antiEntity.getTimeConsuming());
+        }
         if (taskEntity.getExecuteStartTime() != null) {
             update.set("execute_start_time", taskEntity.getExecuteStartTime());
         }

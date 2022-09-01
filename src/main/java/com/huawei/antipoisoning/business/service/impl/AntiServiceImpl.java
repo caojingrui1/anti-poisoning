@@ -108,7 +108,7 @@ public class AntiServiceImpl implements AntiService {
                     //结果计数
                     antiEntity.setResultCount(results.size());
                     antiOperation.updateScanResult(antiEntity);
-                    poisonTaskOperation.updateTask(taskEntity);
+                    poisonTaskOperation.updateTask(antiEntity, taskEntity);
                     // 获取执行时间
                     return MultiResponse.success(200, "success", results);
                 } else //这里可以重试下载 后期优化
