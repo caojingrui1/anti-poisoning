@@ -1,14 +1,20 @@
-FROM picoded/ubuntu-openjdk-8-jdk:16.04
-LABEL maintainer="CloudSCA"
+FROM ubuntu:latest
 
-RUN mkdir -p /opt/app/
-ENV APP_DIR /opt/app/
-WORKDIR $APP_DIR
+# PROJECT_NAME 填写你的项目名字
+ENV PROJECT_NAME anti-poisoning
+# PROJECT_HOME 构建成镜像之后，存放的目录位置
+ENV PROJECT_HOME /usr/local/${PROJECT_NAME}
 
-ADD ./start.sh $APP_DIR
-ARG JAR_FILE=target/anti-poisoning-0.0.1-SNAPSHOT.jar
+RUN mkdir $PROJECT_HOME && mkdir $PROJECT_HOME/logs
+RUN apt-get update && apt-get install -y python3 python3-pip openjdk-17-jdk rpm 7zip unzip rubygems && \
+    pip3 install pyyaml yara_python
 
-COPY ${JAR_FILE} $APP_DIR
-COPY target/classes/*.yaml $APP_DIR
+ADD anti-poisoning-0.0.1-SNAPSHOT.jar $PROJECT_HOME/$PROJECT_NAME.jar
+ADD tools.zip $PROJECT_HOME/
+RUN unzip -d $PROJECT_HOME/ $PROJECT_HOME/tools.zip
 
-ENTRYPOINT ["/bin/bash","start.sh","start"]
+#ARG JAR_FILE
+#COPY ${JAR_FILE} $PROJECT_HOME
+WORKDIR $PROJECT_HOME/tools/SoftwareSupplyChainSecurity-v1/
+
+ENTRYPOINT /usr/bin/java -jar -Xms1536m -Xmx1536m $PROJECT_HOME/$PROJECT_NAME.jar

@@ -27,7 +27,7 @@ import java.util.Map;
 public class YamlUtil {
     private static final Logger logger = LoggerFactory.getLogger(YamlUtil.class);
 
-    private static final String CONFIG_PATH = "/root/opt/SoftwareSupplyChainSecurity-v1/check_anti.yaml";
+    private static final String CONFIG_PATH = "/tools/SoftwareSupplyChainSecurity-v1/check_anti.yaml";
 
 //    private static final String CONFIG_PATH = "C:\\code\\test\\check_anti.yaml";
 
@@ -81,7 +81,7 @@ public class YamlUtil {
     @SneakyThrows
     public static void yamlFile(List<LinkedHashMap<String, Object>> rulesMap) {
         // 生成Filter类
-        FileWriter fileWriter = new FileWriter(new File(CONFIG_PATH));
+        FileWriter fileWriter = new FileWriter(new File(getToolPath() + CONFIG_PATH));
         // 生成yaml类
         Yaml yaml = new Yaml(OPTIONS);
         // 拼接参数
@@ -238,5 +238,20 @@ public class YamlUtil {
             logger.error("cause : {} ", e.getCause());
         }
         return false;
+    }
+
+    /**
+     * 获取工具包所在主目录。
+     *
+     * @return path
+     */
+    public static String getToolPath() {
+        String path = YamlUtil.class.getProtectionDomain().getCodeSource().getLocation().getPath();
+        path = path.replace("file:", "");
+        if (path.contains("jar")) {
+            path = path.substring(0, path.lastIndexOf("."));
+            return path.substring(0, path.lastIndexOf("/"));
+        }
+        return path.replace("target/classes/", "");
     }
 }

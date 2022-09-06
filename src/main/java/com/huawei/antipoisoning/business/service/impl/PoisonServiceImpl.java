@@ -27,9 +27,7 @@ import org.apache.http.message.BasicNameValuePair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
@@ -62,6 +60,9 @@ public class PoisonServiceImpl implements PoisonService {
      */
     @Override
     public MultiResponse poisonScan(RepoInfo repoInfo) {
+        String path = this.getClass().getProtectionDomain().getCodeSource().getLocation().getPath();
+        System.out.println("linux path --- " + path.replace("file:", ""));
+        System.out.println(System.getProperty("user.dir"));
         // 获取仓库信息
         String id = repoInfo.getId();
         repoInfo = repoOperation.getById(id);
@@ -153,7 +154,7 @@ public class PoisonServiceImpl implements PoisonService {
         String read;
         String readStr = "";
         try {
-            URL url = new URL("/root/opt/SoftwareSupplyChainSecurity-v1/poison_logs/" + uuid + ".txt");
+            URL url = new URL(YamlUtil.getToolPath() + "/tools/SoftwareSupplyChainSecurity-v1/poison_logs/" + uuid + ".txt");
             HttpURLConnection urlCon = (HttpURLConnection) url.openConnection();
             urlCon.setConnectTimeout(5000);
             urlCon.setReadTimeout(5000);
