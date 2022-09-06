@@ -96,7 +96,7 @@ public class PoisonTaskOperation {
      * @@return 结果
      */
     public long updateTask(AntiEntity antiEntity, TaskEntity taskEntity) {
-        Query query = Query.query(Criteria.where("scan_id").is(taskEntity.getTaskId()));
+        Query query = Query.query(Criteria.where("task_id").is(taskEntity.getTaskId()));
         Update update = new Update();
         if (antiEntity.getIsScan() != null) {
             update.set("is_scan", antiEntity.getIsScan());
@@ -107,11 +107,11 @@ public class PoisonTaskOperation {
         if (antiEntity.getRulesName() != null) {
             update.set("rules_name", antiEntity.getRulesName());
         }
-        if (antiEntity.getIsScan() != null) {
-            update.set("is_scan", antiEntity.getIsScan());
-        }
         if (antiEntity.getIsDownloaded() != null) {
             update.set("is_download", antiEntity.getIsDownloaded());
+        }
+        if (antiEntity.getStatus() != null) {
+            update.set("is_success", antiEntity.getStatus());
         }
         if (antiEntity.getResultCount() != null) {
             update.set("result_count", antiEntity.getResultCount());
@@ -124,6 +124,18 @@ public class PoisonTaskOperation {
         }
         if (taskEntity.getExecuteEndTime() != null) {
             update.set("execute_end_time", taskEntity.getExecuteEndTime());
+        }
+        if (taskEntity.getLastExecuteStartTime() != null) {
+            update.set("last_execute_start_time", taskEntity.getLastExecuteStartTime());
+        }
+        if (taskEntity.getLastExecuteEndTime() != null) {
+            update.set("last_execute_end_time", taskEntity.getLastExecuteEndTime());
+        }
+        if (antiEntity.getTips() != null) {
+            update.set("tips", antiEntity.getTips());
+        }
+        if (antiEntity.getLanguage() != null) {
+            update.set("languages", antiEntity.getLanguage());
         }
         return mongoTemplate.updateFirst(query, update, POISON_VERSION_TASK).getModifiedCount();
     }

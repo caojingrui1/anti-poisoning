@@ -89,7 +89,7 @@ public class AntiServiceImpl implements AntiService {
                     String sb = AntiMainUtil.execute(arguments);
                     long endTime = System.currentTimeMillis();
                     String taskEndTime = df.format(endTime);
-                    taskEntity.setExecuteStartTime(taskEndTime);
+                    taskEntity.setExecuteEndTime(taskEndTime);
                     String timeConsuming = String.valueOf((startTime - endTime)/1000);
                     antiEntity.setTimeConsuming(timeConsuming + "s");
                     System.out.println("sb ==== :" + sb);
@@ -213,7 +213,7 @@ public class AntiServiceImpl implements AntiService {
     public void taskIdGenerate(AntiEntity antiEntity) {
         List<TaskEntity> taskEntity = poisonTaskOperation.queryTaskId(antiEntity);
         if (null != taskEntity && taskEntity.size() != 0) {
-            poisonTaskOperation.updateTaskResult(antiEntity, taskEntity.get(0).getTaskId());
+            poisonTaskOperation.updateTask(antiEntity, taskEntity.get(0));
             return;
         }
         String taskId = antiEntity.getProjectName() + "-" + antiEntity.getRepoUrl() + "-" + antiEntity.getRepoName();
