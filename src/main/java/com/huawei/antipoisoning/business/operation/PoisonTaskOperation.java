@@ -138,7 +138,7 @@ public class PoisonTaskOperation {
             update.set("tips", antiEntity.getTips());
         }
         if (antiEntity.getLanguage() != null) {
-            update.set("languages", antiEntity.getLanguage());
+            update.set("language", antiEntity.getLanguage());
         }
         if (antiEntity.getExecutorId() != null) {
             update.set("executor_id", antiEntity.getExecutorId());
