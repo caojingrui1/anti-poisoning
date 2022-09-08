@@ -1,9 +1,11 @@
 package com.huawei.antipoisoning.business.service.impl;
 
 
+import com.huawei.antipoisoning.business.enmu.CommonConstants;
 import com.huawei.antipoisoning.business.entity.AntiEntity;
 import com.huawei.antipoisoning.business.entity.RepoInfo;
 import com.huawei.antipoisoning.business.entity.ResultEntity;
+import com.huawei.antipoisoning.business.entity.TaskEntity;
 import com.huawei.antipoisoning.business.entity.checkRule.CheckRuleSet;
 import com.huawei.antipoisoning.business.entity.checkRule.RuleModel;
 import com.huawei.antipoisoning.business.entity.checkRule.RuleSetModel;
@@ -12,27 +14,24 @@ import com.huawei.antipoisoning.business.entity.vo.PageVo;
 import com.huawei.antipoisoning.business.operation.CheckRuleOperation;
 import com.huawei.antipoisoning.business.operation.PoisonResultOperation;
 import com.huawei.antipoisoning.business.operation.PoisonScanOperation;
+import com.huawei.antipoisoning.business.operation.PoisonTaskOperation;
 import com.huawei.antipoisoning.business.operation.RepoOperation;
 import com.huawei.antipoisoning.business.service.AntiService;
 import com.huawei.antipoisoning.business.service.PoisonService;
 import com.huawei.antipoisoning.business.util.YamlUtil;
 import com.huawei.antipoisoning.common.entity.MultiResponse;
 import com.huawei.antipoisoning.common.util.AntiMainUtil;
-import org.apache.http.HttpEntity;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
-import org.apache.http.message.BasicNameValuePair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
+import java.util.Objects;
 
 @Service
 public class PoisonServiceImpl implements PoisonService {
@@ -52,6 +51,9 @@ public class PoisonServiceImpl implements PoisonService {
     @Autowired
     private CheckRuleOperation checkRuleOperation;
 
+    @Autowired
+    private PoisonTaskOperation poisonTaskOperation;
+
     /**
      * 启动扫扫描任务
      *
@@ -64,8 +66,7 @@ public class PoisonServiceImpl implements PoisonService {
         System.out.println("linux path --- " + path.replace("file:", ""));
         System.out.println(System.getProperty("user.dir"));
         // 获取仓库信息
-        String id = repoInfo.getId();
-        repoInfo = repoOperation.getById(id);
+        repoInfo = repoOperation.getById(repoInfo);
         // 查询仓库语言和规则集
         List<TaskRuleSetVo> taskRuleSet = checkRuleOperation.getTaskRuleSet("", repoInfo.getProjectName(), repoInfo.getRepoName());
         List<String> ruleIds = new ArrayList<>();
@@ -168,5 +169,50 @@ public class PoisonServiceImpl implements PoisonService {
             readStr = e.toString();
         }
         return readStr;
+    }
+
+    /**
+     * 检测中心主界面
+     *
+     * @param taskEntity 查询参数
+     * @return queryTaskInfo
+     */
+    @Override
+    public MultiResponse queryTaskInfo(TaskEntity taskEntity) {
+        PageVo pageVo = poisonTaskOperation.queryTaskInfo(taskEntity);
+        // 查询任务所用的规则集信息
+        List<TaskEntity> taskEntities = pageVo.getList();
+        for (TaskEntity task : taskEntities) {
+            List<TaskRuleSetVo> taskRuleSet = checkRuleOperation.getTaskRuleSet("", task.getProjectName(), task.getRepoName());
+            if (taskRuleSet.size() == CommonConstants.CommonNumber.NUMBER_ONE) {
+                task.setTaskRuleSetVo(taskRuleSet.get(0));
+            }
+        }
+        return new MultiResponse().code(200).result(taskEntities);
+    }
+
+    /**
+     * 删除防投毒任务以及相关规则集
+     *
+     * @param taskEntity 删除参数体
+     */
+    @Override
+    public MultiResponse delTask(TaskEntity taskEntity) {
+        // 根据scanId查询出任务信息
+        TaskEntity entity = poisonTaskOperation.queryTaskEntity(taskEntity.getScanId());
+        if (Objects.nonNull(entity)) {
+            // 删除版本级任务信息
+            poisonTaskOperation.delTask(taskEntity.getScanId());
+            // 查询该仓库是否有别的分支在检测
+            TaskEntity task = new TaskEntity();
+            task.setProjectName(entity.getProjectName());
+            task.setRepoName(entity.getRepoName());
+            List<TaskEntity> taskEntities = poisonTaskOperation.queryTaskInfo(task).getList();
+            if (taskEntities.size() == CommonConstants.CommonNumber.NUMBER) {
+                // 删除该任务所选相关规则集
+                checkRuleOperation.delTaskRuleSet(task);
+            }
+        }
+        return new MultiResponse().code(200).message("success");
     }
 }

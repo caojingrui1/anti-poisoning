@@ -1,7 +1,9 @@
 package com.huawei.antipoisoning.business.entity;
 
+import com.huawei.antipoisoning.business.entity.checkRule.TaskRuleSetVo;
 import lombok.Data;
 import lombok.ToString;
+import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.mapping.Field;
 
 /**
@@ -135,4 +137,16 @@ public class TaskEntity {
      */
     @Field("rules_name")
     private String rulesName;
+
+    /**
+     * 该任务所用的规则集参数体
+     */
+    @Transient
+    private TaskRuleSetVo taskRuleSetVo;
+
+    @Transient
+    private Integer pageNum;
+
+    @Transient
+    private Integer pageSize;
 }

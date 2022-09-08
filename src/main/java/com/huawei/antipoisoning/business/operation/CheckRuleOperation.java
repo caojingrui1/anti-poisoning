@@ -1,6 +1,7 @@
 package com.huawei.antipoisoning.business.operation;
 
 import com.huawei.antipoisoning.business.enmu.CollectionTableName;
+import com.huawei.antipoisoning.business.entity.TaskEntity;
 import com.huawei.antipoisoning.business.entity.checkRule.RuleModel;
 import com.huawei.antipoisoning.business.entity.checkRule.RuleResultDetailsVo;
 import com.huawei.antipoisoning.business.entity.checkRule.RuleSetModel;
@@ -231,6 +232,18 @@ public class CheckRuleOperation {
      * @param ruleSetModel updateRuleSet
      */
     public void updateRuleSet(RuleSetModel ruleSetModel) {
-        mongoTemplate.findAndReplace(Query.query(Criteria.where("_id").is(ruleSetModel.getId())), ruleSetModel, CollectionTableName.ANTI_CHECK_RULE_SET);
+        mongoTemplate.findAndReplace(Query.query(Criteria.where("_id").is(ruleSetModel.getId())),
+                ruleSetModel, CollectionTableName.ANTI_CHECK_RULE_SET);
+    }
+
+    /**
+     * 删除任务的规则集信息
+     *
+     * @param taskEntity 参数体
+     */
+    public void delTaskRuleSet(TaskEntity taskEntity) {
+        mongoTemplate.remove(Query.query(Criteria.where("project_name").is(taskEntity.getProjectName())
+                .and("repo_name_en").is(taskEntity.getRepoName())), CollectionTableName.ANTI_TASK_RULE_SET);
+
     }
 }

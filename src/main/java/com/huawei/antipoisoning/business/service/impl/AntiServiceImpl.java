@@ -52,7 +52,6 @@ public class AntiServiceImpl implements AntiService {
     @Autowired
     private PoisonResultOperation poisonResultOperation;
 
-
     /**
      * 执行漏洞
      *
@@ -70,16 +69,16 @@ public class AntiServiceImpl implements AntiService {
                 if (antiEntity.getIsDownloaded() == true) {
                     String[] arguments = new String[]{"/bin/sh", "-c",
                             "python3"
-                            // 工具地址
-                            + " " + YamlUtil.getToolPath() + SCANTOOLPATH
-                            // 仓库下载后存放地址
-                            + " " + YamlUtil.getToolPath() + REPOPATH + "/" + antiEntity.getRepoName() +
-                            // 扫描完成后结果存放地址   /usr/result/openeuler-os-build
-                            " " + YamlUtil.getToolPath() + SCANRESULTPATH + antiEntity.getRepoName() + ".json " +
-                            // 支持多语言规则扫描
-                            "--custom-yaml " + YamlUtil.getToolPath() + SCANTOOLFILE
-                            + "password_scan.yaml > " + YamlUtil.getToolPath() + SCANTOOLFILE +
-                            "poison_logs/" + uuid + ".txt"};
+                                    // 工具地址
+                                    + " " + YamlUtil.getToolPath() + SCANTOOLPATH
+                                    // 仓库下载后存放地址
+                                    + " " + YamlUtil.getToolPath() + REPOPATH + "/" + antiEntity.getRepoName() +
+                                    // 扫描完成后结果存放地址   /usr/result/openeuler-os-build
+                                    " " + YamlUtil.getToolPath() + SCANRESULTPATH + antiEntity.getRepoName() + ".json " +
+                                    // 支持多语言规则扫描
+                                    "--custom-yaml " + YamlUtil.getToolPath() + SCANTOOLFILE
+                                    + "password_scan.yaml > " + YamlUtil.getToolPath() + SCANTOOLFILE +
+                                    "poison_logs/" + uuid + ".txt"};
                     System.out.println(arguments[2]);
                     SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss:SSS");
                     long startTime = System.currentTimeMillis();
@@ -89,10 +88,10 @@ public class AntiServiceImpl implements AntiService {
                     long endTime = System.currentTimeMillis();
                     String taskEndTime = df.format(endTime);
                     taskEntity.setExecuteEndTime(taskEndTime);
-                    String timeConsuming = String.valueOf((startTime - endTime)/1000);
+                    String timeConsuming = String.valueOf((startTime - endTime) / 1000);
                     antiEntity.setTimeConsuming(timeConsuming + "s");
                     System.out.println("sb ==== :" + sb);
-                    String result = AntiMainUtil.getJsonContent( YamlUtil.getToolPath() + SCANRESULTPATH, antiEntity.getRepoName());
+                    String result = AntiMainUtil.getJsonContent(YamlUtil.getToolPath() + SCANRESULTPATH, antiEntity.getRepoName());
                     System.out.println(result);
                     List<ResultEntity> results = JSONArray.parseArray(result, ResultEntity.class);
                     for (ResultEntity resultEntity : results) {
