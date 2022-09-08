@@ -95,52 +95,10 @@ public class PoisonTaskOperation {
      * @param taskEntity 参数
      * @@return 结果
      */
-    public long updateTask(AntiEntity antiEntity, TaskEntity taskEntity) {
+    public void updateTask(AntiEntity antiEntity, TaskEntity taskEntity) {
         Query query = Query.query(Criteria.where("task_id").is(taskEntity.getTaskId()));
-        Update update = new Update();
-        if (antiEntity.getScanId() != null) {
-            update.set("scan_id", antiEntity.getScanId());
-        }
-        if (antiEntity.getIsScan() != null) {
-            update.set("is_scan", antiEntity.getIsScan());
-        }
-        if (antiEntity.getCreateTime() != null) {
-            update.set("create_time", antiEntity.getCreateTime());
-        }
-        if (antiEntity.getRulesName() != null) {
-            update.set("rules_name", antiEntity.getRulesName());
-        }
-        if (antiEntity.getIsDownloaded() != null) {
-            update.set("is_download", antiEntity.getIsDownloaded());
-        }
-        if (antiEntity.getStatus() != null) {
-            update.set("is_success", antiEntity.getStatus());
-        }
-        if (antiEntity.getResultCount() != null) {
-            update.set("result_count", antiEntity.getResultCount());
-        }
-        if (antiEntity.getTimeConsuming() != null) {
-            update.set("time_consuming", antiEntity.getTimeConsuming());
-        }
-        if (taskEntity.getExecuteStartTime() != null) {
-            update.set("execute_start_time", taskEntity.getExecuteStartTime());
-        }
-        if (taskEntity.getExecuteEndTime() != null) {
-            update.set("execute_end_time", taskEntity.getExecuteEndTime());
-        }
-        if (taskEntity.getLastExecuteStartTime() != null) {
-            update.set("last_execute_start_time", taskEntity.getLastExecuteStartTime());
-        }
-        if (taskEntity.getLastExecuteEndTime() != null) {
-            update.set("last_execute_end_time", taskEntity.getLastExecuteEndTime());
-        }
-        if (antiEntity.getTips() != null) {
-            update.set("tips", antiEntity.getTips());
-        }
-        if (antiEntity.getLanguage() != null) {
-            update.set("languages", antiEntity.getLanguage());
-        }
-        return mongoTemplate.updateFirst(query, update, CollectionTableName.POISON_VERSION_TASK).getModifiedCount();
+        mongoTemplate.remove(query, CollectionTableName.POISON_VERSION_TASK);
+        mongoTemplate.save(antiEntity, CollectionTableName.POISON_VERSION_TASK);
     }
 
     /**
