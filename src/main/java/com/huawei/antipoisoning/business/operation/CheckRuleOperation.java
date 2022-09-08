@@ -1,5 +1,6 @@
 package com.huawei.antipoisoning.business.operation;
 
+import com.huawei.antipoisoning.business.enmu.CollectionTableName;
 import com.huawei.antipoisoning.business.entity.checkRule.RuleModel;
 import com.huawei.antipoisoning.business.entity.checkRule.RuleResultDetailsVo;
 import com.huawei.antipoisoning.business.entity.checkRule.RuleSetModel;
@@ -18,10 +19,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.regex.Pattern;
-
-import static com.huawei.antipoisoning.business.enmu.CollectionTableName.ANTI_CHECK_RULE;
-import static com.huawei.antipoisoning.business.enmu.CollectionTableName.ANTI_CHECK_RULE_SET;
-import static com.huawei.antipoisoning.business.enmu.CollectionTableName.ANTI_TASK_RULE_SET;
 
 /**
  * 扫描结果包裹数据存档
@@ -64,12 +61,12 @@ public class CheckRuleOperation {
         }
         Query query = Query.query(criteria);
         // 总数量
-        long count = mongoTemplate.count(query, ANTI_CHECK_RULE);
+        long count = mongoTemplate.count(query, CollectionTableName.ANTI_CHECK_RULE);
         if (rule.getPageNum() != null && rule.getPageSize() != null && count > 0) {
             query.skip((long) (rule.getPageNum() - 1) * rule.getPageSize());
             query.limit(rule.getPageSize());
         }
-        List<RuleModel> codeCheckRuleVos = mongoTemplate.find(query, RuleModel.class, ANTI_CHECK_RULE);
+        List<RuleModel> codeCheckRuleVos = mongoTemplate.find(query, RuleModel.class, CollectionTableName.ANTI_CHECK_RULE);
         return new PageVo(count, codeCheckRuleVos);
     }
 
@@ -97,7 +94,7 @@ public class CheckRuleOperation {
      * @param ruleSetModel 规则集参数
      */
     public void createRuleSet(RuleSetModel ruleSetModel) {
-        mongoTemplate.insert(ruleSetModel, ANTI_CHECK_RULE_SET);
+        mongoTemplate.insert(ruleSetModel, CollectionTableName.ANTI_CHECK_RULE_SET);
     }
 
     /**
@@ -106,7 +103,7 @@ public class CheckRuleOperation {
      * @param ruleModel 规则实体类
      */
     public void createRule(List<RuleModel> ruleModel) {
-        mongoTemplate.insert(ruleModel, ANTI_CHECK_RULE);
+        mongoTemplate.insert(ruleModel, CollectionTableName.ANTI_CHECK_RULE);
     }
 
     /**
@@ -120,7 +117,7 @@ public class CheckRuleOperation {
                 .first("rule_language").as("rule_language")
                 .count().as("count"));
         return mongoTemplate.aggregate(Aggregation.newAggregation(operations),
-                ANTI_CHECK_RULE, RuleModel.class).getMappedResults();
+                CollectionTableName.ANTI_CHECK_RULE, RuleModel.class).getMappedResults();
     }
 
     /**
@@ -146,7 +143,7 @@ public class CheckRuleOperation {
         if (StringUtils.isNotBlank(ruleSetModel.getProjectName())) {
             criteria.and("project_name").is(ruleSetModel.getProjectName());
         }
-        return mongoTemplate.find(Query.query(criteria), RuleSetModel.class, ANTI_CHECK_RULE_SET);
+        return mongoTemplate.find(Query.query(criteria), RuleSetModel.class, CollectionTableName.ANTI_CHECK_RULE_SET);
     }
 
     /**
@@ -155,7 +152,7 @@ public class CheckRuleOperation {
      * @param id 主键id
      */
     public void delRuleSet(String id) {
-        mongoTemplate.remove(Query.query(Criteria.where("_id").is(id)), ANTI_CHECK_RULE_SET);
+        mongoTemplate.remove(Query.query(Criteria.where("_id").is(id)), CollectionTableName.ANTI_CHECK_RULE_SET);
     }
 
     /**
@@ -177,7 +174,7 @@ public class CheckRuleOperation {
         if (StringUtils.isNotBlank(repoName)) {
             criteria.and("repo_name_en").is(repoName);
         }
-        return mongoTemplate.find(Query.query(criteria), TaskRuleSetVo.class, ANTI_TASK_RULE_SET);
+        return mongoTemplate.find(Query.query(criteria), TaskRuleSetVo.class, CollectionTableName.ANTI_TASK_RULE_SET);
     }
 
     /**
@@ -205,7 +202,7 @@ public class CheckRuleOperation {
         }
         Query query = Query.query(criteria);
         // 总数量
-        List<RuleModel> ruleVosCount = mongoTemplate.find(query, RuleModel.class, ANTI_CHECK_RULE);
+        List<RuleModel> ruleVosCount = mongoTemplate.find(query, RuleModel.class, CollectionTableName.ANTI_CHECK_RULE);
         if (ruleSetModel.getPageNum() != null && ruleSetModel.getPageSize() != null && ruleVosCount.size() > 0) {
             query.skip((long) (ruleSetModel.getPageNum() - 1) * ruleSetModel.getPageSize());
             query.limit(ruleSetModel.getPageSize());
@@ -224,7 +221,7 @@ public class CheckRuleOperation {
             }
 
         }
-        List<RuleModel> ruleModelList = mongoTemplate.find(query, RuleModel.class, ANTI_CHECK_RULE);
+        List<RuleModel> ruleModelList = mongoTemplate.find(query, RuleModel.class, CollectionTableName.ANTI_CHECK_RULE);
         return new RuleResultDetailsVo(Long.valueOf(ruleVosCount.size()).intValue(), enableCount, ruleModelList);
     }
 
@@ -234,6 +231,6 @@ public class CheckRuleOperation {
      * @param ruleSetModel updateRuleSet
      */
     public void updateRuleSet(RuleSetModel ruleSetModel) {
-        mongoTemplate.findAndReplace(Query.query(Criteria.where("_id").is(ruleSetModel.getId())), ruleSetModel, ANTI_CHECK_RULE_SET);
+        mongoTemplate.findAndReplace(Query.query(Criteria.where("_id").is(ruleSetModel.getId())), ruleSetModel, CollectionTableName.ANTI_CHECK_RULE_SET);
     }
 }

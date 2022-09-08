@@ -1,5 +1,6 @@
 package com.huawei.antipoisoning.business.operation;
 
+import com.huawei.antipoisoning.business.enmu.CollectionTableName;
 import com.huawei.antipoisoning.business.entity.AntiEntity;
 import com.huawei.antipoisoning.business.entity.TaskEntity;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -10,7 +11,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.ObjectUtils;
 
 import javax.annotation.Resource;
-import java.text.SimpleDateFormat;
 import java.util.List;
 
 /**
@@ -20,11 +20,6 @@ import java.util.List;
  */
 @Component
 public class PoisonTaskOperation {
-    /**
-     * 外部源接口返回任务数据
-     */
-    private static final String POISON_VERSION_TASK = "poison_version_task";
-
     @Resource
     private MongoTemplate mongoTemplate;
 
@@ -45,7 +40,7 @@ public class PoisonTaskOperation {
         taskEntity.setScanId(antiScan.getScanId());
         taskEntity.setProjectName(antiScan.getProjectName());
         taskEntity.setCreateTime(antiScan.getCreateTime());
-        mongoTemplate.insert(taskEntity, POISON_VERSION_TASK);
+        mongoTemplate.insert(taskEntity, CollectionTableName.POISON_VERSION_TASK);
     }
 
     /**
@@ -77,7 +72,7 @@ public class PoisonTaskOperation {
         if (antiEntity.getProjectName() != null) {
             update.set("create_time", antiEntity.getCreateTime());
         }
-        return mongoTemplate.updateFirst(query, update, POISON_VERSION_TASK).getModifiedCount();
+        return mongoTemplate.updateFirst(query, update, CollectionTableName.POISON_VERSION_TASK).getModifiedCount();
     }
 
     /**
@@ -86,7 +81,7 @@ public class PoisonTaskOperation {
      * @param query 查询参数
      */
     public AntiEntity queryScanResult(Query query) { //查询入库结果
-        return mongoTemplate.findOne(query, AntiEntity.class, POISON_VERSION_TASK);
+        return mongoTemplate.findOne(query, AntiEntity.class, CollectionTableName.POISON_VERSION_TASK);
     }
 
     /**
@@ -137,7 +132,7 @@ public class PoisonTaskOperation {
         if (antiEntity.getLanguage() != null) {
             update.set("languages", antiEntity.getLanguage());
         }
-        return mongoTemplate.updateFirst(query, update, POISON_VERSION_TASK).getModifiedCount();
+        return mongoTemplate.updateFirst(query, update, CollectionTableName.POISON_VERSION_TASK).getModifiedCount();
     }
 
     /**
@@ -147,7 +142,7 @@ public class PoisonTaskOperation {
      */
     public TaskEntity queryTaskEntity(String uuid) {
         Query query = Query.query(new Criteria("scan_id").is(uuid));
-        return mongoTemplate.findOne(query, TaskEntity.class, POISON_VERSION_TASK);
+        return mongoTemplate.findOne(query, TaskEntity.class, CollectionTableName.POISON_VERSION_TASK);
     }
 
     /**
@@ -159,6 +154,6 @@ public class PoisonTaskOperation {
         Query query = Query.query(new Criteria("repo_name").is(antiEntity.getRepoName()));
         query.addCriteria(new Criteria("branch").is(antiEntity.getBranch()));
         query.addCriteria(new Criteria("project_name").is(antiEntity.getProjectName()));
-        return mongoTemplate.find(query, TaskEntity.class, POISON_VERSION_TASK);
+        return mongoTemplate.find(query, TaskEntity.class, CollectionTableName.POISON_VERSION_TASK);
     }
 }

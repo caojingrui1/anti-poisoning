@@ -11,6 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -24,8 +25,9 @@ import java.util.Objects;
  * @since 2022/8/1614:23
  */
 @Configuration
-public class saveCheckRule {
-    private static final Logger logger = LoggerFactory.getLogger(saveCheckRule.class);
+@Component
+public class SaveCheckRule {
+    private static final Logger logger = LoggerFactory.getLogger(SaveCheckRule.class);
 
     private static final String FILE_PATH = "C:\\code\\test\\防投毒规则.xlsx";
 
