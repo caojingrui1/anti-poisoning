@@ -96,6 +96,14 @@ public class PoisonServiceImpl implements PoisonService {
         ruleModel.setRuleLanguage("COMMON");
         PageVo commRules = checkRuleOperation.getAllRules(ruleModel, new ArrayList<>());
         List<RuleModel> commList = commRules.getList();
+        List<TaskRuleSetVo> ruleList= checkRuleOperation.getTaskRuleSet("", repoInfo.getProjectName(), repoInfo.getRepoName());
+        List<String> languageList = new ArrayList<>();
+        for (TaskRuleSetVo rule : ruleList){
+            List<CheckRuleSet> checkRuleSetList = rule.getAntiCheckRules();
+            for (CheckRuleSet checkRuleSet : checkRuleSetList){
+                languageList.add(checkRuleSet.getLanguage());
+            }
+        }
         ruleModelList.addAll(commList);
         if (YamlUtil.getRulesMap(ruleModelList)) {
             //1.生成scanId
@@ -106,6 +114,7 @@ public class PoisonServiceImpl implements PoisonService {
             antiEntity.setBranch(repoInfo.getRepoBranchName());
             antiEntity.setRepoUrl(repoInfo.getRepoUrl());
             antiEntity.setRepoName(repoInfo.getRepoName());
+            antiEntity.setLanguage(languageList.toString());
             antiEntity.setIsScan(true);
             antiEntity.setProjectName(repoInfo.getProjectName());
             antiEntity.setRulesName("check_anti.yaml");
