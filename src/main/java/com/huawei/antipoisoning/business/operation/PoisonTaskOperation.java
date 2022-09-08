@@ -96,6 +96,9 @@ public class PoisonTaskOperation {
     public long updateTask(AntiEntity antiEntity, TaskEntity taskEntity) {
         Query query = Query.query(Criteria.where("task_id").is(taskEntity.getTaskId()));
         Update update = new Update();
+        if (antiEntity.getScanId() != null) {
+            update.set("scan_id", antiEntity.getScanId());
+        }
         if (antiEntity.getIsScan() != null) {
             update.set("is_scan", antiEntity.getIsScan());
         }
