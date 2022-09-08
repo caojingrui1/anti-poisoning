@@ -7,20 +7,6 @@ package com.huawei.antipoisoning.business.enmu;
  */
 public interface CommonConstants {
     /**
-     * 项目路径
-     */
-    class commUrl {
-
-        public static final String SCAN_RESULT_PATH = "/root/softwareFile/report/";
-
-        public static final String SCAN_TOOL_PATH = "/root/opt/SoftwareSupplyChainSecurity-v1/openeuler_scan.py";
-
-        public static final String SCAN_TOOL_FILE = "/root/opt/SoftwareSupplyChainSecurity-v1/";
-
-        public static final String REPO_PATH = "/root/softwareFile/download/";
-    }
-
-    /**
      * 魔鬼数字
      */
     class CommonNumber {
