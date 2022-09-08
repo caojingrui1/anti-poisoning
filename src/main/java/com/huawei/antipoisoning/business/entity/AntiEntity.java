@@ -54,11 +54,13 @@ public class AntiEntity {
     /**
      * 语言
      */
+    @Field("language")
     private String language;
 
     /**
      * 分支
      */
+    @Field("branch")
     private String branch;
 
     /**
