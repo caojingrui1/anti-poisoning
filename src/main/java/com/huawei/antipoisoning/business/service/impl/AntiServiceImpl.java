@@ -62,8 +62,12 @@ public class AntiServiceImpl implements AntiService {
     public MultiResponse scanRepo(String uuid) {
         AntiEntity antiEntity = antiOperation.queryAntiEntity(uuid);
         TaskEntity taskEntity = poisonTaskOperation.queryTaskEntity(uuid);
-        taskEntity.setLastExecuteStartTime(taskEntity.getExecuteStartTime());
-        taskEntity.setLastExecuteEndTime(taskEntity.getExecuteEndTime());
+        if (taskEntity.getLastExecuteStartTime() != null){
+            taskEntity.setLastExecuteStartTime(taskEntity.getExecuteStartTime());
+        }
+        if (taskEntity.getExecuteEndTime() != null){
+            taskEntity.setLastExecuteEndTime(taskEntity.getExecuteEndTime());
+        }
         //扫描指定仓库 下载后放入文件夹 扫描 产生报告
         if (null != antiEntity) {
             try {
