@@ -1,5 +1,7 @@
 FROM ubuntu:latest
 
+ENV TZ=Asia/Shanghai
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezon
 # PROJECT_NAME 填写你的项目名字
 ENV PROJECT_NAME anti-poisoning
 # PROJECT_HOME 构建成镜像之后，存放的目录位置
