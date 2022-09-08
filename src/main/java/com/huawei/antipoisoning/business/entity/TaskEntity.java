@@ -139,6 +139,18 @@ public class TaskEntity {
     private String rulesName;
 
     /**
+     * 执行人id（最后一次执行人）
+     */
+    @Field("executor_id")
+    private String executorId;
+
+    /**
+     * 执行人名称
+     */
+    @Field("executor_name")
+    private String executorName;
+
+    /**
      * 该任务所用的规则集参数体
      */
     @Transient

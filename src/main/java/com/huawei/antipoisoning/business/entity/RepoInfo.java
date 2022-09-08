@@ -48,4 +48,14 @@ public class RepoInfo {
      * 当前第几页
      */
     private Integer currentPage = null;
+
+    /**
+     * 执行人id（最后一次执行人）
+     */
+    private String executorId;
+
+    /**
+     * 执行人名称
+     */
+    private String executorName;
 }

@@ -140,6 +140,12 @@ public class PoisonTaskOperation {
         if (antiEntity.getLanguage() != null) {
             update.set("languages", antiEntity.getLanguage());
         }
+        if (antiEntity.getExecutorId() != null) {
+            update.set("executor_id", antiEntity.getExecutorId());
+        }
+        if (antiEntity.getExecutorName() != null) {
+            update.set("executor_name", antiEntity.getExecutorName());
+        }
         return mongoTemplate.updateFirst(query, update, CollectionTableName.POISON_VERSION_TASK).getModifiedCount();
     }
 

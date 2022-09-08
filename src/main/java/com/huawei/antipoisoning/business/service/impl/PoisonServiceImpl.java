@@ -66,7 +66,10 @@ public class PoisonServiceImpl implements PoisonService {
         System.out.println("linux path --- " + path.replace("file:", ""));
         System.out.println(System.getProperty("user.dir"));
         // 获取仓库信息
-        repoInfo = repoOperation.getById(repoInfo);
+        RepoInfo info = repoOperation.getById(repoInfo);
+        info.setExecutorId(repoInfo.getExecutorId());
+        info.setExecutorName(repoInfo.getRepoName());
+        repoInfo = info;
         // 查询仓库语言和规则集
         List<TaskRuleSetVo> taskRuleSet = checkRuleOperation.getTaskRuleSet("", repoInfo.getProjectName(), repoInfo.getRepoName());
         List<String> ruleIds = new ArrayList<>();
@@ -118,6 +121,8 @@ public class PoisonServiceImpl implements PoisonService {
             antiEntity.setIsScan(true);
             antiEntity.setProjectName(repoInfo.getProjectName());
             antiEntity.setRulesName("check_anti.yaml");
+            antiEntity.setExecutorId(repoInfo.getExecutorId());
+            antiEntity.setExecutorName(repoInfo.getExecutorName());
             // 下载目标仓库代码
             antiService.downloadRepo(antiEntity);
             // 防投毒扫描
