@@ -90,7 +90,7 @@ public class AntiServiceImpl implements AntiService {
                     long endTime = System.currentTimeMillis();
                     String taskEndTime = df.format(endTime);
                     taskEntity.setExecuteEndTime(taskEndTime);
-                    String timeConsuming = String.valueOf((startTime - endTime) / 1000);
+                    String timeConsuming = String.valueOf((endTime - startTime) / 1000);
                     antiEntity.setTimeConsuming(timeConsuming + "s");
                     System.out.println("sb ==== :" + sb);
                     String result = AntiMainUtil.getJsonContent(YamlUtil.getToolPath() + SCANRESULTPATH, antiEntity.getRepoName());
