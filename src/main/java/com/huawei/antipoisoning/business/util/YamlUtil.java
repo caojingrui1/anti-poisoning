@@ -97,7 +97,8 @@ public class YamlUtil {
         List<String> excludeList = Arrays.asList("test", "demo", "example", "node_modules", "/doc/", "min.js");
         yamlMap.put("exclude", excludeList);
         String dump = yaml.dump(yamlMap);
-        String replace = dump.replace("\"[", "[").replace("]\"", "]");
+        String replace = dump.replace("\"[", "[").replace("]\"", "]")
+                .replace("\\", "");
         fileWriter.write(replace);
         fileWriter.flush();
         fileWriter.close();
