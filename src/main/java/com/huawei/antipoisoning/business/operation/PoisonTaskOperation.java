@@ -45,6 +45,8 @@ public class PoisonTaskOperation {
         taskEntity.setCreateTime(antiScan.getCreateTime());
         taskEntity.setTips(antiScan.getTips());
         taskEntity.setLanguage(antiScan.getLanguage());
+        taskEntity.setExecutorId(antiScan.getExecutorId());
+        taskEntity.setExecutorName(antiScan.getExecutorName());
         mongoTemplate.insert(taskEntity, CollectionTableName.POISON_VERSION_TASK);
     }
 

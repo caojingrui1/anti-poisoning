@@ -68,7 +68,7 @@ public class PoisonServiceImpl implements PoisonService {
         // 获取仓库信息
         RepoInfo info = repoOperation.getById(repoInfo);
         info.setExecutorId(repoInfo.getExecutorId());
-        info.setExecutorName(repoInfo.getRepoName());
+        info.setExecutorName(repoInfo.getExecutorName());
         repoInfo = info;
         // 查询仓库语言和规则集
         List<TaskRuleSetVo> taskRuleSet = checkRuleOperation.getTaskRuleSet("", repoInfo.getProjectName(), repoInfo.getRepoName());
