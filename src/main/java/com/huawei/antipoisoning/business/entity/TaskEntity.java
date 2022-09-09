@@ -67,28 +67,10 @@ public class TaskEntity {
     private String createTime;
 
     /**
-     * 创建者
-     */
-    @Field("creator")
-    private String creator;
-
-    /**
      * 扫描文件名
      */
     @Field("report_id")
     private String reportId;
-
-    /**
-     * 上一次开始执行时间
-     */
-    @Field("last_execute_start_time")
-    private String lastExecuteStartTime;
-
-    /**
-     * 上一次结束执行时间
-     */
-    @Field("last_execute_end_time")
-    private String lastExecuteEndTime;
 
     /**
      * 是否下载
@@ -127,10 +109,22 @@ public class TaskEntity {
     private Integer resultCount;
 
     /**
-     * 耗时
+     * 总耗时
      */
     @Field("time_consuming")
     private String timeConsuming;
+
+    /**
+     * 任务耗时
+     */
+    @Field("task_consuming")
+    private String taskConsuming;
+
+    /**
+     * 下载耗时
+     */
+    @Field("download_consuming")
+    private String downloadConsuming;
 
     /**
      * 规则集名称

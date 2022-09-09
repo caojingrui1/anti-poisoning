@@ -37,8 +37,8 @@ public class AntiEntity {
     /**
      * 扫描是否成功状态
      */
-    @Field("status")
-    private Boolean status;
+    @Field("is_success")
+    private Boolean isSuccess;
 
     /**
      * 提示信息

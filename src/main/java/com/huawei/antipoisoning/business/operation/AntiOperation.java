@@ -60,8 +60,8 @@ public class AntiOperation {
         if (antiEntity.getResultCount() != null) {
             update.set("result_count", antiEntity.getResultCount());
         }
-        if (antiEntity.getStatus() != null) {
-            update.set("is_downloaded", antiEntity.getStatus());
+        if (antiEntity.getIsSuccess() != null) {
+            update.set("is_downloaded", antiEntity.getIsSuccess());
         }
         if (antiEntity.getTips() != null) {
             update.set("tips", antiEntity.getTips());

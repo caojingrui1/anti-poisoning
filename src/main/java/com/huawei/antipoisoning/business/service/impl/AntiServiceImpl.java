@@ -61,10 +61,6 @@ public class AntiServiceImpl implements AntiService {
     public MultiResponse scanRepo(String uuid) {
         AntiEntity antiEntity = antiOperation.queryAntiEntity(uuid);
         TaskEntity taskEntity = poisonTaskOperation.queryTaskEntity(uuid);
-        if (taskEntity != null){
-            taskEntity.setLastExecuteStartTime(taskEntity.getExecuteStartTime());
-            taskEntity.setLastExecuteEndTime(taskEntity.getExecuteEndTime());
-        }
         //扫描指定仓库 下载后放入文件夹 扫描 产生报告
         if (null != antiEntity) {
             try {
@@ -90,8 +86,8 @@ public class AntiServiceImpl implements AntiService {
                     long endTime = System.currentTimeMillis();
                     String taskEndTime = df.format(endTime);
                     taskEntity.setExecuteEndTime(taskEndTime);
-                    String timeConsuming = String.valueOf((endTime - startTime) / 1000);
-                    antiEntity.setTimeConsuming(timeConsuming + "s");
+                    String taskConsuming = String.valueOf((endTime - startTime) / 1000);
+                    taskEntity.setTaskConsuming(taskConsuming + "s");
                     System.out.println("sb ==== :" + sb);
                     String result = AntiMainUtil.getJsonContent(YamlUtil.getToolPath() + SCANRESULTPATH, antiEntity.getRepoName());
                     System.out.println(result);
@@ -107,7 +103,7 @@ public class AntiServiceImpl implements AntiService {
                     // 是否执行扫描
                     antiEntity.setIsScan(true);
                     // 扫描是否成功
-                    antiEntity.setStatus(true);
+                    antiEntity.setIsSuccess(true);
                     // 扫描结果
                     antiEntity.setScanResult(results);
                     //结果计数
@@ -121,14 +117,14 @@ public class AntiServiceImpl implements AntiService {
                     // 是否执行扫描
                     antiEntity.setIsScan(false);
                     // 扫描是否陈工
-                    antiEntity.setStatus(false);
+                    antiEntity.setIsSuccess(false);
                     // 原因
                     antiEntity.setTips("repo not Downloaded.");
                     antiOperation.updateScanResult(antiEntity);
                     return MultiResponse.error(400, "repoNotDownloaded error");
                 }
             } catch (IOException e) {
-                antiEntity.setStatus(false);
+                antiEntity.setIsSuccess(false);
                 antiEntity.setTips(e.getCause().toString());
                 antiOperation.updateScanResult(antiEntity);
                 e.printStackTrace();
@@ -173,9 +169,12 @@ public class AntiServiceImpl implements AntiService {
         antiEntity.setLanguage(antiEntity.getLanguage());
         antiEntity.setRepoUrl(antiEntity.getRepoUrl());
         antiOperation.insertScanResult(antiEntity);
-        //生成任务id
-        taskIdGenerate(antiEntity);
+        long startTime = System.currentTimeMillis();
         JGitUtil gfxly = new JGitUtil(antiEntity.getRepoName(), gitUser, gitPassword, antiEntity.getBranch(), revision, workspace);
+        long endTime = System.currentTimeMillis();
+        String downloadConsuming = String.valueOf((endTime - startTime) / 1000);
+        //生成任务id
+        taskIdGenerate(antiEntity, downloadConsuming);
         int getPullCode = gfxly.pullVersion(antiEntity.getRepoUrl());
         if (getPullCode == 0) {
             System.out.println("检出代码成功===0");
@@ -210,14 +209,20 @@ public class AntiServiceImpl implements AntiService {
         }
     }
 
-    public void taskIdGenerate(AntiEntity antiEntity) {
+    public void taskIdGenerate(AntiEntity antiEntity, String downloadConsuming) {
         List<TaskEntity> taskEntity = poisonTaskOperation.queryTaskId(antiEntity);
         if (null != taskEntity && taskEntity.size() != 0) {
+            taskEntity.get(0).setDownloadConsuming(downloadConsuming);
             poisonTaskOperation.updateTask(antiEntity, taskEntity.get(0));
             return;
+        }else {
+            TaskEntity newTaskEntity = new TaskEntity();
+            String taskId = antiEntity.getProjectName() + "-" + antiEntity.getRepoUrl() + "-" + antiEntity.getRepoName();
+            newTaskEntity.setTaskId(taskId);
+            newTaskEntity.setDownloadConsuming(downloadConsuming);
+            poisonTaskOperation.insertTaskResult(antiEntity, newTaskEntity);
         }
-        String taskId = antiEntity.getProjectName() + "-" + antiEntity.getRepoUrl() + "-" + antiEntity.getRepoName();
-        poisonTaskOperation.insertTaskResult(antiEntity, taskId);
+
     }
 
 
