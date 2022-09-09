@@ -37,6 +37,8 @@ public class AntiServiceImpl implements AntiService {
 
     private static final String REPOPATH = "/tools/softwareFile/download/";
 
+    private static final String CONFIG_PATH = "/tools/SoftwareSupplyChainSecurity-v1/ruleYaml/";
+
     @Value("${git.username}")
     private String gitUser;
 
@@ -74,8 +76,8 @@ public class AntiServiceImpl implements AntiService {
                                     // 扫描完成后结果存放地址   /usr/result/openeuler-os-build
                                     " " + YamlUtil.getToolPath() + SCANRESULTPATH + antiEntity.getRepoName() + ".json " +
                                     // 支持多语言规则扫描
-                                    "--custom-yaml " + YamlUtil.getToolPath() + SCANTOOLFILE
-                                    + "password_scan.yaml > " + YamlUtil.getToolPath() + SCANTOOLFILE +
+                                    "--custom-yaml " + YamlUtil.getToolPath() + CONFIG_PATH + antiEntity.getRulesName()
+                                    + " > " + YamlUtil.getToolPath() + SCANTOOLFILE +
                                     "poison_logs/" + uuid + ".txt"};
                     System.out.println(arguments[2]);
                     SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss:SSS");
