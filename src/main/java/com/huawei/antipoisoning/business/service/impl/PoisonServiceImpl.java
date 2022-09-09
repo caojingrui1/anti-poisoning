@@ -121,7 +121,7 @@ public class PoisonServiceImpl implements PoisonService {
             antiEntity.setLanguage(languageList.toString());
             antiEntity.setIsScan(true);
             antiEntity.setProjectName(repoInfo.getProjectName());
-            antiEntity.setRulesName("check_anti.yaml");
+            antiEntity.setRulesName(tableName + ".yaml");
             antiEntity.setExecutorId(repoInfo.getExecutorId());
             antiEntity.setExecutorName(repoInfo.getExecutorName());
             // 下载目标仓库代码
