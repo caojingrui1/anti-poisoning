@@ -99,16 +99,17 @@ public class PoisonServiceImpl implements PoisonService {
         ruleModel.setRuleLanguage("COMMON");
         PageVo commRules = checkRuleOperation.getAllRules(ruleModel, new ArrayList<>());
         List<RuleModel> commList = commRules.getList();
-        List<TaskRuleSetVo> ruleList= checkRuleOperation.getTaskRuleSet("", repoInfo.getProjectName(), repoInfo.getRepoName());
+        List<TaskRuleSetVo> ruleList = checkRuleOperation.getTaskRuleSet("", repoInfo.getProjectName(), repoInfo.getRepoName());
         List<String> languageList = new ArrayList<>();
-        for (TaskRuleSetVo rule : ruleList){
+        for (TaskRuleSetVo rule : ruleList) {
             List<CheckRuleSet> checkRuleSetList = rule.getAntiCheckRules();
-            for (CheckRuleSet checkRuleSet : checkRuleSetList){
+            for (CheckRuleSet checkRuleSet : checkRuleSetList) {
                 languageList.add(checkRuleSet.getLanguage());
             }
         }
         ruleModelList.addAll(commList);
-        if (YamlUtil.getRulesMap(ruleModelList)) {
+        String tableName = repoInfo.getProjectName() + "-" + repoInfo.getRepoName() + "-" + repoInfo.getRepoBranchName();
+        if (YamlUtil.getRulesMap(ruleModelList, tableName)) {
             //1.生成scanId
             String scanId = ScanIdGenerate(repoInfo.getProjectName(), repoInfo.getRepoName(), repoInfo.getRepoBranchName());
             //请求下载目标仓地址参数
