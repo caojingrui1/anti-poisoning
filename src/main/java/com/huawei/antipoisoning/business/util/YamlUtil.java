@@ -41,7 +41,7 @@ public class YamlUtil {
 //        rulesMap1.put("rule", "demo_scan_rules/test2.yar");
 //        rulesMap1.put("type", Collections.singletonList(".java").toString());
 //        rulesMaps.add(rulesMap1);
-//        yamlFile(rulesMaps,"openeuler-test");
+//        yamlFile(rulesMaps, "openeuler-test");
 //    }
 
     private static final DumperOptions OPTIONS = new DumperOptions();
@@ -65,7 +65,7 @@ public class YamlUtil {
             LinkedHashMap<String, Object> rulesMap = new LinkedHashMap<>();
             String[] files = ruleModel.getFileIds().split(",");
             rulesMap.put("rule", ruleModel.getRuleName());
-            rulesMap.put("type", files.toString());
+            rulesMap.put("type", Arrays.toString(files));
             rulesMaps.add(rulesMap);
         }
         if (rulesMaps.size() != 0) {
