@@ -109,11 +109,13 @@ public class PoisonTaskOperation {
         taskEntity.setIsSuccess(antiEntity.getIsSuccess());
         taskEntity.setResultCount(antiEntity.getResultCount());
         String taskConsuming = taskEntity.getTaskConsuming();
-        long taskTime = Long.parseLong(taskConsuming.substring(0, taskConsuming.length()-1));
         String downloadConsuming = taskEntity.getDownloadConsuming();
-        long downloadTime = Long.parseLong(downloadConsuming.substring(0, downloadConsuming.length()-1));
-        long time = taskTime + downloadTime;
-        taskEntity.setTimeConsuming(time + "s");
+        if(StringUtils.isNotBlank(taskConsuming) && StringUtils.isNotBlank(downloadConsuming)){
+            long taskTime = Long.parseLong(taskConsuming.substring(0, taskConsuming.length()-1));
+            long downloadTime = Long.parseLong(downloadConsuming.substring(0, downloadConsuming.length()-1));
+            long time = taskTime + downloadTime;
+            taskEntity.setTimeConsuming(time + "s");
+        }
         taskEntity.setTips(antiEntity.getTips());
         taskEntity.setLanguage(antiEntity.getLanguage());
         taskEntity.setExecutorId(antiEntity.getExecutorId());

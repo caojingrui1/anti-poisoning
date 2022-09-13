@@ -174,7 +174,7 @@ public class AntiServiceImpl implements AntiService {
         long startTime = System.currentTimeMillis();
         JGitUtil gfxly = new JGitUtil(antiEntity.getRepoName(), gitUser, gitPassword, antiEntity.getBranch(), revision, workspace);
         long endTime = System.currentTimeMillis();
-        String downloadConsuming = String.valueOf((endTime - startTime) / 1000);
+        String downloadConsuming = String.valueOf((endTime - startTime) / 1000) + "s";
         //生成任务id
         taskIdGenerate(antiEntity, downloadConsuming);
         int getPullCode = gfxly.pullVersion(antiEntity.getRepoUrl());
