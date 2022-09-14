@@ -1,6 +1,7 @@
 import functools
 import itertools
 import os.path
+from hashlib import md5
 from typing import Optional
 
 import yaml
@@ -91,33 +92,59 @@ class YaraScan(object):
         处理扫描结果
         """
         for yara_match in yara_matches:
-            _with_line_number: list[tuple[int, str, str]] = list()
-            meta = yara_match.meta
-            result = {
-                'suspiciousFileName': file_path,
-                'ruleName': yara_path,
-                'suggestion': meta['Suggestion'],
-            }
-            # 将offset转为行号等信息
-            for offset, _, match_bytes in yara_match.strings:
-                line_number = data[:offset].count(b'\n') + 1
-                line_start = data.rfind(b'\n', 0, offset) + 1
-                line_end = data.find(b'\n', offset) + 1
-                try:
-                    piece = match_bytes.decode()
-                    line_content = data[line_start: line_end].decode()
-                except UnicodeDecodeError:
-                    piece = "DECODE ERROR"
-                    line_content = "DECODE ERROR"
-                _with_line_number.append((line_number, piece, line_content))
-            _with_line_number.sort()
-            result['checkResult'] = '\n'.join(
-                [f'{line_number} : {line_content}' for line_number, _, line_content in _with_line_number]
-            )
-            result['keyLogInfo'] = '\n'.join(
-                [f'{line_number} : {piece}' for line_number, piece, _ in _with_line_number]
-            )
-            self.result.append(result)
+            # 1. 先区分开普通匹配和核心匹配
+            core_match, normal_match = [], []
+            for offset, condition, match_bytes in yara_match.strings:
+                if '_CORE' in condition:
+                    core_match.append((offset, condition, match_bytes))
+                else:
+                    normal_match.append((offset, condition, match_bytes))
+            if len(core_match) == 0:
+                # 2. 如果匹配结果里没有 _CORE，就按照匹配结果的个数拆分为 N 个漏洞
+                for offset, condition, match_bytes in normal_match:
+                    result = {
+                        'suspiciousFileName': file_path,
+                        'ruleName': yara_path,
+                    }
+                    line_number, piece, line_content = self.offset_to_content(data, match_bytes, offset)
+                    result['checkResult'] = f'{line_number} : {line_content}'
+                    result['keyLogInfo'] = f'{line_number} : {piece}'
+                    result['hash'] = md5(line_content.encode()).hexdigest()
+                    self.result.append(result)
+            else:
+                # 3. 如果匹配结果里有 _CORE，就按照 _CORE 的个数拆分为 N 个漏洞
+                for offset, condition, match_bytes in core_match:
+                    result = {
+                        'suspiciousFileName': file_path,
+                        'ruleName': yara_path,
+                    }
+                    line_number, piece, line_content = self.offset_to_content(data, match_bytes, offset)
+                    _with_line_number: list[tuple[int, str, str]] = list()
+                    _with_line_number.append((line_number, piece, line_content))
+                    for _offset, _, _match_bytes in normal_match:
+                        _with_line_number.append((self.offset_to_content(data, _match_bytes, _offset)))
+                    _with_line_number.sort()
+                    result['checkResult'] = '\n'.join(
+                        [f'{line_number} : {line_content}' for line_number, _, line_content in _with_line_number]
+                    )
+                    result['keyLogInfo'] = '\n'.join(
+                        [f'{line_number} : {piece}' for line_number, piece, _ in _with_line_number]
+                    )
+                    result['hash'] = md5(line_content.encode()).hexdigest()
+                    self.result.append(result)
+
+    @staticmethod
+    def offset_to_content(data, match_bytes, offset) -> (int, str, str):
+        line_number = data[:offset].count(b'\n') + 1
+        line_start = data.rfind(b'\n', 0, offset) + 1
+        line_end = data.find(b'\n', offset) + 1
+        try:
+            piece = match_bytes.decode()
+            line_content = data[line_start: line_end].decode()
+        except UnicodeDecodeError:
+            piece = "DECODE ERROR"
+            line_content = "DECODE ERROR"
+        return line_number, piece, line_content
 
 
 class YaraJob(object):
