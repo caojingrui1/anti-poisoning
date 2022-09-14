@@ -68,4 +68,10 @@ public class ResultEntity {
      */
     @Field("suggestion")
     private String suggestion;
+
+    /**
+     * 文件hash
+     */
+    @Field("hash")
+    private String hash;
 }
