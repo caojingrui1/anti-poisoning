@@ -124,4 +124,15 @@ public class PoisonResultOperation {
         }
         return mongoTemplate.find(Query.query(criteria), TaskEntity.class, CollectionTableName.POISON_VERSION_TASK);
     }
+
+    /**
+     * 根据hash获取屏蔽数据量
+     *
+     * @param hash 问题的唯一hash值
+     */
+    public int getResultDetailByHash(String hash) {
+        Criteria criteria = Criteria.where("hash").is(hash).and("status").is("2");
+        return mongoTemplate.find(Query.query(criteria), ResultEntity.class,
+                CollectionTableName.SCAN_RESULT_DETAILS).size();
+    }
 }
