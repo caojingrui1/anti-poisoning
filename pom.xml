@@ -14,7 +14,7 @@
 	<name>anti-poisoning</name>
 	<description>antiPoisoning web project for Spring Boot</description>
 	<properties>
-		<java.version>8</java.version>
+		<java.version>17</java.version>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -40,7 +40,7 @@
 		<dependency>
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
-			<version>1.18.16</version>
+			<version>1.18.24</version>
 			<scope>compile</scope>
 		</dependency>
 		<dependency>
@@ -82,9 +82,14 @@
 	</dependencies>
 	<build>
 		<plugins>
+<!--			<plugin>-->
+<!--				<groupId>org.springframework.boot</groupId>-->
+<!--				<artifactId>spring-boot-maven-plugin</artifactId>-->
+<!--			</plugin>-->
 			<plugin>
-				<groupId>org.springframework.boot</groupId>
-				<artifactId>spring-boot-maven-plugin</artifactId>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>3.8.1</version>
 			</plugin>
 		</plugins>
 	</build>
