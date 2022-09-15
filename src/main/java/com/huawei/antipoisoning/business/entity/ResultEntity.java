@@ -11,6 +11,12 @@ import org.springframework.data.mongodb.core.mapping.Field;
 @ToString
 public class ResultEntity {
     /**
+     * id
+     */
+    @Field("task_id")
+    private String taskId;
+
+    /**
      * 社区
      */
     @Field("project_name")

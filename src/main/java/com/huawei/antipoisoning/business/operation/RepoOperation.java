@@ -44,7 +44,7 @@ public class RepoOperation {
      * @param repoInfo 仓库参数
      * @return getById
      */
-    public RepoInfo getIdByInfo(RepoInfo repoInfo) {
+    public List<RepoInfo> getRepoByInfo(RepoInfo repoInfo) {
         Criteria criteria = new Criteria();
         if (StringUtils.isNotBlank(repoInfo.getProjectName())) {
             criteria.and("project_name").is(repoInfo.getProjectName());
@@ -55,13 +55,6 @@ public class RepoOperation {
         if (StringUtils.isNotBlank(repoInfo.getRepoBranchName())) {
             criteria.and("repo_branch_name").is(repoInfo.getRepoBranchName());
         }
-        return mongoTemplate.findOne(Query.query(criteria), RepoInfo.class, CollectionTableName.BRANCH_REPO);
-    }
-
-    /**
-     * @return getById
-     */
-    public List<RepoInfo> getAll() {
-        return mongoTemplate.findAll(RepoInfo.class, CollectionTableName.BRANCH_REPO);
+        return mongoTemplate.find(Query.query(criteria), RepoInfo.class, CollectionTableName.BRANCH_REPO);
     }
 }

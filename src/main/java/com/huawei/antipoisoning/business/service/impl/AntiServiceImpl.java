@@ -102,6 +102,7 @@ public class AntiServiceImpl implements AntiService {
                         resultEntity.setBranch(antiEntity.getBranch());
                         resultEntity.setStatus(status);
                         resultEntity.setScanId(uuid);
+                        resultEntity.setTaskId(taskEntity.getTaskId());
                         poisonResultOperation.insertResultDetails(resultEntity);
                     }
                     // 是否执行扫描
@@ -221,7 +222,7 @@ public class AntiServiceImpl implements AntiService {
             return;
         }else {
             TaskEntity newTaskEntity = new TaskEntity();
-            String taskId = antiEntity.getProjectName() + "-" + antiEntity.getRepoUrl() + "-" + antiEntity.getRepoName();
+            String taskId = antiEntity.getProjectName() + "-" + antiEntity.getRepoName() + "-" + antiEntity.getBranch();
             newTaskEntity.setTaskId(taskId);
             newTaskEntity.setDownloadConsuming(downloadConsuming);
             poisonTaskOperation.insertTaskResult(antiEntity, newTaskEntity);

@@ -21,6 +21,7 @@ import com.huawei.antipoisoning.business.service.PoisonService;
 import com.huawei.antipoisoning.business.util.YamlUtil;
 import com.huawei.antipoisoning.common.entity.MultiResponse;
 import com.huawei.antipoisoning.common.util.AntiMainUtil;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -195,24 +196,41 @@ public class PoisonServiceImpl implements PoisonService {
     @Override
     public MultiResponse queryTaskInfo(TaskEntity taskEntity) {
         PageVo pageVo = poisonTaskOperation.queryTaskInfo(taskEntity);
-        List<RepoInfo> repoInfos = repoOperation.getAll();
         List<TaskEntity> taskEntities = pageVo.getList();
+        //获取所有仓库信息
+        RepoInfo repoInfoTask = new RepoInfo();
+        repoInfoTask.setProjectName(taskEntity.getProjectName());
+        repoInfoTask.setRepoName(taskEntity.getRepoName());
+        repoInfoTask.setRepoBranchName(taskEntity.getBranch());
+        List<RepoInfo> repoInfos = repoOperation.getRepoByInfo(repoInfoTask);
         // 查询任务所用的规则集信息
+        //给所有已启动过的任务匹配一个仓库信息，以便检测中心启动
         for (TaskEntity task : taskEntities) {
             List<TaskRuleSetVo> taskRuleSet = checkRuleOperation.getTaskRuleSet("", task.getProjectName(), task.getRepoName());
             if (taskRuleSet.size() == CommonConstants.CommonNumber.NUMBER_ONE) {
                 task.setTaskRuleSetVo(taskRuleSet.get(0));
-                RepoInfo repoInfo = new RepoInfo();
-                repoInfo.setProjectName(task.getProjectName());
-                repoInfo.setRepoName(task.getRepoName());
-                repoInfo.setRepoBranchName(task.getBranch());
-                RepoInfo result = repoOperation.getIdByInfo(repoInfo);
-                task.setBranchRepositoryId(result.getId());
+                RepoInfo repoInfo2 = new RepoInfo();
+                repoInfo2.setProjectName(task.getProjectName());
+                repoInfo2.setRepoName(task.getRepoName());
+                repoInfo2.setRepoBranchName(task.getBranch());
+                List<RepoInfo> result = repoOperation.getRepoByInfo(repoInfo2);
+                task.setBranchRepositoryId(result.get(0).getId());
             }
+        }
+        if (Objects.nonNull(taskEntity.getIsSuccess())){
+            return new MultiResponse().code(200).result(taskEntities);
         }
         List<TaskEntity> result = new ArrayList<>();
         for (RepoInfo repoInfo : repoInfos){
+            if(taskEntities.size()==0){
+                TaskEntity taskEntityNew = new TaskEntity();
+                taskEntityNew.setProjectName(repoInfo.getProjectName());
+                taskEntityNew.setRepoName(repoInfo.getRepoName());
+                taskEntityNew.setBranch(repoInfo.getRepoBranchName());
+                result.add(taskEntityNew);
+            }
             for (TaskEntity taskEntity1 : taskEntities){
+                //筛选出没跑过任务的仓库信息，赋予初始值
                 if (repoInfo.getId().equals(taskEntity1.getBranchRepositoryId())){
                     result.add(taskEntity1);
                 }else {
