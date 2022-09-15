@@ -13,6 +13,7 @@ import org.springframework.data.mongodb.core.aggregation.Aggregation;
 import org.springframework.data.mongodb.core.aggregation.AggregationOperation;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -234,6 +235,22 @@ public class CheckRuleOperation {
     public void updateRuleSet(RuleSetModel ruleSetModel) {
         mongoTemplate.findAndReplace(Query.query(Criteria.where("_id").is(ruleSetModel.getId())),
                 ruleSetModel, CollectionTableName.ANTI_CHECK_RULE_SET);
+    }
+
+    /**
+     * 修改任务的规则集信息
+     *
+     * @param taskEntity 参数体
+     * @return
+     */
+    public long updateTaskRuleSet(TaskEntity taskEntity) {
+
+        Query query = Query.query(Criteria.where("_id").is(taskEntity.getTaskRuleSetVo().getId()));
+        Update update = new Update();
+        if (!taskEntity.getTaskRuleSetVo().getAntiCheckRules().isEmpty()) {
+            update.set("anti_check_rules", taskEntity.getTaskRuleSetVo().getAntiCheckRules());
+        }
+        return mongoTemplate.updateFirst(query, update, CollectionTableName.ANTI_TASK_RULE_SET).getModifiedCount();
     }
 
     /**

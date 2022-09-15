@@ -110,9 +110,9 @@ public class PoisonTaskOperation {
         taskEntity.setResultCount(antiEntity.getResultCount());
         String taskConsuming = taskEntity.getTaskConsuming();
         String downloadConsuming = taskEntity.getDownloadConsuming();
-        if(StringUtils.isNotBlank(taskConsuming) && StringUtils.isNotBlank(downloadConsuming)){
-            long taskTime = Long.parseLong(taskConsuming.substring(0, taskConsuming.length()-1));
-            long downloadTime = Long.parseLong(downloadConsuming.substring(0, downloadConsuming.length()-1));
+        if (StringUtils.isNotBlank(taskConsuming) && StringUtils.isNotBlank(downloadConsuming)) {
+            long taskTime = Long.parseLong(taskConsuming.substring(0, taskConsuming.length() - 1));
+            long downloadTime = Long.parseLong(downloadConsuming.substring(0, downloadConsuming.length() - 1));
             long time = taskTime + downloadTime;
             taskEntity.setTimeConsuming(time + "s");
         }
@@ -121,50 +121,6 @@ public class PoisonTaskOperation {
         taskEntity.setExecutorId(antiEntity.getExecutorId());
         taskEntity.setExecutorName(antiEntity.getExecutorName());
         return mongoTemplate.save(taskEntity, CollectionTableName.POISON_VERSION_TASK);
-//        Update update = new Update();
-//        if (antiEntity.getScanId() != null) {
-//            update.set("scan_id", antiEntity.getScanId());
-//        }
-//        if (antiEntity.getIsScan() != null) {
-//            update.set("is_scan", antiEntity.getIsScan());
-//        }
-//        if (antiEntity.getCreateTime() != null) {
-//            update.set("create_time", antiEntity.getCreateTime());
-//        }
-//        if (antiEntity.getRulesName() != null) {
-//            update.set("rules_name", antiEntity.getRulesName());
-//        }
-//        if (antiEntity.getIsDownloaded() != null) {
-//            update.set("is_download", antiEntity.getIsDownloaded());
-//        }
-//        if (antiEntity.getStatus() != null) {
-//            update.set("is_success", antiEntity.getStatus());
-//        }
-//        if (antiEntity.getResultCount() != null) {
-//            update.set("result_count", antiEntity.getResultCount());
-//        }
-//        if (antiEntity.getTimeConsuming() != null) {
-//            update.set("time_consuming", antiEntity.getTimeConsuming());
-//        }
-//        if (taskEntity.getExecuteStartTime() != null) {
-//            update.set("execute_start_time", taskEntity.getExecuteStartTime());
-//        }
-//        if (taskEntity.getExecuteEndTime() != null) {
-//            update.set("execute_end_time", taskEntity.getExecuteEndTime());
-//        }
-//        if (antiEntity.getTips() != null) {
-//            update.set("tips", antiEntity.getTips());
-//        }
-//        if (antiEntity.getLanguage() != null) {
-//            update.set("language", antiEntity.getLanguage());
-//        }
-//        if (antiEntity.getExecutorId() != null) {
-//            update.set("executor_id", antiEntity.getExecutorId());
-//        }
-//        if (antiEntity.getExecutorName() != null) {
-//            update.set("executor_name", antiEntity.getExecutorName());
-//        }
-//        return mongoTemplate.updateFirst(query, update, CollectionTableName.POISON_VERSION_TASK).getModifiedCount();
     }
 
     /**
@@ -174,6 +130,16 @@ public class PoisonTaskOperation {
      */
     public TaskEntity queryTaskEntity(String uuid) {
         Query query = Query.query(new Criteria("scan_id").is(uuid));
+        return mongoTemplate.findOne(query, TaskEntity.class, CollectionTableName.POISON_VERSION_TASK);
+    }
+
+    /**
+     * 查询一条结果
+     *
+     * @return AntiEntity
+     */
+    public TaskEntity queryTaskEntityById(String id) {
+        Query query = Query.query(new Criteria("_id").is(id));
         return mongoTemplate.findOne(query, TaskEntity.class, CollectionTableName.POISON_VERSION_TASK);
     }
 

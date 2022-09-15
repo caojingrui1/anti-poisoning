@@ -269,4 +269,10 @@ public class PoisonServiceImpl implements PoisonService {
         }
         return new MultiResponse().code(200).message("success");
     }
+
+    @Override
+    public MultiResponse queryTaskById(TaskEntity taskEntity) {
+        TaskEntity result = poisonTaskOperation.queryTaskEntityById(taskEntity.getId());
+        return new MultiResponse().code(200).result(result);
+    }
 }

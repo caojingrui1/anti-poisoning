@@ -13,6 +13,10 @@ import org.springframework.data.mongodb.core.mapping.Field;
 @ToString
 public class TaskEntity {
     /**
+     * id
+     */
+    private String id;
+    /**
      * 任务id
      */
     @Field("task_id")
