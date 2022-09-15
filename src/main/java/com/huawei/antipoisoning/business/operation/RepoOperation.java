@@ -9,6 +9,7 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
+import java.util.List;
 
 /**
  * 仓库相关查询类
@@ -37,5 +38,30 @@ public class RepoOperation {
             criteria.and("manifest_branch_name").is(repoInfo.getRepoBranchName());
         }
         return mongoTemplate.findOne(Query.query(criteria), RepoInfo.class, CollectionTableName.BRANCH_REPO);
+    }
+
+    /**
+     * @param repoInfo 仓库参数
+     * @return getById
+     */
+    public RepoInfo getIdByInfo(RepoInfo repoInfo) {
+        Criteria criteria = new Criteria();
+        if (StringUtils.isNotBlank(repoInfo.getProjectName())) {
+            criteria.and("project_name").is(repoInfo.getProjectName());
+        }
+        if (StringUtils.isNotBlank(repoInfo.getRepoName())) {
+            criteria.and("repo_name").is(repoInfo.getRepoName());
+        }
+        if (StringUtils.isNotBlank(repoInfo.getRepoBranchName())) {
+            criteria.and("repo_branch_name").is(repoInfo.getRepoBranchName());
+        }
+        return mongoTemplate.findOne(Query.query(criteria), RepoInfo.class, CollectionTableName.BRANCH_REPO);
+    }
+
+    /**
+     * @return getById
+     */
+    public List<RepoInfo> getAll() {
+        return mongoTemplate.findAll(RepoInfo.class, CollectionTableName.BRANCH_REPO);
     }
 }
