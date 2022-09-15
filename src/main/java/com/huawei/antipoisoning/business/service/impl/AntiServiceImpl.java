@@ -95,7 +95,8 @@ public class AntiServiceImpl implements AntiService {
                     System.out.println(result);
                     List<ResultEntity> results = JSONArray.parseArray(result, ResultEntity.class);
                     for (ResultEntity resultEntity : results) {
-                        int count = poisonResultOperation.getResultDetailByHash(resultEntity.getHash());
+                        int count = poisonResultOperation.getResultDetailByHash(resultEntity.getHash(),
+                                resultEntity.getScanId());
                         String status = count > 0 ? "2" : "0";
                         resultEntity.setProjectName(antiEntity.getProjectName());
                         resultEntity.setRepoName(antiEntity.getRepoName());
