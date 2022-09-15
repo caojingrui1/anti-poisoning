@@ -150,6 +150,12 @@ public class TaskEntity {
     @Transient
     private TaskRuleSetVo taskRuleSetVo;
 
+    /**
+     * 该任务所用的规则集参数体
+     */
+    @Transient
+    private String branchRepositoryId;
+
     @Transient
     private Integer pageNum;
 

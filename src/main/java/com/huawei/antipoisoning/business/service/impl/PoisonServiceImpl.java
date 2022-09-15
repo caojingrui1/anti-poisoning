@@ -195,15 +195,36 @@ public class PoisonServiceImpl implements PoisonService {
     @Override
     public MultiResponse queryTaskInfo(TaskEntity taskEntity) {
         PageVo pageVo = poisonTaskOperation.queryTaskInfo(taskEntity);
-        // 查询任务所用的规则集信息
+        List<RepoInfo> repoInfos = repoOperation.getAll();
         List<TaskEntity> taskEntities = pageVo.getList();
+        // 查询任务所用的规则集信息
         for (TaskEntity task : taskEntities) {
             List<TaskRuleSetVo> taskRuleSet = checkRuleOperation.getTaskRuleSet("", task.getProjectName(), task.getRepoName());
             if (taskRuleSet.size() == CommonConstants.CommonNumber.NUMBER_ONE) {
                 task.setTaskRuleSetVo(taskRuleSet.get(0));
+                RepoInfo repoInfo = new RepoInfo();
+                repoInfo.setProjectName(task.getProjectName());
+                repoInfo.setRepoName(task.getRepoName());
+                repoInfo.setRepoBranchName(task.getBranch());
+                RepoInfo result = repoOperation.getIdByInfo(repoInfo);
+                task.setBranchRepositoryId(result.getId());
             }
         }
-        return new MultiResponse().code(200).result(taskEntities);
+        List<TaskEntity> result = new ArrayList<>();
+        for (RepoInfo repoInfo : repoInfos){
+            for (TaskEntity taskEntity1 : taskEntities){
+                if (repoInfo.getId().equals(taskEntity1.getBranchRepositoryId())){
+                    result.add(taskEntity1);
+                }else {
+                    TaskEntity taskEntityNew = new TaskEntity();
+                    taskEntityNew.setProjectName(repoInfo.getProjectName());
+                    taskEntityNew.setRepoName(repoInfo.getRepoName());
+                    taskEntityNew.setBranch(repoInfo.getRepoBranchName());
+                    result.add(taskEntityNew);
+                }
+            }
+        }
+        return new MultiResponse().code(200).result(result);
     }
 
     /**
