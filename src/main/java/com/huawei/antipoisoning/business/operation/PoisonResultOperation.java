@@ -130,9 +130,9 @@ public class PoisonResultOperation {
      *
      * @param hash 问题的唯一hash值
      */
-    public int getResultDetailByHash(String hash, String scanId) {
+    public int getResultDetailByHash(String hash, String taskId) {
         Criteria criteria = Criteria.where("hash").is(hash).and("status").is("2");
-        criteria.and("scan_id").is(scanId);
+        criteria.and("task_id").is(taskId);
         return mongoTemplate.find(Query.query(criteria), ResultEntity.class,
                 CollectionTableName.SCAN_RESULT_DETAILS).size();
     }
