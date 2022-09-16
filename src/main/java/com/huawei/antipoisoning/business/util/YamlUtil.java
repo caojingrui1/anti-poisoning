@@ -254,6 +254,6 @@ public class YamlUtil {
             path = path.substring(0, path.lastIndexOf("."));
             return path.substring(0, path.lastIndexOf("/"));
         }
-        return path.replace("target/", "").replace("classes/", "");
+        return path.replace("/target", "").replace("/classes", "");
     }
 }
