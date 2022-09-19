@@ -1,8 +1,10 @@
 package com.huawei.antipoisoning.business.controller;
 
 
+import com.huawei.antipoisoning.business.entity.TaskEntity;
 import com.huawei.antipoisoning.business.entity.checkRule.RuleModel;
 import com.huawei.antipoisoning.business.entity.checkRule.RuleSetModel;
+import com.huawei.antipoisoning.business.entity.checkRule.TaskRuleSetVo;
 import com.huawei.antipoisoning.business.service.CheckRuleService;
 import com.huawei.antipoisoning.common.entity.MultiResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -89,5 +91,39 @@ public class CheckRuleController {
     @PostMapping(value = "/query/rule/set/config")
     public MultiResponse queryRuleSetConfig(@RequestBody RuleSetModel ruleSetModel) {
         return checkRuleService.queryRuleSetConfig(ruleSetModel);
+    }
+
+    /**
+     * 获取社区的所有的规则集（主界面）
+     *
+     * @param ruleSetModel 查询参数
+     * @return queryRuleSet
+     */
+    @PostMapping(value = "/update/taskRule/set")
+    public MultiResponse updateTaskRuleSet(@RequestBody RuleSetModel ruleSetModel) {
+        return checkRuleService.queryRuleSet(ruleSetModel);
+    }
+
+    /**
+     * 查询检测中心任务的规则列表
+     *
+     * @param ruleSetModel 查询参数
+     * @return queryRuleSet
+     */
+    @PostMapping(value = "poison/queryRuleById")
+    public MultiResponse queryRuleById(@RequestBody RuleSetModel ruleSetModel) {
+        return checkRuleService.queryTaskById(ruleSetModel);
+    }
+
+    /**
+     * 修改任务规则集
+     *
+     * @param taskRuleSetVo 任务规则集实体类
+     * @return createRuleSet
+     */
+    @PostMapping(value = "/update/taskRule")
+    public MultiResponse updateTaskRule(@RequestBody TaskRuleSetVo taskRuleSetVo) {
+        checkRuleService.updateTaskRule(taskRuleSetVo);
+        return new MultiResponse().code(200).message("success");
     }
 }
