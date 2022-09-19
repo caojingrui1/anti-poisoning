@@ -82,6 +82,7 @@ public class YamlUtil {
     public static void yamlFile(List<LinkedHashMap<String, Object>> rulesMap, String tableName) {
         // 生成Filter类
         String path = CONFIG_PATH + tableName + ".yaml";
+        System.out.println("filePath is :" + getToolPath() + path);
         FileWriter fileWriter = new FileWriter(new File(getToolPath()
                  + path));
         // 生成yaml类
