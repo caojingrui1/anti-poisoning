@@ -252,8 +252,8 @@ public class YamlUtil {
         path = path.replace("file:", "");
         if (path.contains("jar")) {
             path = path.substring(0, path.lastIndexOf("."));
-            return path.substring(0, path.lastIndexOf("/"));
+            return path.replace("/target", "").substring(0, path.lastIndexOf("/"));
         }
-        return path.replace("target/classes/", "");
+        return path.replace("/target", "").replace("/classes", "");
     }
 }
