@@ -82,7 +82,8 @@ public class YamlUtil {
     public static void yamlFile(List<LinkedHashMap<String, Object>> rulesMap, String tableName) {
         // 生成Filter类
         String path = CONFIG_PATH + tableName + ".yaml";
-        FileWriter fileWriter = new FileWriter(new File(getToolPath() + path));
+        FileWriter fileWriter = new FileWriter(new File(getToolPath()
+                .replace("/target", "") + path));
         // 生成yaml类
         Yaml yaml = new Yaml(OPTIONS);
         // 拼接参数
@@ -252,7 +253,7 @@ public class YamlUtil {
         path = path.replace("file:", "");
         if (path.contains("jar")) {
             path = path.substring(0, path.lastIndexOf("."));
-            return path.replace("/target", "").substring(0, path.lastIndexOf("/"));
+            return path.substring(0, path.lastIndexOf("/"));
         }
         return path.replace("/target", "").replace("/classes", "");
     }
