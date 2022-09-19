@@ -21,8 +21,6 @@ import com.huawei.antipoisoning.business.service.PoisonService;
 import com.huawei.antipoisoning.business.util.YamlUtil;
 import com.huawei.antipoisoning.common.entity.MultiResponse;
 import com.huawei.antipoisoning.common.util.AntiMainUtil;
-import javafx.concurrent.Task;
-import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -151,7 +149,7 @@ public class PoisonServiceImpl implements PoisonService {
 
     @Override
     public MultiResponse selectLog(AntiEntity antiEntity) throws IOException {
-        String url = "/usr/local/anti-poisoning/tools/SoftwareSupplyChainSecurity-v1/poison_logs";
+        String url = YamlUtil.getToolPath() + "/tools/SoftwareSupplyChainSecurity-v1/poison_logs";
         return new MultiResponse().code(200).result(AntiMainUtil.getTxtContent(url, antiEntity.getScanId()));
     }
 
