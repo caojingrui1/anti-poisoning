@@ -84,15 +84,4 @@ public class PoisonController {
     public MultiResponse delRuleSet(@RequestBody TaskEntity taskEntity) {
         return poisonService.delTask(taskEntity);
     }
-
-    /**
-     * 查询检测中心任务列表
-     *
-     * @param taskEntity 查询参数
-     * @return queryRuleSet
-     */
-    @PostMapping(value = "poison/queryTaskById")
-    public MultiResponse queryTaskById(@RequestBody TaskEntity taskEntity) {
-        return poisonService.queryTaskById(taskEntity);
-    }
 }

@@ -21,7 +21,4 @@ public interface PoisonService {
     MultiResponse queryTaskInfo(TaskEntity taskEntity);
 
     MultiResponse delTask(TaskEntity taskEntity);
-
-    MultiResponse queryTaskById(TaskEntity taskEntity);
-
 }

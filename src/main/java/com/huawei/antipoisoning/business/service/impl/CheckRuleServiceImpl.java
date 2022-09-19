@@ -137,4 +137,26 @@ public class CheckRuleServiceImpl implements CheckRuleService {
         checkRuleOperation.delRuleSet(ruleSetModel.getId());
         return new MultiResponse().code(200).message("success");
     }
+
+    /**
+     * 查找任务规则
+     *
+     * @param ruleSetModel 查找id
+     */
+    @Override
+    public MultiResponse queryTaskById(RuleSetModel ruleSetModel) {
+        return new MultiResponse().code(200).
+                result(checkRuleOperation.queryRuleById(ruleSetModel));
+    }
+
+    /**
+     * 更改任务规则
+     *
+     * @param taskRuleSetVo 修改后的任务规则信息
+     */
+    @Override
+    public MultiResponse updateTaskRule(TaskRuleSetVo taskRuleSetVo) {
+        checkRuleOperation.updateTaskRule(taskRuleSetVo);
+        return new MultiResponse().code(200).message("success");
+    }
 }

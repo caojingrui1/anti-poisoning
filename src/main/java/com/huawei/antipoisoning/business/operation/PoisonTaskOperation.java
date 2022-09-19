@@ -134,16 +134,6 @@ public class PoisonTaskOperation {
     }
 
     /**
-     * 查询一条结果
-     *
-     * @return AntiEntity
-     */
-    public TaskEntity queryTaskEntityById(String id) {
-        Query query = Query.query(new Criteria("_id").is(id));
-        return mongoTemplate.findOne(query, TaskEntity.class, CollectionTableName.POISON_VERSION_TASK);
-    }
-
-    /**
      * 查询taskId结果
      *
      * @return AntiEntity
@@ -178,10 +168,10 @@ public class PoisonTaskOperation {
         Query query = Query.query(criteria);
         // 总数量
         long count = mongoTemplate.count(query, TaskEntity.class, CollectionTableName.POISON_VERSION_TASK);
-        if (taskEntity.getPageNum() != null && taskEntity.getPageSize() != null && count > 0) {
-            query.skip((long) (taskEntity.getPageNum() - 1) * taskEntity.getPageSize());
-            query.limit(taskEntity.getPageSize());
-        }
+//        if (taskEntity.getPageNum() != null && taskEntity.getPageSize() != null && count > 0) {
+//            query.skip((long) (taskEntity.getPageNum() - 1) * taskEntity.getPageSize());
+//            query.limit(taskEntity.getPageSize());
+//        }
         List<TaskEntity> list = mongoTemplate.find(query, TaskEntity.class, CollectionTableName.POISON_VERSION_TASK);
         return new PageVo(count, list);
     }

@@ -21,6 +21,7 @@ import com.huawei.antipoisoning.business.service.PoisonService;
 import com.huawei.antipoisoning.business.util.YamlUtil;
 import com.huawei.antipoisoning.common.entity.MultiResponse;
 import com.huawei.antipoisoning.common.util.AntiMainUtil;
+import javafx.concurrent.Task;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -31,6 +32,7 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
@@ -209,40 +211,36 @@ public class PoisonServiceImpl implements PoisonService {
             List<TaskRuleSetVo> taskRuleSet = checkRuleOperation.getTaskRuleSet("", task.getProjectName(), task.getRepoName());
             if (taskRuleSet.size() == CommonConstants.CommonNumber.NUMBER_ONE) {
                 task.setTaskRuleSetVo(taskRuleSet.get(0));
-                RepoInfo repoInfo2 = new RepoInfo();
-                repoInfo2.setProjectName(task.getProjectName());
-                repoInfo2.setRepoName(task.getRepoName());
-                repoInfo2.setRepoBranchName(task.getBranch());
-                List<RepoInfo> result = repoOperation.getRepoByInfo(repoInfo2);
-                task.setBranchRepositoryId(result.get(0).getId());
+                task.setBranchRepositoryId(repoInfos.get(0).getId());
+                List<CheckRuleSet> checkRuleSet = taskRuleSet.get(0).getAntiCheckRules();
+                List<String> language = new ArrayList<>();
+                for (CheckRuleSet checkRuleSet1 : checkRuleSet){
+                    language.add(checkRuleSet1.getLanguage());
+                }
+                task.setLanguage(language.toString());
             }
         }
         if (Objects.nonNull(taskEntity.getIsSuccess())){
-            return new MultiResponse().code(200).result(taskEntities);
+            return new MultiResponse().code(200).result(
+                    new PageVo(Long.valueOf(taskEntities.size()), manualPaging(taskEntities, taskEntity)));
         }
         List<TaskEntity> result = new ArrayList<>();
-        for (RepoInfo repoInfo : repoInfos){
-            if(taskEntities.size()==0){
-                TaskEntity taskEntityNew = new TaskEntity();
-                taskEntityNew.setProjectName(repoInfo.getProjectName());
-                taskEntityNew.setRepoName(repoInfo.getRepoName());
-                taskEntityNew.setBranch(repoInfo.getRepoBranchName());
-                result.add(taskEntityNew);
-            }
+        outer: for (RepoInfo repoInfo : repoInfos){
             for (TaskEntity taskEntity1 : taskEntities){
                 //筛选出没跑过任务的仓库信息，赋予初始值
                 if (repoInfo.getId().equals(taskEntity1.getBranchRepositoryId())){
                     result.add(taskEntity1);
-                }else {
-                    TaskEntity taskEntityNew = new TaskEntity();
-                    taskEntityNew.setProjectName(repoInfo.getProjectName());
-                    taskEntityNew.setRepoName(repoInfo.getRepoName());
-                    taskEntityNew.setBranch(repoInfo.getRepoBranchName());
-                    result.add(taskEntityNew);
+                    continue outer;
                 }
             }
+            TaskEntity taskEntityNew = new TaskEntity();
+            taskEntityNew.setProjectName(repoInfo.getProjectName());
+            taskEntityNew.setRepoName(repoInfo.getRepoName());
+            taskEntityNew.setBranch(repoInfo.getRepoBranchName());
+            result.add(taskEntityNew);
         }
-        return new MultiResponse().code(200).result(result);
+        return new MultiResponse().code(200).result(
+                new PageVo(Long.valueOf(result.size()), manualPaging(result, taskEntity)));
     }
 
     /**
@@ -270,9 +268,34 @@ public class PoisonServiceImpl implements PoisonService {
         return new MultiResponse().code(200).message("success");
     }
 
-    @Override
-    public MultiResponse queryTaskById(TaskEntity taskEntity) {
-        TaskEntity result = poisonTaskOperation.queryTaskEntityById(taskEntity.getId());
-        return new MultiResponse().code(200).result(result);
+
+    /**
+     * 检查中心列表手动分页
+     *
+     * @param results List<TaskEntity>
+     *                     * @param results List<TaskEntity>
+     */
+    public List<TaskEntity> manualPaging(List<TaskEntity> results, TaskEntity taskEntity){
+        int pageNum = taskEntity.getPageNum();
+        int pageSize = taskEntity.getPageSize();
+        if (pageSize == 1){
+            return results;
+        } else if (pageSize >= 2){
+            int listSize = results.size();
+            if (pageSize >= listSize && pageNum == 1){
+                return results;
+            }else {
+                int index = pageNum * pageSize - pageSize;
+                List<TaskEntity> newResults = new ArrayList<>();
+                for (int i=0 ; i<pageSize ; i++){
+                    if(index + i >= results.size()){
+                        break;
+                    }
+                    newResults.add(results.get(i+index));
+                }
+                return newResults;
+            }
+        }
+        return Collections.emptyList();
     }
 }

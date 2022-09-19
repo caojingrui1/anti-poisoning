@@ -240,17 +240,17 @@ public class CheckRuleOperation {
     /**
      * 修改任务的规则集信息
      *
-     * @param taskEntity 参数体
+     * @param taskRuleSetVo 参数体
      * @return
      */
-    public long updateTaskRuleSet(TaskEntity taskEntity) {
+    public void updateTaskRule(TaskRuleSetVo taskRuleSetVo) {
 
-        Query query = Query.query(Criteria.where("_id").is(taskEntity.getTaskRuleSetVo().getId()));
+        Query query = Query.query(Criteria.where("_id").is(taskRuleSetVo.getId()));
         Update update = new Update();
-        if (!taskEntity.getTaskRuleSetVo().getAntiCheckRules().isEmpty()) {
-            update.set("anti_check_rules", taskEntity.getTaskRuleSetVo().getAntiCheckRules());
+        if (!taskRuleSetVo.getAntiCheckRules().isEmpty()) {
+            update.set("anti_check_rules", taskRuleSetVo.getAntiCheckRules());
         }
-        return mongoTemplate.updateFirst(query, update, CollectionTableName.ANTI_TASK_RULE_SET).getModifiedCount();
+        mongoTemplate.updateFirst(query, update, CollectionTableName.ANTI_TASK_RULE_SET).getModifiedCount();
     }
 
     /**
@@ -262,5 +262,15 @@ public class CheckRuleOperation {
         mongoTemplate.remove(Query.query(Criteria.where("project_name").is(taskEntity.getProjectName())
                 .and("repo_name_en").is(taskEntity.getRepoName())), CollectionTableName.ANTI_TASK_RULE_SET);
 
+    }
+
+    /**
+     * 查找自定义规则集
+     *
+     * @param ruleSetModel updateRuleSet
+     */
+    public TaskRuleSetVo queryRuleById(RuleSetModel ruleSetModel) {
+        return mongoTemplate.findOne(Query.query(Criteria.where("_id").is(ruleSetModel.getId())),
+                TaskRuleSetVo.class, CollectionTableName.ANTI_TASK_RULE_SET);
     }
 }
