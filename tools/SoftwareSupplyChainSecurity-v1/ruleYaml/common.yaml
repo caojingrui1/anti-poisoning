@@ -1,0 +1,40 @@
+scan_tasks:
+  - name: Yara scan (common)
+    rule_dir: password_scan
+    rules:
+      - rule: password_scan/linux_api_key_reg1.yar_all
+        description: "检测私钥、token"
+        type: [ .sh, .c, .h, .cpp, .cc, .cxx, .hpp, .py, .go, .java, .rb, .js, .ts, .php ]
+      - rule: password_scan/linux_api_key_reg2.yar_all
+        description: "检测私钥、token"
+        type: [ .sh, .c, .h, .cpp, .cc, .cxx, .hpp, .py, .go, .java, .rb, .js, .ts, .php ]
+      - rule: password_scan/linux_api_key_reg3.yar_all
+        description: "检测私钥、token"
+        type: [ .sh, .c, .h, .cpp, .cc, .cxx, .hpp, .py, .go, .java, .rb, .js, .ts, .php ]
+      - rule: password_scan/password_in_command.yar_all
+        description: "检测sshpass中的密码"
+        type: [ .sh, .c, .h, .cpp, .cc, .cxx, .hpp, .py, .go, .java, .rb, .js, .ts, .php ]
+      - rule: password_scan/password_in_var.yar_strong
+        description: "检测作为常量字符串的密码"
+        type: [ '*' ]
+      - rule: password_scan/password_in_conf.yar_all
+        description: "检测作为常量字符串的密码"
+        type: [ '*' ]
+      - rule: password_scan/secert_key_reg.yar_all
+        description: "检测访问凭证"
+        type: [ .sh, .c, .h, .cpp, .cc, .cxx, .hpp, .py, .go, .java, .rb, .js, .ts, .php ]
+      - rule: password_scan/token_in_var.yar_strong
+        description: "检测访问凭证"
+        type: [ .sh, .c, .h, .cpp, .cc, .cxx, .hpp, .py, .go, .java, .rb, .js, .ts, .php ]
+      - rule: password_scan/trojan_scan.yar_all
+        description: "检测恶意unicode字符"
+        type: [ .sh, .c, .h, .cpp, .cc, .cxx, .hpp, .py, .go, .java, .rb, .js, .ts, .php ]
+
+exclude:
+  - test
+  - demo
+  - node_modules
+  - /doc/
+  - min.js
+  - example
+shebang_exam: no
