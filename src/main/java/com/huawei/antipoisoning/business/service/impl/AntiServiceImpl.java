@@ -87,7 +87,9 @@ public class AntiServiceImpl implements AntiService {
                     String taskStartTime = df.format(startTime);
                     taskEntity.setExecuteStartTime(taskStartTime);
                     //工具执行
+                    System.out.println(taskStartTime);
                     String sb = AntiMainUtil.execute(arguments);
+                    System.out.println(sb);
                     //设置任务结束时间
                     long endTime = System.currentTimeMillis();
                     String taskEndTime = df.format(endTime);
@@ -233,7 +235,6 @@ public class AntiServiceImpl implements AntiService {
         if (null != taskEntity && taskEntity.size() != 0) {
             taskEntity.get(0).setDownloadConsuming(downloadConsuming);
             poisonTaskOperation.updateTaskDownload(antiEntity, taskEntity.get(0));
-            return;
         }else {
             TaskEntity newTaskEntity = new TaskEntity();
             String taskId = antiEntity.getProjectName() + "-" + antiEntity.getRepoName() + "-" + antiEntity.getBranch();
