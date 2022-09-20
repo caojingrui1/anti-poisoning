@@ -14,10 +14,11 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
-import java.util.Collections;
 import java.util.Date;
 import java.util.Objects;
-import java.util.concurrent.*;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author zhangshengjie
@@ -28,7 +29,9 @@ public class PoisonController {
 
     private static final LinkedBlockingQueue<RepoInfo> BLOCKING_QUEUE = new LinkedBlockingQueue<>(200);
     private static final LinkedBlockingQueue<MultiResponse> RESULT_QUEUE = new LinkedBlockingQueue<>(200);
-    private static final ThreadPoolExecutor  THREAD_SCHEDULED_EXECUTOR = new ThreadPoolExecutor(1, 200, 0, TimeUnit.SECONDS, new LinkedBlockingQueue<>(200));
+    private static final ThreadPoolExecutor THREAD_SCHEDULED_EXECUTOR =
+            new ThreadPoolExecutor(1, 200, 0,
+                    TimeUnit.SECONDS, new LinkedBlockingQueue<>(200));
 
 
     @Autowired(required = false)

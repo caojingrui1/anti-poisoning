@@ -141,7 +141,11 @@ public class AntiServiceImpl implements AntiService {
         }
     }
 
-    //设置环境变量，暂时黄区演示需要
+    /**
+     * 环境变量设置。
+     *
+     * @return MultiResponse
+     */
     @Override
     public MultiResponse setEnv() {
         System.out.println("开始 start");
@@ -163,19 +167,18 @@ public class AntiServiceImpl implements AntiService {
         SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss:SSS");
         String createTime = df.format(System.currentTimeMillis());
         antiEntity.setCreateTime(createTime);
-        //ci-backend-service.git
-        //"openeuler-os-build";
-        // String branch = "master";
         if (StringUtils.isEmpty(antiEntity.getBranch())) {
             antiEntity.setBranch("master");
         }
-        String workspace = YamlUtil.getToolPath() + REPOPATH + "/" + antiEntity.getRepoName() + "-" + antiEntity.getBranch();
+        String workspace = YamlUtil.getToolPath() + REPOPATH + "/" + antiEntity.getRepoName()
+                + "-" + antiEntity.getBranch();
         antiEntity.setBranch(antiEntity.getBranch());
         antiEntity.setLanguage(antiEntity.getLanguage());
         antiEntity.setRepoUrl(antiEntity.getRepoUrl());
         antiOperation.insertScanResult(antiEntity);
         long startTime = System.currentTimeMillis();
-        JGitUtil gfxly = new JGitUtil(antiEntity.getRepoName(), gitUser, gitPassword, antiEntity.getBranch(), null, workspace);
+        JGitUtil gfxly = new JGitUtil(antiEntity.getRepoName(), gitUser, gitPassword,
+                antiEntity.getBranch(), null, workspace);
         long endTime = System.currentTimeMillis();
         String downloadConsuming = String.valueOf((endTime - startTime) / 1000) + "s";
         //生成任务id
@@ -214,6 +217,12 @@ public class AntiServiceImpl implements AntiService {
         }
     }
 
+    /**
+     * 任务ID生成。
+     *
+     * @param antiEntity 任务对象
+     * @param downloadConsuming 下载信息
+     */
     public void taskIdGenerate(AntiEntity antiEntity, String downloadConsuming) {
         List<TaskEntity> taskEntity = poisonTaskOperation.queryTaskId(antiEntity);
         if (null != taskEntity && taskEntity.size() != 0) {

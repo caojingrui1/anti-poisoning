@@ -4,7 +4,11 @@ import com.huawei.antipoisoning.business.entity.AntiEntity;
 import com.huawei.antipoisoning.business.service.AntiService;
 import com.huawei.antipoisoning.common.entity.MultiResponse;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.RequestBody;
 
 /**
  * 漏洞控制类
@@ -23,7 +27,7 @@ public class AntiController {
      * @return MultiResponse
      */
     @RequestMapping("/scanRepo/{uuid}")
-    public MultiResponse scanRepo(@PathVariable("uuid") String uuid){
+    public MultiResponse scanRepo(@PathVariable("uuid") String uuid) {
         MultiResponse multiResponse =  antiService.scanRepo(uuid);
         return multiResponse;
     }
@@ -34,7 +38,7 @@ public class AntiController {
      * @return MultiResponse
      */
     @RequestMapping(value = "/downloadRepo", method = RequestMethod.POST)
-    public MultiResponse downloadRepo(@RequestBody AntiEntity antiEntity){
+    public MultiResponse downloadRepo(@RequestBody AntiEntity antiEntity) {
         if (null == antiEntity.getScanId() || "".equals(antiEntity.getScanId())) {
             return MultiResponse.error(400,"error: no scanId detected!");
         }
@@ -54,7 +58,7 @@ public class AntiController {
      * @return MultiResponse@PathVariable("id") String id
      */
     @RequestMapping(value = "/setEnv")
-    public MultiResponse scanRepo1(){
+    public MultiResponse scanRepo1() {
         MultiResponse multiResponse =  antiService.setEnv();
         return multiResponse;
     }
