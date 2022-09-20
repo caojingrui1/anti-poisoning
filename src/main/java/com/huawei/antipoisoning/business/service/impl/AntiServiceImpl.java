@@ -73,7 +73,8 @@ public class AntiServiceImpl implements AntiService {
                                     // 工具地址
                                     + " " + YamlUtil.getToolPath() + SCANTOOLPATH
                                     // 仓库下载后存放地址
-                                    + " " + YamlUtil.getToolPath() + REPOPATH + "/" + antiEntity.getRepoName() +
+                                    + " " + YamlUtil.getToolPath() + REPOPATH + "/" + antiEntity.getRepoName() + "-"
+                                    + antiEntity.getBranch() +
                                     // 扫描完成后结果存放地址   /usr/result/openeuler-os-build
                                     " " + YamlUtil.getToolPath() + SCANRESULTPATH + antiEntity.getRepoName() + ".json " +
                                     // 支持多语言规则扫描
@@ -94,8 +95,8 @@ public class AntiServiceImpl implements AntiService {
                     long endTime = System.currentTimeMillis();
                     String taskEndTime = df.format(endTime);
                     taskEntity.setExecuteEndTime(taskEndTime);
-                    String taskConsuming = String.valueOf((endTime - startTime) / 1000);
-                    taskEntity.setTaskConsuming(taskConsuming + "s");
+                    String taskConsuming = (endTime - startTime) / 1000 + "s";
+                    taskEntity.setTaskConsuming(taskConsuming);
                     //设置总耗时
                     String downloadConsuming = taskEntity.getDownloadConsuming();
                     if (StringUtils.isNotBlank(taskConsuming) && StringUtils.isNotBlank(downloadConsuming)) {
@@ -140,7 +141,7 @@ public class AntiServiceImpl implements AntiService {
                 }
             } catch (IOException e) {
                 antiEntity.setIsSuccess(false);
-                antiEntity.setTips(e.getCause().toString());
+                antiEntity.setTips(e.toString());
                 antiOperation.updateScanResult(antiEntity);
                 poisonTaskOperation.updateTask(antiEntity, taskEntity);
                 e.printStackTrace();

@@ -119,7 +119,14 @@ public class PoisonServiceImpl implements PoisonService {
             antiEntity.setBranch(repoInfo.getRepoBranchName());
             antiEntity.setRepoUrl(repoInfo.getRepoUrl());
             antiEntity.setRepoName(repoInfo.getRepoName());
-            antiEntity.setLanguage(languageList.toString());
+            StringBuffer stringBuffer = new StringBuffer();
+            for (int i=0 ; i<languageList.size() ; i++){
+                stringBuffer.append(languageList.get(i));
+                if (i != languageList.size()){
+                    stringBuffer.append(" ");
+                }
+            }
+            antiEntity.setLanguage(stringBuffer.toString());
             antiEntity.setIsScan(true);
             antiEntity.setProjectName(repoInfo.getProjectName());
             antiEntity.setRulesName(tableName + ".yaml");

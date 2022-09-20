@@ -26,7 +26,7 @@ import java.util.concurrent.*;
 @RequestMapping(value = "/releasepoison")
 public class PoisonController {
 
-    private static final LinkedBlockingQueue<RepoInfo> BLOCKING_QUEUE = new LinkedBlockingQueue<>(200);
+    private static final LinkedBlockingQueue<RepoInfo> BLOCKING_QUEUE = new LinkedBlockingQueue<>(1000);
     private static final ThreadPoolExecutor  THREAD_SCHEDULED_EXECUTOR = new ThreadPoolExecutor(1, 200, 0, TimeUnit.SECONDS, new LinkedBlockingQueue<>(200));
 
 
@@ -45,6 +45,7 @@ public class PoisonController {
             method = RequestMethod.POST)
     public MultiResponse poisonScan(@RequestBody RepoInfo repoInfo) throws InterruptedException {
         queueService(repoInfo);
+//        poisonService.poisonScan(repoInfo);
         return new MultiResponse().result("success");
     }
 
@@ -120,6 +121,7 @@ public class PoisonController {
                     System.out.println(multiResponse);
                     Thread.sleep(1000);
                     System.out.println("The task had complete.");
+                    System.out.println(BLOCKING_QUEUE.size() + "tasks are left to wait");
                     System.out.println("-------------------------------------------");
                 } catch (InterruptedException e) {
                     System.err.println("Blocking queue take string failed.");
