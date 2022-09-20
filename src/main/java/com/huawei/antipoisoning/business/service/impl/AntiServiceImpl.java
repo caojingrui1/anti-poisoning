@@ -169,14 +169,13 @@ public class AntiServiceImpl implements AntiService {
         if (StringUtils.isEmpty(antiEntity.getBranch())) {
             antiEntity.setBranch("master");
         }
-        String revision = "7c2f9fa05ec24426a289d881814745d8f2482f4b";
-        String workspace = YamlUtil.getToolPath() + REPOPATH + "/" + antiEntity.getRepoName();
+        String workspace = YamlUtil.getToolPath() + REPOPATH + "/" + antiEntity.getRepoName() + "-" + antiEntity.getBranch();
         antiEntity.setBranch(antiEntity.getBranch());
         antiEntity.setLanguage(antiEntity.getLanguage());
         antiEntity.setRepoUrl(antiEntity.getRepoUrl());
         antiOperation.insertScanResult(antiEntity);
         long startTime = System.currentTimeMillis();
-        JGitUtil gfxly = new JGitUtil(antiEntity.getRepoName(), gitUser, gitPassword, antiEntity.getBranch(), revision, workspace);
+        JGitUtil gfxly = new JGitUtil(antiEntity.getRepoName(), gitUser, gitPassword, antiEntity.getBranch(), null, workspace);
         long endTime = System.currentTimeMillis();
         String downloadConsuming = String.valueOf((endTime - startTime) / 1000) + "s";
         //生成任务id
