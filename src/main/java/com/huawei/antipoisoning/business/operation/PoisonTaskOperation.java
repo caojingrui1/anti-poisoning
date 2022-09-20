@@ -29,25 +29,26 @@ public class PoisonTaskOperation {
     /**
      * 保存扫描结果
      *
-     * @param antiScan 扫描数据
+     * @param antiEntity 扫描数据
      */
-    public void insertTaskResult(AntiEntity antiScan, TaskEntity newtaskEntity) {
-        if (ObjectUtils.isEmpty(antiScan)) {
+    public void insertTaskResult(AntiEntity antiEntity, TaskEntity newtaskEntity) {
+        if (ObjectUtils.isEmpty(antiEntity)) {
             return;
         }
         TaskEntity taskEntity = new TaskEntity();
         taskEntity.setTaskId(newtaskEntity.getTaskId());
-        taskEntity.setBranch(antiScan.getBranch());
-        taskEntity.setRepoName(antiScan.getRepoName());
-        taskEntity.setRepoUrl(antiScan.getRepoUrl());
-        taskEntity.setScanId(antiScan.getScanId());
-        taskEntity.setProjectName(antiScan.getProjectName());
-        taskEntity.setCreateTime(antiScan.getCreateTime());
-        taskEntity.setTips(antiScan.getTips());
-        taskEntity.setLanguage(antiScan.getLanguage());
-        taskEntity.setExecutorId(antiScan.getExecutorId());
-        taskEntity.setExecutorName(antiScan.getExecutorName());
+        taskEntity.setScanId(antiEntity.getScanId());
+        taskEntity.setBranch(antiEntity.getBranch());
+        taskEntity.setRepoUrl(antiEntity.getRepoUrl());
+        taskEntity.setRepoName(antiEntity.getRepoName());
+        taskEntity.setCreateTime(antiEntity.getCreateTime());
         taskEntity.setDownloadConsuming(newtaskEntity.getDownloadConsuming());
+        taskEntity.setLanguage(antiEntity.getLanguage());
+        taskEntity.setIsScan(antiEntity.getIsScan());
+        taskEntity.setProjectName(antiEntity.getProjectName());
+        taskEntity.setRulesName(antiEntity.getRulesName());
+        taskEntity.setExecutorId(antiEntity.getExecutorId());
+        taskEntity.setExecutorName(antiEntity.getExecutorName());
         mongoTemplate.insert(taskEntity, CollectionTableName.POISON_VERSION_TASK);
     }
 
@@ -93,34 +94,54 @@ public class PoisonTaskOperation {
     }
 
     /**
+     * 下载完更新扫描结果
+     *
+     * @param taskEntity 参数
+     * @@return 结果
+     */
+    public Long updateTaskDownload(AntiEntity antiEntity, TaskEntity taskEntity) {
+        Query query = Query.query(Criteria.where("task_id").is(taskEntity.getTaskId()));
+        Update update = new Update();
+        if (antiEntity.getCreateTime() != null) {
+            update.set("create_time", antiEntity.getCreateTime());
+        }
+        if (taskEntity.getTaskConsuming() != null) {
+            update.set("download_consuming", taskEntity.getDownloadConsuming());
+        }
+        return mongoTemplate.updateFirst(query, update, CollectionTableName.POISON_VERSION_TASK).getModifiedCount();
+    }
+
+    /**
      * ID更新扫描结果
      *
      * @param taskEntity 参数
      * @@return 结果
      */
-    public TaskEntity updateTask(AntiEntity antiEntity, TaskEntity taskEntity) {
+    public Long updateTask(AntiEntity antiEntity, TaskEntity taskEntity) {
         Query query = Query.query(Criteria.where("task_id").is(taskEntity.getTaskId()));
-        mongoTemplate.remove(query, CollectionTableName.POISON_VERSION_TASK);
-        taskEntity.setScanId(antiEntity.getScanId());
-        taskEntity.setIsScan(antiEntity.getIsScan());
-        taskEntity.setCreateTime(antiEntity.getCreateTime());
-        taskEntity.setRulesName(antiEntity.getRulesName());
-        taskEntity.setIsDownloaded(antiEntity.getIsDownloaded());
-        taskEntity.setIsSuccess(antiEntity.getIsSuccess());
-        taskEntity.setResultCount(antiEntity.getResultCount());
-        String taskConsuming = taskEntity.getTaskConsuming();
-        String downloadConsuming = taskEntity.getDownloadConsuming();
-        if (StringUtils.isNotBlank(taskConsuming) && StringUtils.isNotBlank(downloadConsuming)) {
-            long taskTime = Long.parseLong(taskConsuming.substring(0, taskConsuming.length() - 1));
-            long downloadTime = Long.parseLong(downloadConsuming.substring(0, downloadConsuming.length() - 1));
-            long time = taskTime + downloadTime;
-            taskEntity.setTimeConsuming(time + "s");
+        Update update = new Update();
+        if (taskEntity.getExecuteStartTime() != null) {
+            update.set("execute_start_time", taskEntity.getExecuteStartTime());
         }
-        taskEntity.setTips(antiEntity.getTips());
-        taskEntity.setLanguage(antiEntity.getLanguage());
-        taskEntity.setExecutorId(antiEntity.getExecutorId());
-        taskEntity.setExecutorName(antiEntity.getExecutorName());
-        return mongoTemplate.save(taskEntity, CollectionTableName.POISON_VERSION_TASK);
+        if (taskEntity.getExecuteEndTime() != null) {
+            update.set("execute_end_time", taskEntity.getExecuteEndTime());
+        }
+        if (taskEntity.getTaskConsuming() != null) {
+            update.set("task_consuming", taskEntity.getTaskConsuming());
+        }
+        if (taskEntity.getTimeConsuming() != null) {
+            update.set("time_consuming", taskEntity.getTimeConsuming());
+        }
+        if (antiEntity.getIsSuccess() != null) {
+            update.set("is_success", antiEntity.getIsSuccess());
+        }
+        if (antiEntity.getResultCount() != null) {
+            update.set("result_count", antiEntity.getResultCount());
+        }
+        if (antiEntity.getTips() != null) {
+            update.set("tips", antiEntity.getTips());
+        }
+        return mongoTemplate.updateFirst(query, update, CollectionTableName.POISON_VERSION_TASK).getModifiedCount();
     }
 
     /**
