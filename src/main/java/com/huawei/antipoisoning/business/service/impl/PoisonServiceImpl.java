@@ -149,7 +149,7 @@ public class PoisonServiceImpl implements PoisonService {
 
     @Override
     public MultiResponse selectLog(AntiEntity antiEntity) throws IOException {
-        String url = YamlUtil.getToolPath() + "/tools/SoftwareSupplyChainSecurity-v1/poison_logs";
+        String url = YamlUtil.getToolPath() + "/tools/SoftwareSupplyChainSecurity-v1/poison_logs/";
         return new MultiResponse().code(200).result(AntiMainUtil.getTxtContent(url, antiEntity.getScanId()));
     }
 
