@@ -63,6 +63,7 @@ public class AntiServiceImpl implements AntiService {
     public MultiResponse scanRepo(String uuid) {
         AntiEntity antiEntity = antiOperation.queryAntiEntity(uuid);
         TaskEntity taskEntity = poisonTaskOperation.queryTaskEntity(uuid);
+        System.out.println(taskEntity);
         //扫描指定仓库 下载后放入文件夹 扫描 产生报告
         if (null != antiEntity) {
             try {
@@ -81,15 +82,19 @@ public class AntiServiceImpl implements AntiService {
                                     "poison_logs/" + uuid + ".txt"};
                     System.out.println(arguments[2]);
                     SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss:SSS");
+                    //设置任务开始时间
                     long startTime = System.currentTimeMillis();
                     String taskStartTime = df.format(startTime);
                     taskEntity.setExecuteStartTime(taskStartTime);
+                    //工具执行
                     String sb = AntiMainUtil.execute(arguments);
+                    //设置任务结束时间
                     long endTime = System.currentTimeMillis();
                     String taskEndTime = df.format(endTime);
                     taskEntity.setExecuteEndTime(taskEndTime);
                     String taskConsuming = String.valueOf((endTime - startTime) / 1000);
                     taskEntity.setTaskConsuming(taskConsuming + "s");
+                    //设置总耗时
                     String downloadConsuming = taskEntity.getDownloadConsuming();
                     if (StringUtils.isNotBlank(taskConsuming) && StringUtils.isNotBlank(downloadConsuming)) {
                         long taskTime = Long.parseLong(taskConsuming.substring(0, taskConsuming.length() - 1));
