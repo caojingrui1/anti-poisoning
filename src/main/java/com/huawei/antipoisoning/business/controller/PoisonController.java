@@ -116,7 +116,8 @@ public class PoisonController {
             while (BLOCKING_QUEUE.size() > 0) {
                 try {
                     RepoInfo take = BLOCKING_QUEUE.take();
-                    System.out.println("[" + new Date() + " | take: " + take + " ]");
+                    MultiResponse multiResponse = poisonService.poisonScan(take);
+                    System.out.println(multiResponse);
                     Thread.sleep(1000);
                     System.out.println("The task had complete.");
                     System.out.println("-------------------------------------------");
