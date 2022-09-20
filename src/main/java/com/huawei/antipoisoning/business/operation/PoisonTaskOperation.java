@@ -102,6 +102,9 @@ public class PoisonTaskOperation {
     public Long updateTaskDownload(AntiEntity antiEntity, TaskEntity taskEntity) {
         Query query = Query.query(Criteria.where("task_id").is(taskEntity.getTaskId()));
         Update update = new Update();
+        if (antiEntity.getScanId() != null) {
+            update.set("scan_id", antiEntity.getScanId());
+        }
         if (antiEntity.getCreateTime() != null) {
             update.set("create_time", antiEntity.getCreateTime());
         }
