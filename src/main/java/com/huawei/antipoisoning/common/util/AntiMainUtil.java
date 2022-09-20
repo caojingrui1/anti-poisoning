@@ -16,7 +16,6 @@ public class AntiMainUtil {
             while ((line = reader.readLine()) != null) {
                 sb.append(line);
                 sb.append("\n");
-              //  System.out.println("***   " + line);
             }
             return sb.toString();
         } catch (IOException e) {
@@ -56,21 +55,6 @@ public class AntiMainUtil {
             return null;
         }
     }
-//    public static void main(String[] args) {
-////        String command1 = "export JOERN_HOME=/opt/sscs/joern-cli/" ;
-////        String command2 = "export JAVA_HOME=/usr/lib/jvm/java-1.11.0-openjdk-amd64 ";
-////        System.out.println("test export : AntiMainUtil.execute(new String[] {\"/bin/sh\",\"-c\",command1})) ====/r/n "+AntiMainUtil.execute(new String[] {"/bin/sh","-c",command1}));
-////        System.out.println("test export : AntiMainUtil.execute(new String[] {\"/bin/sh\",\"-c\",command2})) ====/r/n "+AntiMainUtil.execute(new String[] {"/bin/sh","-c",command2}));
-//      //  System.out.println("test two : AntiMainUtil.execute(new String[] {command1}));====/r/n  "+AntiMainUtil.execute(new String[] {command1}));
-//        String[] arguments = new String[] {"/bin/sh","-c","time /usr/local/bin/python3 /opt/sscs/SoftwareSupplyChainSecurity-release-openeuler/openeuler_scan.py "
-//                +"/usr/test/openeuler-os-build-master " + "/usr/result/openeuler-os-build-new.json " +
-//                "--enable-python"};
-//      //  AntiMainUtil.execute(arguments);
-//       System.out.println(AntiMainUtil.execute(arguments));
-//       String result = getJsonContent("openeuler-os-build-new","/usr/result");
-//       System.out.println(result);
-//        //判断文件存在 读取文件 返回json
-//    }
 
     /**
      * 获取py文件生成的json文件信息.
