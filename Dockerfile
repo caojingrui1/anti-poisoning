@@ -1,26 +1,27 @@
-FROM ubuntu:latest
+# 要求使用openeuler作为基础镜像
+FROM openeuler/openeuler:22.03-lts
 
 # PROJECT_NAME 填写你的项目名字
 ENV PROJECT_NAME anti-poisoning
 # PROJECT_HOME 构建成镜像之后，存放的目录位置
 ENV PROJECT_HOME /usr/local/${PROJECT_NAME}
 
-RUN mkdir $PROJECT_HOME && mkdir $PROJECT_HOME/logs
-RUN apt-get update && apt-get install -y python3 python3-pip openjdk-17-jdk rpm 7zip unzip rubygems && \
-    pip3 install pyyaml yara_python
+RUN rm -f $PROJECT_HOME
+RUN mkdir $PROJECT_HOME
+RUN yum update -y && yum install -y python3 python3-pip python3-devel gcc java-1.8.0-openjdk rpm rubygems git maven && \
+    pip3 install pyyaml wheel yara_python
 
-ADD anti-poisoning-0.0.1-SNAPSHOT.jar $PROJECT_HOME/$PROJECT_NAME.jar
-ADD tools.zip $PROJECT_HOME/
-RUN unzip -d $PROJECT_HOME/ $PROJECT_HOME/tools.zip
+# 拉取代码
+LABEL git="update"
+RUN git clone -b dev https://openMajun_admin:Jszb2022h1@gitee.com/openMajun_enterprise/anti-poisoning.git $PROJECT_HOME
+WORKDIR $PROJECT_HOME/
+RUN mvn clean install -s setting-new.xml
 
 # 设置编码
 ENV LANG C.UTF-8
 # 设置时区
 ENV TZ=Asia/Shanghai
 
-
-#ARG JAR_FILE
-#COPY ${JAR_FILE} $PROJECT_HOME
 WORKDIR $PROJECT_HOME/tools/SoftwareSupplyChainSecurity-v1/
 
-ENTRYPOINT /usr/bin/java -jar -Xms1536m -Xmx1536m $PROJECT_HOME/$PROJECT_NAME.jar
+ENTRYPOINT /usr/bin/java -jar -Xms1536m -Xmx1536m $PROJECT_HOME/target/$PROJECT_NAME-0.0.1-SNAPSHOT.jar
