@@ -14,11 +14,10 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.Date;
 import java.util.Objects;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 
 /**
  * @author zhangshengjie
@@ -28,10 +27,7 @@ import java.util.concurrent.TimeUnit;
 public class PoisonController {
 
     private static final LinkedBlockingQueue<RepoInfo> BLOCKING_QUEUE = new LinkedBlockingQueue<>(200);
-    private static final LinkedBlockingQueue<MultiResponse> RESULT_QUEUE = new LinkedBlockingQueue<>(200);
-    private static final ThreadPoolExecutor THREAD_SCHEDULED_EXECUTOR =
-            new ThreadPoolExecutor(1, 200, 0,
-                    TimeUnit.SECONDS, new LinkedBlockingQueue<>(200));
+    private static final ThreadPoolExecutor  THREAD_SCHEDULED_EXECUTOR = new ThreadPoolExecutor(1, 200, 0, TimeUnit.SECONDS, new LinkedBlockingQueue<>(200));
 
 
     @Autowired(required = false)
@@ -48,8 +44,8 @@ public class PoisonController {
             consumes = {"application/json"},
             method = RequestMethod.POST)
     public MultiResponse poisonScan(@RequestBody RepoInfo repoInfo) throws InterruptedException {
-//        return poisonService.poisonScan(repoInfo);
-        return queueService(repoInfo);
+        queueService(repoInfo);
+        return new MultiResponse().result("success");
     }
 
     @RequestMapping(value = "/query-results",
@@ -104,10 +100,9 @@ public class PoisonController {
      * @param repoInfo 任务实体类
      * @return MultiResponse
      */
-    public MultiResponse queueService(RepoInfo repoInfo) throws InterruptedException {
+    public void queueService(RepoInfo repoInfo) throws InterruptedException {
         if (Objects.isNull(repoInfo) || BLOCKING_QUEUE.remainingCapacity() <= 0) {
             System.err.println("Blocking queue is full.");
-            return new MultiResponse().message("Blocking queue is full.");
         }
 
         try {
@@ -121,9 +116,8 @@ public class PoisonController {
             while (BLOCKING_QUEUE.size() > 0) {
                 try {
                     RepoInfo take = BLOCKING_QUEUE.take();
-                    RESULT_QUEUE.put(poisonService.poisonScan(take));
                     System.out.println("[" + new Date() + " | take: " + take + " ]");
-                    Thread.sleep(10000);
+                    Thread.sleep(1000);
                     System.out.println("The task had complete.");
                     System.out.println("-------------------------------------------");
                 } catch (InterruptedException e) {
@@ -132,7 +126,6 @@ public class PoisonController {
                 }
             }
         }));
-        return RESULT_QUEUE.take();
     }
 }
 
