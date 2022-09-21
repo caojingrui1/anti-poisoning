@@ -144,6 +144,9 @@ public class PoisonTaskOperation {
         if (antiEntity.getTips() != null) {
             update.set("tips", antiEntity.getTips());
         }
+        if (taskEntity.getLogs() != null) {
+            update.set("logs", taskEntity.getLogs());
+        }
         return mongoTemplate.updateFirst(query, update, CollectionTableName.POISON_VERSION_TASK).getModifiedCount();
     }
 

@@ -88,9 +88,11 @@ public class AntiServiceImpl implements AntiService {
                     String taskStartTime = df.format(startTime);
                     taskEntity.setExecuteStartTime(taskStartTime);
                     //工具执行
-                    System.out.println(taskStartTime);
                     String sb = AntiMainUtil.execute(arguments);
                     System.out.println(sb);
+                    //保存日志内容
+                    String url = YamlUtil.getToolPath() + "/tools/SoftwareSupplyChainSecurity-v1/poison_logs/";
+                    taskEntity.setLogs(AntiMainUtil.getTxtContent(url, uuid));
                     //设置任务结束时间
                     long endTime = System.currentTimeMillis();
                     String taskEndTime = df.format(endTime);

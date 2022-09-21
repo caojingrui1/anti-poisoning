@@ -160,6 +160,12 @@ public class TaskEntity {
     @Transient
     private String branchRepositoryId;
 
+    /**
+     * 本次执行日志
+     */
+    @Field("logs")
+    private String logs;
+
     @Transient
     private Integer pageNum;
 
