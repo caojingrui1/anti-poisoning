@@ -125,11 +125,7 @@ public class AntiServiceImpl implements AntiService {
                     // 扫描是否成功
                     antiEntity.setIsSuccess(true);
                     //结果计数
-                    if (results.size() == 0){
-                        antiEntity.setResultCount(0);
-                    }else {
-                        antiEntity.setResultCount(results.size());
-                    }
+                    antiEntity.setResultCount(results.size());
                     //更新扫描结果
                     antiOperation.updateScanResult(antiEntity);
                     //更新版本级结果
