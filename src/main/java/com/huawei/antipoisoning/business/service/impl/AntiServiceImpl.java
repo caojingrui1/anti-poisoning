@@ -109,6 +109,7 @@ public class AntiServiceImpl implements AntiService {
                     String result = AntiMainUtil.getJsonContent(YamlUtil.getToolPath() + SCANRESULTPATH, antiEntity.getRepoName());
                     System.out.println(result);
                     List<ResultEntity> results = JSONArray.parseArray(result, ResultEntity.class);
+                    //扫描结果详情
                     for (ResultEntity resultEntity : results) {
                         int count = poisonResultOperation.getResultDetailByHash(resultEntity.getHash(),
                                 resultEntity.getTaskId());
@@ -124,10 +125,15 @@ public class AntiServiceImpl implements AntiService {
                     // 扫描是否成功
                     antiEntity.setIsSuccess(true);
                     //结果计数
-                    antiEntity.setResultCount(results.size());
+                    if (results.size() == 0){
+                        antiEntity.setResultCount(0);
+                    }else {
+                        antiEntity.setResultCount(results.size());
+                    }
+                    //更新扫描结果
                     antiOperation.updateScanResult(antiEntity);
+                    //更新版本级结果
                     poisonTaskOperation.updateTask(antiEntity, taskEntity);
-                    // 获取执行时间
                     return MultiResponse.success(200, "success", results);
                 } else //这里可以重试下载 后期优化
                 {
