@@ -65,14 +65,6 @@ public class PoisonController {
         return poisonService.queryResultsDetail(antiEntity);
     }
 
-    @RequestMapping(value = "/selectLog",
-            produces = {"application/json"},
-            consumes = {"application/json"},
-            method = RequestMethod.POST)
-    public MultiResponse selectLog(@RequestBody AntiEntity antiEntity) throws IOException {
-        return poisonService.selectLog(antiEntity);
-    }
-
     /**
      * 获取检测中心（主界面）
      *

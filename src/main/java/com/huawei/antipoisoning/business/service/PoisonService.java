@@ -16,8 +16,6 @@ public interface PoisonService {
 
     MultiResponse queryResultsDetail(AntiEntity antiEntity);
 
-    MultiResponse selectLog(AntiEntity antiEntity) throws IOException;
-
     MultiResponse queryTaskInfo(TaskEntity taskEntity);
 
     MultiResponse delTask(TaskEntity taskEntity);
