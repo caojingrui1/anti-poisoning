@@ -228,6 +228,20 @@ public class CheckRuleOperation {
     }
 
     /**
+     * 通过规则id数组获取规则详情
+     *
+     * @param ruleIds id数组
+     * @return getRuleByIds
+     */
+    public List<RuleModel> getRuleByIds(List<String> ruleIds) {
+        Criteria criteria = new Criteria();
+        if (ruleIds.size() > 0) {
+            criteria.and("rule_id").in(ruleIds);
+        }
+        return mongoTemplate.find(Query.query(criteria), RuleModel.class, CollectionTableName.ANTI_CHECK_RULE);
+    }
+
+    /**
      * 修改自定义规则集
      *
      * @param ruleSetModel updateRuleSet
@@ -235,6 +249,19 @@ public class CheckRuleOperation {
     public void updateRuleSet(RuleSetModel ruleSetModel) {
         mongoTemplate.findAndReplace(Query.query(Criteria.where("_id").is(ruleSetModel.getId())),
                 ruleSetModel, CollectionTableName.ANTI_CHECK_RULE_SET);
+    }
+
+    /**
+     * 去掉规则集无用的规则
+     *
+     * @param id      主键id
+     * @param ruleIds 规则数据
+     */
+    public void updateRuleSetToRuleIds(String id, List<String> ruleIds) {
+        Criteria criteria = Criteria.where("_id").is(id);
+        Update update = new Update();
+        update.set("rule_ids", ruleIds);
+        mongoTemplate.updateFirst(Query.query(criteria), update, CollectionTableName.ANTI_CHECK_RULE_SET);
     }
 
     /**
@@ -273,4 +300,6 @@ public class CheckRuleOperation {
         return mongoTemplate.findOne(Query.query(Criteria.where("_id").is(ruleSetModel.getId())),
                 TaskRuleSetVo.class, CollectionTableName.ANTI_TASK_RULE_SET);
     }
+
+
 }

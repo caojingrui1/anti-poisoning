@@ -99,7 +99,17 @@ public class CheckRuleServiceImpl implements CheckRuleService {
         }
         // 得到每个规则集的规则个数
         for (RuleSetModel ruleSet : ruleSetModels) {
-            ruleSet.setRuleCount(ruleSet.getRuleIds().size());
+            if (ruleSet.getRuleIds().size() > 0) {
+                List<RuleModel> ruleByIds = checkRuleOperation.getRuleByIds(ruleSet.getRuleIds());
+                ruleSet.setRuleCount(ruleByIds.size());
+                if (ruleByIds.size() != ruleSet.getRuleIds().size()) {
+                    // 更换该规则集的规则id
+                    List<String> ruleIds = ruleByIds.stream().map(RuleModel::getRuleId).distinct().collect(Collectors.toList());
+                    checkRuleOperation.updateRuleSetToRuleIds(ruleSet.getId(), ruleIds);
+                }
+            } else {
+                ruleSet.setRuleCount(0);
+            }
             // 判断是否在使用中
             List<TaskRuleSetVo> taskRuleSet = checkRuleOperation.getTaskRuleSet(ruleSet.getId(), "", "");
             if (taskRuleSet.size() != 0) {
