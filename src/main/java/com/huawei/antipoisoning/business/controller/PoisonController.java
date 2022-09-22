@@ -45,8 +45,7 @@ public class PoisonController {
             method = RequestMethod.POST)
     public MultiResponse poisonScan(@RequestBody RepoInfo repoInfo) throws InterruptedException {
         queueService(repoInfo);
-//        poisonService.poisonScan(repoInfo);
-        return new MultiResponse().result("success");
+        return new MultiResponse().result("success").code(200);
     }
 
     @RequestMapping(value = "/query-results",
