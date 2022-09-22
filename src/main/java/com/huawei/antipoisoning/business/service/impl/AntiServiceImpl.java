@@ -131,6 +131,11 @@ public class AntiServiceImpl implements AntiService {
                     antiEntity.setIsSuccess(true);
                     //结果计数
                     antiEntity.setResultCount(results.size());
+                    if (results.size() > 0) {
+                      int solveCount = poisonResultOperation.getCountByStatus("2", results.get(0).getScanId());
+                      antiEntity.setSolveCount(solveCount);
+                      antiEntity.setIssueCount(results.size() - solveCount);
+                    }
                     //更新扫描结果
                     antiOperation.updateScanResult(antiEntity);
                     //更新版本级结果
