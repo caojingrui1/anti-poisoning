@@ -87,9 +87,6 @@ public class CheckRuleServiceImpl implements CheckRuleService {
      */
     @Override
     public MultiResponse queryRuleSet(RuleSetModel ruleSetModel) {
-        if (StringUtils.isBlank(ruleSetModel.getProjectName())) {
-            return new MultiResponse().code(400).message("projectName is error");
-        }
         // 查出所有的系统规则集
         RuleSetModel ruleSets = new RuleSetModel();
         ruleSets.setDefaultTemplate(0);
