@@ -13,11 +13,15 @@ import com.huawei.antipoisoning.common.entity.MultiResponse;
 import com.huawei.antipoisoning.common.util.AntiMainUtil;
 import com.huawei.antipoisoning.common.util.JGitUtil;
 import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.text.SimpleDateFormat;
 import java.util.List;
 
@@ -28,6 +32,8 @@ import java.util.List;
  */
 @Service("vmsService")
 public class AntiServiceImpl implements AntiService {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(AntiServiceImpl.class);
 
     private static final String SCANRESULTPATH = "/tools/softwareFile/report/";
 
@@ -69,19 +75,16 @@ public class AntiServiceImpl implements AntiService {
             try {
                 if (antiEntity.getIsDownloaded() == true) {
                     String[] arguments = new String[]{"/bin/sh", "-c",
-                            "python3"
-                                    // 工具地址
-                                    + " " + YamlUtil.getToolPath() + SCANTOOLPATH
+                            "python3 " + YamlUtil.getToolPath() + SCANTOOLPATH
                                     // 仓库下载后存放地址
-                                    + " " + YamlUtil.getToolPath() + REPOPATH + "/" + antiEntity.getRepoName() + "-"
-                                    + antiEntity.getBranch() +
+                                    + " " + YamlUtil.getToolPath() + REPOPATH + File.separator
+                                    + antiEntity.getRepoName() + "-" + antiEntity.getBranch() + " "
                                     // 扫描完成后结果存放地址   /usr/result/openeuler-os-build
-                                    " " + YamlUtil.getToolPath() + SCANRESULTPATH + antiEntity.getRepoName() + ".json " +
+                                    + YamlUtil.getToolPath() + SCANRESULTPATH + antiEntity.getRepoName() + ".json " +
                                     // 支持多语言规则扫描
                                     "--custom-yaml " + YamlUtil.getToolPath() + CONFIG_PATH + antiEntity.getRulesName()
                                     + " > " + YamlUtil.getToolPath() + SCANTOOLFILE +
-                                    "poison_logs/" + uuid + ".txt"};
-                    System.out.println(arguments[2]);
+                                    "poison_logs" + File.separator + uuid + ".txt"};
                     SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss:SSS");
                     //设置任务开始时间
                     long startTime = System.currentTimeMillis();
@@ -89,7 +92,6 @@ public class AntiServiceImpl implements AntiService {
                     taskEntity.setExecuteStartTime(taskStartTime);
                     //工具执行
                     String sb = AntiMainUtil.execute(arguments);
-                    System.out.println(sb);
                     //保存日志内容
                     String url = YamlUtil.getToolPath() + "/tools/SoftwareSupplyChainSecurity-v1/poison_logs/";
                     taskEntity.setLogs(AntiMainUtil.getTxtContent(url, uuid));
@@ -103,13 +105,14 @@ public class AntiServiceImpl implements AntiService {
                     String downloadConsuming = taskEntity.getDownloadConsuming();
                     if (StringUtils.isNotBlank(taskConsuming) && StringUtils.isNotBlank(downloadConsuming)) {
                         long taskTime = Long.parseLong(taskConsuming.substring(0, taskConsuming.length() - 1));
-                        long downloadTime = Long.parseLong(downloadConsuming.substring(0, downloadConsuming.length() - 1));
+                        long downloadTime = Long.parseLong(downloadConsuming.substring(0,
+                                downloadConsuming.length() - 1));
                         long time = taskTime + downloadTime;
                         taskEntity.setTimeConsuming(time + "s");
                     }
-                    System.out.println("sb ==== :" + sb);
-                    String result = AntiMainUtil.getJsonContent(YamlUtil.getToolPath() + SCANRESULTPATH, antiEntity.getRepoName());
-                    System.out.println(result);
+                    String result = AntiMainUtil.getJsonContent(YamlUtil.getToolPath() + SCANRESULTPATH,
+                            antiEntity.getRepoName());
+                    LOGGER.info("The scan result is : {}" + result);
                     List<ResultEntity> results = JSONArray.parseArray(result, ResultEntity.class);
                     //扫描结果详情
                     for (ResultEntity resultEntity : results) {
@@ -148,7 +151,7 @@ public class AntiServiceImpl implements AntiService {
                 antiEntity.setTips(e.toString());
                 antiOperation.updateScanResult(antiEntity);
                 poisonTaskOperation.updateTask(antiEntity, taskEntity);
-                e.printStackTrace();
+                LOGGER.error(e.getMessage());
                 return MultiResponse.error(400, "scan error : " + e.getCause());
             }
         } else {
@@ -163,7 +166,7 @@ public class AntiServiceImpl implements AntiService {
      */
     @Override
     public MultiResponse setEnv() {
-        System.out.println("开始 start");
+        LOGGER.info("--- scan start ---");
         try {
             String command0 = "cd";
             String command1 = "export JOERN_HOME=/opt/sscs/joern-cli/";
@@ -172,7 +175,7 @@ public class AntiServiceImpl implements AntiService {
             Runtime.getRuntime().exec(new String[]{"/bin/sh", "-c", command1});
             Runtime.getRuntime().exec(new String[]{"/bin/sh", "-c", command2});
         } catch (IOException e) {
-            e.printStackTrace();
+            LOGGER.error(e.getMessage());
         }
         return MultiResponse.success(200, "success");
     }
@@ -185,7 +188,7 @@ public class AntiServiceImpl implements AntiService {
         if (StringUtils.isEmpty(antiEntity.getBranch())) {
             antiEntity.setBranch("master");
         }
-        String workspace = YamlUtil.getToolPath() + REPOPATH + "/" + antiEntity.getRepoName()
+        String workspace = YamlUtil.getToolPath() + REPOPATH + File.separator + antiEntity.getRepoName()
                 + "-" + antiEntity.getBranch();
         antiOperation.insertScanResult(antiEntity);
         long startTime = System.currentTimeMillis();
@@ -197,32 +200,32 @@ public class AntiServiceImpl implements AntiService {
         //生成任务id
         taskIdGenerate(antiEntity, downloadConsuming);
         if (getPullCode == 0) {
-            System.out.println("检出代码成功===0");
+            LOGGER.info("检出代码成功===0");
             antiEntity.setIsDownloaded(true);
             antiOperation.updateScanResult(antiEntity);
             return MultiResponse.success(200, "success");
         } else if (getPullCode == 1) {
-            antiEntity.setTips("检出代码未知异常===1");
+            LOGGER.info("检出代码未知异常===1");
             antiEntity.setIsDownloaded(false);
             antiOperation.updateScanResult(antiEntity);
             return MultiResponse.error(400, "downloadRepo error");
         } else if (getPullCode == 2) {
-            antiEntity.setTips("检出代码未知异常===2");
+            LOGGER.info("检出代码未知异常===2");
             antiEntity.setIsDownloaded(false);
             antiOperation.updateScanResult(antiEntity);
             return MultiResponse.error(400, "downloadRepo error");
         } else if (getPullCode == 3) {
-            antiEntity.setTips("检出代码未知异常===3");
+            LOGGER.info("检出代码未知异常===3");
             antiEntity.setIsDownloaded(false);
             antiOperation.updateScanResult(antiEntity);
             return MultiResponse.error(400, "downloadRepo error");
         } else if (getPullCode == 4) {
-            antiEntity.setTips("检出代码未知异常===4");
+            LOGGER.info("检出代码未知异常===4");
             antiEntity.setIsDownloaded(false);
             antiOperation.updateScanResult(antiEntity);
             return MultiResponse.error(400, "downloadRepo error");
         } else {
-            antiEntity.setTips("检出代码未知异常===5");
+            LOGGER.info("检出代码未知异常===5");
             antiEntity.setIsDownloaded(false);
             antiOperation.updateScanResult(antiEntity);
             return MultiResponse.error(400, "downloadRepo error");

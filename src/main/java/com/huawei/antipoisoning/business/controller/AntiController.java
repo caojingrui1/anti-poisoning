@@ -28,8 +28,7 @@ public class AntiController {
      */
     @RequestMapping("/scanRepo/{uuid}")
     public MultiResponse scanRepo(@PathVariable("uuid") String uuid) {
-        MultiResponse multiResponse =  antiService.scanRepo(uuid);
-        return multiResponse;
+        return antiService.scanRepo(uuid);
     }
 
     /**
@@ -48,8 +47,7 @@ public class AntiController {
         if (null == antiEntity.getLanguage() || "".equals(antiEntity.getLanguage())) {
             return MultiResponse.error(400,"error: no language detected!");
         }
-        MultiResponse multiResponse =  antiService.downloadRepo(antiEntity);
-        return multiResponse;
+        return antiService.downloadRepo(antiEntity);
     }
 
     /**
@@ -59,7 +57,6 @@ public class AntiController {
      */
     @RequestMapping(value = "/setEnv")
     public MultiResponse scanRepo1() {
-        MultiResponse multiResponse =  antiService.setEnv();
-        return multiResponse;
+        return antiService.setEnv();
     }
 }

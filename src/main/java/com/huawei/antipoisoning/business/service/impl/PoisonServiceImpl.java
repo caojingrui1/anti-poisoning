@@ -20,7 +20,6 @@ import com.huawei.antipoisoning.business.service.AntiService;
 import com.huawei.antipoisoning.business.service.PoisonService;
 import com.huawei.antipoisoning.business.util.YamlUtil;
 import com.huawei.antipoisoning.common.entity.MultiResponse;
-import com.huawei.antipoisoning.common.util.AntiMainUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

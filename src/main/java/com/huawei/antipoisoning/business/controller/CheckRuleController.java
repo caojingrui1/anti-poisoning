@@ -1,6 +1,5 @@
 package com.huawei.antipoisoning.business.controller;
 
-
 import com.huawei.antipoisoning.business.entity.checkRule.RuleModel;
 import com.huawei.antipoisoning.business.entity.checkRule.RuleSetModel;
 import com.huawei.antipoisoning.business.entity.checkRule.TaskRuleSetVo;
