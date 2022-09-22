@@ -46,15 +46,6 @@ public class PoisonScanOperation {
      */
     private Criteria getCommonCriteria(RepoInfo repoInfo) {
         Criteria criteria = new Criteria();
-//        if (StringUtils.isNotBlank(repoInfo.getCommunity())) {
-//            criteria.and("projectName").is(repoInfo.getCommunity());
-//        }
-//        if (StringUtils.isNotBlank(repoInfo.getBranch())) {
-//            criteria.and("gitBranch").is(repoInfo.getBranch());
-//        }
-//        if (StringUtils.isNotBlank(repoInfo.getRepoName())) {
-//            criteria.and("repoNameEn").is(repoInfo.getRepoName());
-//        }
         return criteria;
     }
 }
