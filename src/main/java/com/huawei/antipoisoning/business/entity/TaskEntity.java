@@ -113,6 +113,18 @@ public class TaskEntity {
     private Integer resultCount;
 
     /**
+     * 已解决问题数
+     */
+    @Field("solve_Count")
+    private Integer solveCount;
+
+    /**
+     * 未解决问题数
+     */
+    @Field("issue_count")
+    private Integer issueCount;
+
+    /**
      * 总耗时
      */
     @Field("time_consuming")

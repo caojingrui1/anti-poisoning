@@ -10,10 +10,11 @@ RUN rm -f $PROJECT_HOME
 RUN mkdir $PROJECT_HOME
 RUN yum update -y && yum install -y python3 python3-pip python3-devel gcc java-1.8.0-openjdk rpm rubygems git maven && \
     pip3 install pyyaml wheel yara_python
+VOLUME /tmp
+
 
 # 拉取代码
-LABEL git="update"
-RUN git clone -b dev https://openMajun_admin:Jszb2022h1@gitee.com/openMajun_enterprise/anti-poisoning.git $PROJECT_HOME
+RUN git clone -b dev https://gitee.com/openMajun_enterprise/anti-poisoning.git $PROJECT_HOME
 WORKDIR $PROJECT_HOME/
 RUN mvn clean install -s setting-new.xml
 

@@ -75,6 +75,18 @@ public class AntiEntity {
     private Integer resultCount;
 
     /**
+     * 已解决问题数
+     */
+    @Field("solve_Count")
+    private Integer solveCount;
+
+    /**
+     * 未解决问题数
+     */
+    @Field("issue_count")
+    private Integer issueCount;
+
+    /**
      * 问题详情列表
      */
     @Field("scan_result")
