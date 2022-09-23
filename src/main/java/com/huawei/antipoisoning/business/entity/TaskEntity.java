@@ -178,6 +178,12 @@ public class TaskEntity {
     @Field("logs")
     private String logs;
 
+    /**
+     * 执行状态
+     */
+    @Field("execution_status")
+    private Integer executionStatus;
+
     @Transient
     private Integer pageNum;
 

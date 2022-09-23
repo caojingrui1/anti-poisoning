@@ -42,13 +42,13 @@ public class PoisonTaskOperation {
         taskEntity.setRepoUrl(antiEntity.getRepoUrl());
         taskEntity.setRepoName(antiEntity.getRepoName());
         taskEntity.setCreateTime(antiEntity.getCreateTime());
-        taskEntity.setDownloadConsuming(newtaskEntity.getDownloadConsuming());
         taskEntity.setLanguage(antiEntity.getLanguage());
         taskEntity.setIsScan(antiEntity.getIsScan());
         taskEntity.setProjectName(antiEntity.getProjectName());
         taskEntity.setRulesName(antiEntity.getRulesName());
         taskEntity.setExecutorId(antiEntity.getExecutorId());
         taskEntity.setExecutorName(antiEntity.getExecutorName());
+        taskEntity.setExecutionStatus(newtaskEntity.getExecutionStatus());
         mongoTemplate.insert(taskEntity, CollectionTableName.POISON_VERSION_TASK);
     }
 
@@ -85,12 +85,18 @@ public class PoisonTaskOperation {
     }
 
     /**
-     * 保存扫描结果
+     * 下载完更新扫描结果
      *
-     * @param query 查询参数
+     * @param taskEntity 参数
+     * @@return 结果
      */
-    public AntiEntity queryScanResult(Query query) { //查询入库结果
-        return mongoTemplate.findOne(query, AntiEntity.class, CollectionTableName.POISON_VERSION_TASK);
+    public Long updateTaskDownloadTime(TaskEntity taskEntity) {
+        Query query = Query.query(Criteria.where("task_id").is(taskEntity.getTaskId()));
+        Update update = new Update();
+        if (taskEntity.getDownloadConsuming() != null) {
+            update.set("download_consuming", taskEntity.getDownloadConsuming());
+        }
+        return mongoTemplate.updateFirst(query, update, CollectionTableName.POISON_VERSION_TASK).getModifiedCount();
     }
 
     /**
@@ -108,8 +114,8 @@ public class PoisonTaskOperation {
         if (antiEntity.getCreateTime() != null) {
             update.set("create_time", antiEntity.getCreateTime());
         }
-        if (taskEntity.getTaskConsuming() != null) {
-            update.set("download_consuming", taskEntity.getDownloadConsuming());
+        if (taskEntity.getExecutionStatus() != null) {
+            update.set("execution_status", taskEntity.getExecutionStatus());
         }
         return mongoTemplate.updateFirst(query, update, CollectionTableName.POISON_VERSION_TASK).getModifiedCount();
     }
@@ -146,6 +152,9 @@ public class PoisonTaskOperation {
         }
         if (taskEntity.getLogs() != null) {
             update.set("logs", taskEntity.getLogs());
+        }
+        if (taskEntity.getExecutionStatus() != null) {
+            update.set("execution_status", taskEntity.getExecutionStatus());
         }
         return mongoTemplate.updateFirst(query, update, CollectionTableName.POISON_VERSION_TASK).getModifiedCount();
     }

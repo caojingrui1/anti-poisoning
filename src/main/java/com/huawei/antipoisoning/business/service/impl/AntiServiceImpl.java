@@ -30,7 +30,7 @@ import java.util.List;
  *
  * @since: 2022/5/30 16:22
  */
-@Service("vmsService")
+@Service
 public class AntiServiceImpl implements AntiService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AntiServiceImpl.class);
@@ -136,6 +136,7 @@ public class AntiServiceImpl implements AntiService {
                       antiEntity.setSolveCount(solveCount);
                       antiEntity.setIssueCount(results.size() - solveCount);
                     }
+                    taskEntity.setExecutionStatus(2);
                     //更新扫描结果
                     antiOperation.updateScanResult(antiEntity);
                     //更新版本级结果
@@ -147,6 +148,7 @@ public class AntiServiceImpl implements AntiService {
                     antiEntity.setIsSuccess(false);
                     // 原因
                     antiEntity.setTips("repo not Downloaded.");
+                    taskEntity.setExecutionStatus(3);
                     antiOperation.updateScanResult(antiEntity);
                     poisonTaskOperation.updateTask(antiEntity, taskEntity);
                     return MultiResponse.error(400, "repoNotDownloaded error");
@@ -154,6 +156,7 @@ public class AntiServiceImpl implements AntiService {
             } catch (IOException e) {
                 antiEntity.setIsSuccess(false);
                 antiEntity.setTips(e.toString());
+                taskEntity.setExecutionStatus(3);
                 antiOperation.updateScanResult(antiEntity);
                 poisonTaskOperation.updateTask(antiEntity, taskEntity);
                 LOGGER.error(e.getMessage());
@@ -190,6 +193,8 @@ public class AntiServiceImpl implements AntiService {
         SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss:SSS");
         String createTime = df.format(System.currentTimeMillis());
         antiEntity.setCreateTime(createTime);
+        //生成任务id
+        TaskEntity taskEntity = taskIdGenerate(antiEntity);
         if (StringUtils.isEmpty(antiEntity.getBranch())) {
             antiEntity.setBranch("master");
         }
@@ -202,8 +207,8 @@ public class AntiServiceImpl implements AntiService {
         int getPullCode = gfxly.pullVersion(antiEntity.getRepoUrl());
         long endTime = System.currentTimeMillis();
         String downloadConsuming = (endTime - startTime) / 1000 + "s";
-        //生成任务id
-        taskIdGenerate(antiEntity, downloadConsuming);
+        taskEntity.setDownloadConsuming(downloadConsuming);
+        poisonTaskOperation.updateTaskDownloadTime(taskEntity);
         if (getPullCode == 0) {
             LOGGER.info("检出代码成功===0");
             antiEntity.setIsDownloaded(true);
@@ -241,19 +246,20 @@ public class AntiServiceImpl implements AntiService {
      * 任务ID生成。
      *
      * @param antiEntity 任务对象
-     * @param downloadConsuming 下载信息
      */
-    public void taskIdGenerate(AntiEntity antiEntity, String downloadConsuming) {
+    public TaskEntity taskIdGenerate(AntiEntity antiEntity) {
         List<TaskEntity> taskEntity = poisonTaskOperation.queryTaskId(antiEntity);
         if (null != taskEntity && taskEntity.size() != 0) {
-            taskEntity.get(0).setDownloadConsuming(downloadConsuming);
+            taskEntity.get(0).setExecutionStatus(1);
             poisonTaskOperation.updateTaskDownload(antiEntity, taskEntity.get(0));
+            return taskEntity.get(0);
         }else {
             TaskEntity newTaskEntity = new TaskEntity();
             String taskId = antiEntity.getProjectName() + "-" + antiEntity.getRepoName() + "-" + antiEntity.getBranch();
             newTaskEntity.setTaskId(taskId);
-            newTaskEntity.setDownloadConsuming(downloadConsuming);
+            newTaskEntity.setExecutionStatus(1);
             poisonTaskOperation.insertTaskResult(antiEntity, newTaskEntity);
+            return newTaskEntity;
         }
 
     }
