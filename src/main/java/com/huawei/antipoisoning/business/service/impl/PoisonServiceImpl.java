@@ -236,6 +236,7 @@ public class PoisonServiceImpl implements PoisonService {
             taskEntityNew.setProjectName(repoInfo.getProjectName());
             taskEntityNew.setRepoName(repoInfo.getRepoName());
             taskEntityNew.setBranch(repoInfo.getRepoBranchName());
+            taskEntityNew.setExecutionStatus(0);
             result.add(taskEntityNew);
         }
         return new MultiResponse().code(200).result(
