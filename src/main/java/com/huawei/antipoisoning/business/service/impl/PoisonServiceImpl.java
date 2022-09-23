@@ -78,7 +78,7 @@ public class PoisonServiceImpl implements PoisonService {
                 RuleSetModel ruleSetModel = new RuleSetModel();
                 ruleSetModel.setId(checkRuleSet.getRuleSetId());
                 List<RuleSetModel> ruleSetModels = checkRuleOperation.queryRuleSet(ruleSetModel);
-                if (ruleSetModels.size() == 1) {
+                if (ruleSetModels.size() == 1 && (!("通用检查规则集").equals(ruleSetModels.get(0).getTemplateName()))) {
                     ruleIds.addAll(ruleSetModels.get(0).getRuleIds());
                 } else {
                     return new MultiResponse().code(400).message("ruleSet is error");
@@ -119,9 +119,9 @@ public class PoisonServiceImpl implements PoisonService {
             antiEntity.setRepoUrl(repoInfo.getRepoUrl());
             antiEntity.setRepoName(repoInfo.getRepoName());
             StringBuffer stringBuffer = new StringBuffer();
-            for (int i=0 ; i<languageList.size() ; i++){
+            for (int i = 0; i < languageList.size(); i++) {
                 stringBuffer.append(languageList.get(i));
-                if (i != languageList.size()){
+                if (i != languageList.size()) {
                     stringBuffer.append(" ");
                 }
             }
@@ -212,21 +212,22 @@ public class PoisonServiceImpl implements PoisonService {
                 task.setBranchRepositoryId(repoInfos.get(0).getId());
                 List<CheckRuleSet> checkRuleSet = taskRuleSet.get(0).getAntiCheckRules();
                 List<String> language = new ArrayList<>();
-                for (CheckRuleSet checkRuleSet1 : checkRuleSet){
+                for (CheckRuleSet checkRuleSet1 : checkRuleSet) {
                     language.add(checkRuleSet1.getLanguage());
                 }
                 task.setLanguage(language.toString());
             }
         }
-        if (Objects.nonNull(taskEntity.getIsSuccess())){
+        if (Objects.nonNull(taskEntity.getIsSuccess())) {
             return new MultiResponse().code(200).result(
                     new PageVo(Long.valueOf(taskEntities.size()), manualPaging(taskEntities, taskEntity)));
         }
         List<TaskEntity> result = new ArrayList<>();
-        outer: for (RepoInfo repoInfo : repoInfos){
-            for (TaskEntity taskEntity1 : taskEntities){
+        outer:
+        for (RepoInfo repoInfo : repoInfos) {
+            for (TaskEntity taskEntity1 : taskEntities) {
                 //筛选出没跑过任务的仓库信息，赋予初始值
-                if (repoInfo.getId().equals(taskEntity1.getBranchRepositoryId())){
+                if (repoInfo.getId().equals(taskEntity1.getBranchRepositoryId())) {
                     result.add(taskEntity1);
                     continue outer;
                 }
@@ -271,25 +272,25 @@ public class PoisonServiceImpl implements PoisonService {
      * 检查中心列表手动分页
      *
      * @param results List<TaskEntity>
-     *                     * @param results List<TaskEntity>
+     *                * @param results List<TaskEntity>
      */
-    public List<TaskEntity> manualPaging(List<TaskEntity> results, TaskEntity taskEntity){
+    public List<TaskEntity> manualPaging(List<TaskEntity> results, TaskEntity taskEntity) {
         int pageNum = taskEntity.getPageNum();
         int pageSize = taskEntity.getPageSize();
-        if (pageSize == 1){
+        if (pageSize == 1) {
             return results;
-        } else if (pageSize >= 2){
+        } else if (pageSize >= 2) {
             int listSize = results.size();
-            if (pageSize >= listSize && pageNum == 1){
+            if (pageSize >= listSize && pageNum == 1) {
                 return results;
-            }else {
+            } else {
                 int index = pageNum * pageSize - pageSize;
                 List<TaskEntity> newResults = new ArrayList<>();
-                for (int i=0 ; i<pageSize ; i++){
-                    if(index + i >= results.size()){
+                for (int i = 0; i < pageSize; i++) {
+                    if (index + i >= results.size()) {
                         break;
                     }
-                    newResults.add(results.get(i+index));
+                    newResults.add(results.get(i + index));
                 }
                 return newResults;
             }
