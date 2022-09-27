@@ -1,9 +1,11 @@
 package com.huawei.antipoisoning.business.entity;
 
+import com.huawei.antipoisoning.business.enmu.CollectionTableName;
 import com.huawei.antipoisoning.business.entity.checkRule.TaskRuleSetVo;
 import lombok.Data;
 import lombok.ToString;
 import org.springframework.data.annotation.Transient;
+import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
 /**
@@ -11,6 +13,7 @@ import org.springframework.data.mongodb.core.mapping.Field;
  */
 @Data
 @ToString
+@Document(collection = CollectionTableName.POISON_VERSION_TASK)
 public class TaskEntity {
     /**
      * id

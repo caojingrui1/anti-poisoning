@@ -1,7 +1,10 @@
 package com.huawei.antipoisoning.business.entity;
 
+import com.huawei.antipoisoning.business.enmu.CollectionTableName;
+import com.huawei.antipoisoning.business.entity.shield.Revision;
 import lombok.Data;
 import lombok.ToString;
+import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
 /**
@@ -9,7 +12,9 @@ import org.springframework.data.mongodb.core.mapping.Field;
  */
 @Data
 @ToString
+@Document(collection = CollectionTableName.SCAN_RESULT_DETAILS)
 public class ResultEntity {
+    private String id;
     /**
      * id
      */
@@ -80,4 +85,12 @@ public class ResultEntity {
      */
     @Field("hash")
     private String hash;
+
+    private Revision revision;
+
+    /**
+     * 关联问题详情id
+     */
+    @Field("detail_id")
+    private String detailId;
 }
