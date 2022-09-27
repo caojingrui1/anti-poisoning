@@ -40,4 +40,9 @@ public class CollectionTableName {
      * 扫描任务表
      */
     public static final String POISON_VERSION_TASK = "poison_version_task";
+
+    /**
+     * 屏蔽问题详情
+     */
+    public static final String SHIELD_RESULT_DETAIL = "shield_result_detail";
 }
