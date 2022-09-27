@@ -215,6 +215,7 @@ public class PoisonServiceImpl implements PoisonService {
                     language.add(checkRuleSet1.getLanguage());
                 }
                 task.setLanguage(language.toString());
+                task.setExecutionStatus(2);
             }
         }
         if (Objects.nonNull(taskEntity.getIsSuccess())) {
