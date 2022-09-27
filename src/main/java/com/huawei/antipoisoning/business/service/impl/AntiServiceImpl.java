@@ -93,7 +93,7 @@ public class AntiServiceImpl implements AntiService {
                     //工具执行
                     String sb = AntiMainUtil.execute(arguments);
                     //保存日志内容
-                    String url = YamlUtil.getToolPath() + "/tools/SoftwareSupplyChainSecurity-v1/poison_logs/";
+                    String url = YamlUtil.getToolPath() + SCANTOOLFILE + "poison_logs"  + File.separator;
                     taskEntity.setLogs(AntiMainUtil.getTxtContent(url, uuid));
                     //设置任务结束时间
                     long endTime = System.currentTimeMillis();

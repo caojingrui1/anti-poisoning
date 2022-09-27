@@ -84,7 +84,7 @@ public class AntiMainUtil {
      * @param fileName json文件名称
      * @param resultPath json文件位置
      */
-    public static String getTxtContent(String resultPath, String fileName) throws NoSuchObjectException,IOException {
+    public static String getTxtContent(String resultPath, String fileName) throws IOException {
         String jsonStr = "";
         File file = new File(resultPath + fileName + ".txt");
         FileReader fileReader = new FileReader(file);
