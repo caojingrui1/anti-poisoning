@@ -62,14 +62,13 @@ public class PoisonServiceImpl implements PoisonService {
      */
     @Override
     public MultiResponse poisonScan(RepoInfo repoInfo) {
-        String path = this.getClass().getProtectionDomain().getCodeSource().getLocation().getPath();
-        System.out.println("linux path --- " + path.replace("file:", ""));
-        System.out.println(System.getProperty("user.dir"));
-        // 获取仓库信息
-        RepoInfo info = repoOperation.getById(repoInfo);
-        info.setExecutorId(repoInfo.getExecutorId());
-        info.setExecutorName(repoInfo.getExecutorName());
-        repoInfo = info;
+//        String path = this.getClass().getProtectionDomain().getCodeSource().getLocation().getPath();
+//        System.out.println("linux path --- " + path.replace("file:", ""));
+//        System.out.println(System.getProperty("user.dir"));
+//        RepoInfo info = repoOperation.getById(repoInfo);
+//        info.setExecutorId(repoInfo.getExecutorId());
+//        info.setExecutorName(repoInfo.getExecutorName());
+//        repoInfo = info;
         // 查询仓库语言和规则集
         List<TaskRuleSetVo> taskRuleSet = checkRuleOperation.getTaskRuleSet("", repoInfo.getProjectName(), repoInfo.getRepoName());
         List<String> ruleIds = new ArrayList<>();

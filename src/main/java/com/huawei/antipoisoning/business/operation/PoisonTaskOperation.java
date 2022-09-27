@@ -111,6 +111,9 @@ public class PoisonTaskOperation {
         if (antiEntity.getScanId() != null) {
             update.set("scan_id", antiEntity.getScanId());
         }
+        if (antiEntity.getLanguage() != null){
+            update.set("language", antiEntity.getLanguage());
+        }
         if (antiEntity.getCreateTime() != null) {
             update.set("create_time", antiEntity.getCreateTime());
         }
