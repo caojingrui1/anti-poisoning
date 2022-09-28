@@ -7,6 +7,8 @@ import lombok.ToString;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
+import java.util.Map;
+
 /**
  * @author zhangshengjie
  */
@@ -93,4 +95,6 @@ public class ResultEntity {
      */
     @Field("detail_id")
     private String detailId;
+
+    private Map link;
 }
