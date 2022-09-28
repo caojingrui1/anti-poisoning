@@ -58,4 +58,10 @@ public class RepoInfo {
      * 执行人名称
      */
     private String executorName;
+
+    /**
+     * 防投毒任务id
+     */
+    @Field("poison_task_id")
+    private String poisonTaskId;
 }

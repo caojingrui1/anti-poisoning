@@ -7,6 +7,7 @@ import com.huawei.antipoisoning.business.entity.TaskEntity;
 import com.huawei.antipoisoning.business.operation.AntiOperation;
 import com.huawei.antipoisoning.business.operation.PoisonResultOperation;
 import com.huawei.antipoisoning.business.operation.PoisonTaskOperation;
+import com.huawei.antipoisoning.business.operation.RepoOperation;
 import com.huawei.antipoisoning.business.service.AntiService;
 import com.huawei.antipoisoning.business.util.YamlUtil;
 import com.huawei.antipoisoning.common.entity.MultiResponse;
@@ -59,6 +60,9 @@ public class AntiServiceImpl implements AntiService {
 
     @Autowired
     private PoisonResultOperation poisonResultOperation;
+
+    @Autowired
+    private RepoOperation repoOperation;
 
     /**
      * 执行漏洞
@@ -191,12 +195,13 @@ public class AntiServiceImpl implements AntiService {
     }
 
     @Override
-    public MultiResponse downloadRepo(AntiEntity antiEntity) {
+    public MultiResponse downloadRepo(AntiEntity antiEntity, String id) {
         SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss:SSS");
         String createTime = df.format(System.currentTimeMillis());
         antiEntity.setCreateTime(createTime);
         //生成任务id
         TaskEntity taskEntity = taskIdGenerate(antiEntity);
+        repoOperation.updateRepo(id, taskEntity.getTaskId());
         if (StringUtils.isEmpty(antiEntity.getBranch())) {
             antiEntity.setBranch("master");
         }

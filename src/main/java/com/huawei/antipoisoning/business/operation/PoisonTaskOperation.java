@@ -207,8 +207,8 @@ public class PoisonTaskOperation {
         if (StringUtils.isNotBlank(taskEntity.getBranch())) {
             criteria.and("branch").is(taskEntity.getBranch());
         }
-        if (Objects.nonNull(taskEntity.getIsSuccess())) {
-            criteria.and("is_success").is(taskEntity.getIsSuccess());
+        if (taskEntity.getExecutionStatus() != null) {
+            criteria.and("execution_status").is(taskEntity.getExecutionStatus());
         }
         Query query = Query.query(criteria);
         // 总数量

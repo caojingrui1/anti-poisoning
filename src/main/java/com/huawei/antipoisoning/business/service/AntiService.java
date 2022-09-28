@@ -33,5 +33,5 @@ public interface AntiService {
      * @param antiEntity 扫描任务实体
      * @return MultiResponse<List<VmsExternalCveSourceDTO>>
      */
-    MultiResponse downloadRepo(AntiEntity antiEntity);
+    MultiResponse downloadRepo(AntiEntity antiEntity, String id);
 }
