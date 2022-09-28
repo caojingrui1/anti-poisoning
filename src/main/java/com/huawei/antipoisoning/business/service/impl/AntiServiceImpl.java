@@ -121,7 +121,7 @@ public class AntiServiceImpl implements AntiService {
                     //扫描结果详情
                     for (ResultEntity resultEntity : results) {
                         int count = poisonResultOperation.getResultDetailByHash(resultEntity.getHash(),
-                                resultEntity.getTaskId());
+                                taskEntity.getTaskId());
                         String status = count > 0 ? "2" : "0";
                         resultEntity.setProjectName(antiEntity.getProjectName());
                         resultEntity.setRepoName(antiEntity.getRepoName());
