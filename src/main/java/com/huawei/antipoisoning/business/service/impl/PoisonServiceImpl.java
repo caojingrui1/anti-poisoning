@@ -20,6 +20,7 @@ import com.huawei.antipoisoning.business.service.AntiService;
 import com.huawei.antipoisoning.business.service.PoisonService;
 import com.huawei.antipoisoning.business.util.YamlUtil;
 import com.huawei.antipoisoning.common.entity.MultiResponse;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -131,7 +132,7 @@ public class PoisonServiceImpl implements PoisonService {
             antiEntity.setExecutorId(repoInfo.getExecutorId());
             antiEntity.setExecutorName(repoInfo.getExecutorName());
             // 下载目标仓库代码
-            antiService.downloadRepo(antiEntity);
+            antiService.downloadRepo(antiEntity, repoInfo.getId());
             // 防投毒扫描
             antiService.scanRepo(scanId);
         } else {
@@ -218,16 +219,20 @@ public class PoisonServiceImpl implements PoisonService {
                 task.setExecutionStatus(2);
             }
         }
-        if (Objects.nonNull(taskEntity.getIsSuccess())) {
+//        if (Objects.nonNull(taskEntity.getIsSuccess())) {
+        if (taskEntity.getExecutionStatus() != null && taskEntity.getExecutionStatus() != 0) {
             return new MultiResponse().code(200).result(
                     new PageVo(Long.valueOf(taskEntities.size()), manualPaging(taskEntities, taskEntity)));
         }
         List<TaskEntity> result = new ArrayList<>();
         outer:
         for (RepoInfo repoInfo : repoInfos) {
+            if(taskEntities.size() == 0 && StringUtils.isNotBlank(repoInfo.getPoisonTaskId())){
+                continue outer;
+            }
             for (TaskEntity taskEntity1 : taskEntities) {
                 //筛选出没跑过任务的仓库信息，赋予初始值
-                if (repoInfo.getId().equals(taskEntity1.getBranchRepositoryId())) {
+                if (StringUtils.isNotBlank(repoInfo.getPoisonTaskId())) {
                     result.add(taskEntity1);
                     continue outer;
                 }

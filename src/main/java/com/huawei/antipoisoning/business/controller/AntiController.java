@@ -37,7 +37,7 @@ public class AntiController {
      * @return MultiResponse
      */
     @RequestMapping(value = "/downloadRepo", method = RequestMethod.POST)
-    public MultiResponse downloadRepo(@RequestBody AntiEntity antiEntity) {
+    public MultiResponse downloadRepo(@RequestBody AntiEntity antiEntity, String id) {
         if (null == antiEntity.getScanId() || "".equals(antiEntity.getScanId())) {
             return MultiResponse.error(400,"error: no scanId detected!");
         }
@@ -47,7 +47,7 @@ public class AntiController {
         if (null == antiEntity.getLanguage() || "".equals(antiEntity.getLanguage())) {
             return MultiResponse.error(400,"error: no language detected!");
         }
-        return antiService.downloadRepo(antiEntity);
+        return antiService.downloadRepo(antiEntity, id);
     }
 
     /**
