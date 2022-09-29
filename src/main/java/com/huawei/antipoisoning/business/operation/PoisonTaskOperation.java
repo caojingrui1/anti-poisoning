@@ -163,11 +163,11 @@ public class PoisonTaskOperation {
         if (taskEntity.getExecutionStatus() != null) {
             update.set("execution_status", taskEntity.getExecutionStatus());
         }
-        if (taskEntity.getSolveCount() != null) {
-            update.set("solve_Count", taskEntity.getSolveCount());
+        if (antiEntity.getSolveCount() != null) {
+            update.set("solve_Count", antiEntity.getSolveCount());
         }
-        if (taskEntity.getIssueCount() != null) {
-            update.set("issue_count", taskEntity.getIssueCount());
+        if (antiEntity.getIssueCount() != null) {
+            update.set("issue_count", antiEntity.getIssueCount());
         }
         return mongoTemplate.updateFirst(query, update, CollectionTableName.POISON_VERSION_TASK).getModifiedCount();
     }
