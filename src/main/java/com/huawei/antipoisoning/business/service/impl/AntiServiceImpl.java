@@ -257,7 +257,9 @@ public class AntiServiceImpl implements AntiService {
     public TaskEntity taskIdGenerate(AntiEntity antiEntity) {
         List<TaskEntity> taskEntity = poisonTaskOperation.queryTaskId(antiEntity);
         if (null != taskEntity && taskEntity.size() != 0) {
+            String taskId = taskEntity.get(0).getProjectName() + "-" + taskEntity.get(0).getRepoName() + "-" + taskEntity.get(0).getBranch();
             taskEntity.get(0).setExecutionStatus(1);
+            taskEntity.get(0).setTaskId(taskId);
             poisonTaskOperation.updateTaskDownload(antiEntity, taskEntity.get(0));
             return taskEntity.get(0);
         }else {

@@ -121,10 +121,12 @@ public class PoisonServiceImpl implements PoisonService {
             StringBuffer stringBuffer = new StringBuffer();
             for (int i = 0; i < languageList.size(); i++) {
                 stringBuffer.append(languageList.get(i));
-                if (i != languageList.size()) {
+                if (i < languageList.size() - 1) {
                     stringBuffer.append(" ");
                 }
             }
+            //同步同社区同仓库的语言配置
+            poisonTaskOperation.updateTaskLanguage(antiEntity, stringBuffer.toString());
             antiEntity.setLanguage(stringBuffer.toString());
             antiEntity.setIsScan(true);
             antiEntity.setProjectName(repoInfo.getProjectName());
@@ -209,17 +211,19 @@ public class PoisonServiceImpl implements PoisonService {
             List<TaskRuleSetVo> taskRuleSet = checkRuleOperation.getTaskRuleSet("", task.getProjectName(), task.getRepoName());
             if (taskRuleSet.size() == CommonConstants.CommonNumber.NUMBER_ONE) {
                 task.setTaskRuleSetVo(taskRuleSet.get(0));
-                task.setBranchRepositoryId(repoInfos.get(0).getId());
+                for (RepoInfo repoInfo : repoInfos){
+                    if (StringUtils.isNotBlank(repoInfo.getPoisonTaskId()) && repoInfo.getPoisonTaskId().equals(task.getTaskId())){
+                        task.setBranchRepositoryId(repoInfo.getId());
+                    }
+                }
                 List<CheckRuleSet> checkRuleSet = taskRuleSet.get(0).getAntiCheckRules();
                 List<String> language = new ArrayList<>();
                 for (CheckRuleSet checkRuleSet1 : checkRuleSet) {
                     language.add(checkRuleSet1.getLanguage());
                 }
                 task.setLanguage(language.toString());
-                task.setExecutionStatus(2);
             }
         }
-//        if (Objects.nonNull(taskEntity.getIsSuccess())) {
         if (taskEntity.getExecutionStatus() != null && taskEntity.getExecutionStatus() != 0) {
             return new MultiResponse().code(200).result(
                     new PageVo(Long.valueOf(taskEntities.size()), manualPaging(taskEntities, taskEntity)));
@@ -232,7 +236,7 @@ public class PoisonServiceImpl implements PoisonService {
             }
             for (TaskEntity taskEntity1 : taskEntities) {
                 //筛选出没跑过任务的仓库信息，赋予初始值
-                if (StringUtils.isNotBlank(repoInfo.getPoisonTaskId())) {
+                if (taskEntity1.getTaskId().equals(repoInfo.getPoisonTaskId())) {
                     result.add(taskEntity1);
                     continue outer;
                 }
@@ -242,6 +246,7 @@ public class PoisonServiceImpl implements PoisonService {
             taskEntityNew.setRepoName(repoInfo.getRepoName());
             taskEntityNew.setBranch(repoInfo.getRepoBranchName());
             taskEntityNew.setExecutionStatus(0);
+            taskEntityNew.setBranchRepositoryId(repoInfo.getId());
             result.add(taskEntityNew);
         }
         return new MultiResponse().code(200).result(

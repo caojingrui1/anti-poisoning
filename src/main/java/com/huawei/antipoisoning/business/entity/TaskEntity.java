@@ -170,7 +170,7 @@ public class TaskEntity {
     private TaskRuleSetVo taskRuleSetVo;
 
     /**
-     * 该任务所用的规则集参数体
+     * 仓库id
      */
     @Transient
     private String branchRepositoryId;

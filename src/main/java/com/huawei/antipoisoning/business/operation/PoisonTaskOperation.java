@@ -4,7 +4,9 @@ import com.huawei.antipoisoning.business.enmu.CollectionTableName;
 import com.huawei.antipoisoning.business.entity.AntiEntity;
 import com.huawei.antipoisoning.business.entity.TaskEntity;
 import com.huawei.antipoisoning.business.entity.vo.PageVo;
+import com.mongodb.client.result.UpdateResult;
 import org.apache.commons.lang.StringUtils;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -14,7 +16,6 @@ import org.springframework.util.ObjectUtils;
 
 import javax.annotation.Resource;
 import java.util.List;
-import java.util.Objects;
 
 /**
  * 扫描结果包裹数据存档
@@ -120,6 +121,9 @@ public class PoisonTaskOperation {
         if (taskEntity.getExecutionStatus() != null) {
             update.set("execution_status", taskEntity.getExecutionStatus());
         }
+        if (taskEntity.getTaskId() != null) {
+            update.set("task_id", taskEntity.getTaskId());
+        }
         return mongoTemplate.updateFirst(query, update, CollectionTableName.POISON_VERSION_TASK).getModifiedCount();
     }
 
@@ -212,6 +216,7 @@ public class PoisonTaskOperation {
         }
         Query query = Query.query(criteria);
         // 总数量
+        query.with(Sort.by(Sort.Direction.DESC, "_id"));
         long count = mongoTemplate.count(query, TaskEntity.class, CollectionTableName.POISON_VERSION_TASK);
 //        if (taskEntity.getPageNum() != null && taskEntity.getPageSize() != null && count > 0) {
 //            query.skip((long) (taskEntity.getPageNum() - 1) * taskEntity.getPageSize());
@@ -228,5 +233,24 @@ public class PoisonTaskOperation {
      */
     public void delTask(String scanId) {
         mongoTemplate.remove(Query.query(Criteria.where("scan_id").is(scanId)), CollectionTableName.POISON_VERSION_TASK);
+    }
+
+    /**
+     * 修改同社区统仓的语言
+     *
+     * @param antiEntity 扫描数据
+     * @return
+     */
+    public UpdateResult updateTaskLanguage(AntiEntity antiEntity, String language) {
+        if (ObjectUtils.isEmpty(antiEntity)) {
+            return null;
+        }
+        Query query = Query.query(Criteria.where("project_name").is(antiEntity.getProjectName())
+                .and("repo_name").is(antiEntity.getRepoName()));
+        Update update = new Update();
+        if (StringUtils.isNotBlank(language)) {
+            update.set("language", language);
+        }
+        return mongoTemplate.updateMulti(query, update, CollectionTableName.POISON_VERSION_TASK);
     }
 }
