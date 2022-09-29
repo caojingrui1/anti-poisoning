@@ -27,9 +27,9 @@ import java.util.concurrent.TimeUnit;
 @RequestMapping(value = "/releasepoison")
 public class PoisonController {
     private static final Logger LOGGER = LoggerFactory.getLogger(PoisonController.class);
-    private static final LinkedBlockingQueue<RepoInfo> BLOCKING_QUEUE = new LinkedBlockingQueue<>(1000);
+    private static final LinkedBlockingQueue<RepoInfo> BLOCKING_QUEUE = new LinkedBlockingQueue<>(200);
     private static final ThreadPoolExecutor THREAD_SCHEDULED_EXECUTOR =
-            new ThreadPoolExecutor(1, 200, 0,
+            new ThreadPoolExecutor(10, 200, 0,
                     TimeUnit.SECONDS, new LinkedBlockingQueue<>(200));
 
     @Autowired(required = false)

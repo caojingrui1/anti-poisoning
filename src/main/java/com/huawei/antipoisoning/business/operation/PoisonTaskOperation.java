@@ -124,6 +124,10 @@ public class PoisonTaskOperation {
         if (taskEntity.getTaskId() != null) {
             update.set("task_id", taskEntity.getTaskId());
         }
+        //初始化总耗时
+        if (taskEntity.getTimeConsuming() != null){
+            update.set("time_consuming", "");
+        }
         return mongoTemplate.updateFirst(query, update, CollectionTableName.POISON_VERSION_TASK).getModifiedCount();
     }
 
