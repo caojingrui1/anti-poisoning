@@ -1,6 +1,7 @@
 package com.huawei.antipoisoning.business.controller;
 
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.huawei.antipoisoning.business.entity.AntiEntity;
 import com.huawei.antipoisoning.business.entity.RepoInfo;
 import com.huawei.antipoisoning.business.entity.TaskEntity;
@@ -16,9 +17,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Objects;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 
 /**
  * @author zhangshengjie
@@ -45,9 +44,8 @@ public class PoisonController {
             produces = {"application/json"},
             consumes = {"application/json"},
             method = RequestMethod.POST)
-    public MultiResponse poisonScan(@RequestBody RepoInfo repoInfo) throws InterruptedException {
-        queueService(repoInfo);
-        return new MultiResponse().code(200).result("success");
+    public MultiResponse poisonScan(@RequestBody RepoInfo repoInfo) throws InterruptedException, ExecutionException {
+        return queueService(repoInfo);
     }
 
     @RequestMapping(value = "/query-results",
@@ -94,7 +92,7 @@ public class PoisonController {
      * @param repoInfo 任务实体类
      * @return MultiResponse
      */
-    public void queueService(RepoInfo repoInfo) throws InterruptedException {
+    public MultiResponse queueService(RepoInfo repoInfo) throws InterruptedException, ExecutionException {
         if (Objects.isNull(repoInfo) || BLOCKING_QUEUE.remainingCapacity() <= 0) {
             LOGGER.error("Blocking queue is full.");
         }
@@ -104,21 +102,19 @@ public class PoisonController {
         } catch (InterruptedException e) {
             LOGGER.error("{} Blocking queue put string failed." + e.getMessage());
         }
-
-        THREAD_SCHEDULED_EXECUTOR.submit(new Thread(() -> {
-            while (BLOCKING_QUEUE.size() > 0) {
-                try {
-                    RepoInfo take = BLOCKING_QUEUE.take();
-                    MultiResponse multiResponse = poisonService.poisonScan(take);
-                    LOGGER.info(multiResponse.getMessage());
-                    Thread.sleep(1000);
-                    LOGGER.info("The task had complete.");
-                    LOGGER.info("{} tasks are left to wait" + BLOCKING_QUEUE.size());
-                } catch (InterruptedException e) {
-                    LOGGER.error("{} Blocking queue take string failed." + e.getMessage());
-                }
-            }
-        }));
+        Future future = THREAD_SCHEDULED_EXECUTOR.submit(() -> {
+            RepoInfo take = BLOCKING_QUEUE.take();
+            poisonService.poisonScan(take);
+            return poisonService.poisonScan(take);
+        });
+        ObjectMapper objectMapper = new ObjectMapper();
+        MultiResponse response;
+        try {
+            response = objectMapper.convertValue(future.get(3, TimeUnit.SECONDS), MultiResponse.class);
+        }catch (Exception e){
+            return new MultiResponse().code(200).message("success");
+        }
+        return response;
     }
 }
 
