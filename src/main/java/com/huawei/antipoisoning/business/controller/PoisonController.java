@@ -3,6 +3,7 @@ package com.huawei.antipoisoning.business.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.huawei.antipoisoning.business.entity.AntiEntity;
+import com.huawei.antipoisoning.business.entity.pr.PullRequestInfo;
 import com.huawei.antipoisoning.business.entity.RepoInfo;
 import com.huawei.antipoisoning.business.entity.TaskEntity;
 import com.huawei.antipoisoning.business.service.PoisonService;
@@ -96,7 +97,6 @@ public class PoisonController {
         if (Objects.isNull(repoInfo) || BLOCKING_QUEUE.remainingCapacity() <= 0) {
             LOGGER.error("Blocking queue is full.");
         }
-
         try {
             BLOCKING_QUEUE.put(repoInfo);
         } catch (InterruptedException e) {
@@ -115,6 +115,20 @@ public class PoisonController {
             return new MultiResponse().code(200).message("success");
         }
         return response;
+    }
+
+    /**
+     * 启动扫描任务
+     *
+     * @param info pullRequest 信息
+     * @return MultiResponse
+     */
+    @RequestMapping(value = "/pr-diff",
+            produces = {"application/json"},
+            consumes = {"application/json"},
+            method = RequestMethod.POST)
+    public MultiResponse getPrDiff(@RequestBody PullRequestInfo info) throws InterruptedException {
+        return poisonService.getPrDiff(info);
     }
 }
 
