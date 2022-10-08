@@ -268,11 +268,18 @@ public class CheckRuleOperation {
      * 修改任务的规则集信息
      *
      * @param taskRuleSetVo 参数体
-     * @return
      */
     public void updateTaskRule(TaskRuleSetVo taskRuleSetVo) {
-
-        Query query = Query.query(Criteria.where("_id").is(taskRuleSetVo.getId()));
+        Criteria criteria = new Criteria();
+        if (StringUtils.isNotBlank(taskRuleSetVo.getId())) {
+            criteria.and("_id").is(taskRuleSetVo.getId());
+        }
+        if (StringUtils.isNotBlank(taskRuleSetVo.getProjectName()) &&
+                StringUtils.isNotBlank(taskRuleSetVo.getRepoNameEn())) {
+            criteria.and("project_name").is(taskRuleSetVo.getProjectName()).and("repo_name_en")
+                    .is(taskRuleSetVo.getRepoNameEn());
+        }
+        Query query = Query.query(criteria);
         Update update = new Update();
         if (!taskRuleSetVo.getAntiCheckRules().isEmpty()) {
             update.set("anti_check_rules", taskRuleSetVo.getAntiCheckRules());
