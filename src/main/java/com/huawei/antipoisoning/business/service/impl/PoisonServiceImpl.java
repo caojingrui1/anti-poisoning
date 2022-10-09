@@ -212,7 +212,7 @@ public class PoisonServiceImpl implements PoisonService {
                 && (JSONObject.parseObject(body).get("result") != null
                 || JSONObject.parseObject(body).get("result") != "")
                 && "200".equals(JSONObject.parseObject(body).get("code").toString())) {
-            repoInfos = (List<RepoInfo>) JSONObject.parseObject(body).get("result");
+            repoInfos = JSONObject.parseArray(JSONObject.parseObject(body).get("result").toString(), RepoInfo.class);
         }
         // 查询任务所用的规则集信息
         //给所有已启动过的任务匹配一个仓库信息，以便检测中心启动
