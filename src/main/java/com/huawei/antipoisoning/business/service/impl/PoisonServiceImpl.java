@@ -202,9 +202,9 @@ public class PoisonServiceImpl implements PoisonService {
         repoInfoTask.setProjectName(taskEntity.getProjectName());
         repoInfoTask.setRepoName(taskEntity.getRepoName());
         repoInfoTask.setRepoBranchName(taskEntity.getBranch());
-//        HttpUtil httpUtil = new HttpUtil(ConstantsArgs.MAJUN_LOCAL_URL);
         HttpUtil httpUtil = new HttpUtil(ConstantsArgs.MAJUN_BETA_URL);
-        String url = "/ci-backend/ci-portal/v1/poison/get-repo-infos";
+        LOGGER.info(ConstantsArgs.MAJUN_BETA_URL);
+        String url = "/api/ci-backend/webhook/schedule/v1/poison/get-repo-infos";
         JSONObject jsonObject = (JSONObject) JSONObject.toJSON(repoInfoTask);
         String body = httpUtil.doPost(jsonObject, url);
         List<RepoInfo> repoInfos = new ArrayList<>();
@@ -214,7 +214,6 @@ public class PoisonServiceImpl implements PoisonService {
                 && "200".equals(JSONObject.parseObject(body).get("code").toString())) {
             repoInfos = (List<RepoInfo>) JSONObject.parseObject(body).get("result");
         }
-//        List<RepoInfo> repoInfos = repoOperation.getRepoByInfo(repoInfoTask);
         // 查询任务所用的规则集信息
         //给所有已启动过的任务匹配一个仓库信息，以便检测中心启动
         for (TaskEntity task : taskEntities) {
