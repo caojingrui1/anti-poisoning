@@ -203,10 +203,10 @@ public class AntiServiceImpl implements AntiService {
         antiEntity.setCreateTime(createTime);
         //生成任务id
         TaskEntity taskEntity = taskIdGenerate(antiEntity);
-        String url = "/ci-portal/v1/poison/update-repo?id="
+        String url = "/ci-backend/ci-portal/v1/poison/update-repo?id="
                 + id + "&taskId=" + taskEntity.getTaskId();
-        HttpUtil httpUtil = new HttpUtil(ConstantsArgs.MAJUN_LOCAL_URL);
-//        HttpUtil httpUtil = new HttpUtil(ConstantsArgs.MAJUN_BETA_URL);
+//        HttpUtil httpUtil = new HttpUtil(ConstantsArgs.MAJUN_LOCAL_URL);
+        HttpUtil httpUtil = new HttpUtil(ConstantsArgs.MAJUN_BETA_URL);
         httpUtil.doPost(null, url);
 //        repoOperation.updateRepo(id, taskEntity.getTaskId());
         if (StringUtils.isEmpty(antiEntity.getBranch())) {

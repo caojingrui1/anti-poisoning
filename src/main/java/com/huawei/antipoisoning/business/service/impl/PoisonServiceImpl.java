@@ -202,9 +202,9 @@ public class PoisonServiceImpl implements PoisonService {
         repoInfoTask.setProjectName(taskEntity.getProjectName());
         repoInfoTask.setRepoName(taskEntity.getRepoName());
         repoInfoTask.setRepoBranchName(taskEntity.getBranch());
-        HttpUtil httpUtil = new HttpUtil(ConstantsArgs.MAJUN_LOCAL_URL);
-//        HttpUtil httpUtil = new HttpUtil(ConstantsArgs.MAJUN_BETA_URL);
-        String url = "/ci-portal/v1/poison/get-repo-infos";
+//        HttpUtil httpUtil = new HttpUtil(ConstantsArgs.MAJUN_LOCAL_URL);
+        HttpUtil httpUtil = new HttpUtil(ConstantsArgs.MAJUN_BETA_URL);
+        String url = "/ci-backend/ci-portal/v1/poison/get-repo-infos";
         JSONObject jsonObject = (JSONObject) JSONObject.toJSON(repoInfoTask);
         String body = httpUtil.doPost(jsonObject, url);
         List<RepoInfo> repoInfos = new ArrayList<>();
