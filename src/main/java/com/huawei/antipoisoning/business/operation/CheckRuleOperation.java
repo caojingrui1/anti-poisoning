@@ -228,6 +228,20 @@ public class CheckRuleOperation {
     }
 
     /**
+     * 通过规则id数组获取规则详情
+     *
+     * @param ruleIds id数组
+     * @return getRuleByIds
+     */
+    public List<RuleModel> getRuleByIds(List<String> ruleIds) {
+        Criteria criteria = new Criteria();
+        if (ruleIds.size() > 0) {
+            criteria.and("rule_id").in(ruleIds);
+        }
+        return mongoTemplate.find(Query.query(criteria), RuleModel.class, CollectionTableName.ANTI_CHECK_RULE);
+    }
+
+    /**
      * 修改自定义规则集
      *
      * @param ruleSetModel updateRuleSet
@@ -238,19 +252,39 @@ public class CheckRuleOperation {
     }
 
     /**
+     * 去掉规则集无用的规则
+     *
+     * @param id      主键id
+     * @param ruleIds 规则数据
+     */
+    public void updateRuleSetToRuleIds(String id, List<String> ruleIds) {
+        Criteria criteria = Criteria.where("_id").is(id);
+        Update update = new Update();
+        update.set("rule_ids", ruleIds);
+        mongoTemplate.updateFirst(Query.query(criteria), update, CollectionTableName.ANTI_CHECK_RULE_SET);
+    }
+
+    /**
      * 修改任务的规则集信息
      *
-     * @param taskEntity 参数体
-     * @return
+     * @param taskRuleSetVo 参数体
      */
-    public long updateTaskRuleSet(TaskEntity taskEntity) {
-
-        Query query = Query.query(Criteria.where("_id").is(taskEntity.getTaskRuleSetVo().getId()));
-        Update update = new Update();
-        if (!taskEntity.getTaskRuleSetVo().getAntiCheckRules().isEmpty()) {
-            update.set("anti_check_rules", taskEntity.getTaskRuleSetVo().getAntiCheckRules());
+    public void updateTaskRule(TaskRuleSetVo taskRuleSetVo) {
+        Criteria criteria = new Criteria();
+        if (StringUtils.isNotBlank(taskRuleSetVo.getId())) {
+            criteria.and("_id").is(taskRuleSetVo.getId());
         }
-        return mongoTemplate.updateFirst(query, update, CollectionTableName.ANTI_TASK_RULE_SET).getModifiedCount();
+        if (StringUtils.isNotBlank(taskRuleSetVo.getProjectName()) &&
+                StringUtils.isNotBlank(taskRuleSetVo.getRepoNameEn())) {
+            criteria.and("project_name").is(taskRuleSetVo.getProjectName()).and("repo_name_en")
+                    .is(taskRuleSetVo.getRepoNameEn());
+        }
+        Query query = Query.query(criteria);
+        Update update = new Update();
+        if (!taskRuleSetVo.getAntiCheckRules().isEmpty()) {
+            update.set("anti_check_rules", taskRuleSetVo.getAntiCheckRules());
+        }
+        mongoTemplate.updateFirst(query, update, CollectionTableName.ANTI_TASK_RULE_SET).getModifiedCount();
     }
 
     /**
@@ -263,4 +297,16 @@ public class CheckRuleOperation {
                 .and("repo_name_en").is(taskEntity.getRepoName())), CollectionTableName.ANTI_TASK_RULE_SET);
 
     }
+
+    /**
+     * 查找自定义规则集
+     *
+     * @param ruleSetModel updateRuleSet
+     */
+    public TaskRuleSetVo queryRuleById(RuleSetModel ruleSetModel) {
+        return mongoTemplate.findOne(Query.query(Criteria.where("_id").is(ruleSetModel.getId())),
+                TaskRuleSetVo.class, CollectionTableName.ANTI_TASK_RULE_SET);
+    }
+
+
 }

@@ -1,13 +1,5 @@
 server:
   port: 8086
-spring:
-  data:
-    mongodb:
-      host: 192.168.0.81
-      database: dev_ci_info
-      port: 8635
-      username: rwuser
-      password: ENC(X1c9rQ0E+CfNc4DfZuyMOdBhQmdTPMKZ)
 git:
   username: openlibing@163.com
   password: ENC(ac2sDLzYl/zj9MFEwF7wmZsYjn7V1B5J)
@@ -15,4 +7,3 @@ jasypt:
   encryptor:
     algorithm: PBEWithMD5AndDES
     iv-generator-classname: org.jasypt.iv.NoIvGenerator
-    password: softwaresupplychain

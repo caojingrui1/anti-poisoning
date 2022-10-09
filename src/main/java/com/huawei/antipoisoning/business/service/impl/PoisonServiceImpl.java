@@ -1,15 +1,15 @@
 package com.huawei.antipoisoning.business.service.impl;
 
 
+import com.alibaba.fastjson.JSONObject;
 import com.huawei.antipoisoning.business.enmu.CommonConstants;
-import com.huawei.antipoisoning.business.entity.AntiEntity;
-import com.huawei.antipoisoning.business.entity.RepoInfo;
-import com.huawei.antipoisoning.business.entity.ResultEntity;
-import com.huawei.antipoisoning.business.entity.TaskEntity;
+import com.huawei.antipoisoning.business.enmu.ConstantsArgs;
+import com.huawei.antipoisoning.business.entity.*;
 import com.huawei.antipoisoning.business.entity.checkRule.CheckRuleSet;
 import com.huawei.antipoisoning.business.entity.checkRule.RuleModel;
 import com.huawei.antipoisoning.business.entity.checkRule.RuleSetModel;
 import com.huawei.antipoisoning.business.entity.checkRule.TaskRuleSetVo;
+import com.huawei.antipoisoning.business.entity.pr.PullRequestInfo;
 import com.huawei.antipoisoning.business.entity.vo.PageVo;
 import com.huawei.antipoisoning.business.operation.CheckRuleOperation;
 import com.huawei.antipoisoning.business.operation.PoisonResultOperation;
@@ -20,22 +20,27 @@ import com.huawei.antipoisoning.business.service.AntiService;
 import com.huawei.antipoisoning.business.service.PoisonService;
 import com.huawei.antipoisoning.business.util.YamlUtil;
 import com.huawei.antipoisoning.common.entity.MultiResponse;
-import com.huawei.antipoisoning.common.util.AntiMainUtil;
+import com.huawei.antipoisoning.common.util.HttpUtil;
+import com.huawei.antipoisoning.common.util.JGitUtil;
+import org.apache.commons.collections4.MapUtils;
+import org.apache.commons.lang.ObjectUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
 @Service
 public class PoisonServiceImpl implements PoisonService {
+    private static final Logger LOGGER = LoggerFactory.getLogger(PoisonServiceImpl.class);
 
     @Autowired
     private AntiService antiService;
@@ -63,14 +68,6 @@ public class PoisonServiceImpl implements PoisonService {
      */
     @Override
     public MultiResponse poisonScan(RepoInfo repoInfo) {
-        String path = this.getClass().getProtectionDomain().getCodeSource().getLocation().getPath();
-        System.out.println("linux path --- " + path.replace("file:", ""));
-        System.out.println(System.getProperty("user.dir"));
-        // 获取仓库信息
-        RepoInfo info = repoOperation.getById(repoInfo);
-        info.setExecutorId(repoInfo.getExecutorId());
-        info.setExecutorName(repoInfo.getExecutorName());
-        repoInfo = info;
         // 查询仓库语言和规则集
         List<TaskRuleSetVo> taskRuleSet = checkRuleOperation.getTaskRuleSet("", repoInfo.getProjectName(), repoInfo.getRepoName());
         List<String> ruleIds = new ArrayList<>();
@@ -79,7 +76,7 @@ public class PoisonServiceImpl implements PoisonService {
                 RuleSetModel ruleSetModel = new RuleSetModel();
                 ruleSetModel.setId(checkRuleSet.getRuleSetId());
                 List<RuleSetModel> ruleSetModels = checkRuleOperation.queryRuleSet(ruleSetModel);
-                if (ruleSetModels.size() == 1) {
+                if (ruleSetModels.size() == 1 && (!("通用检查规则集").equals(ruleSetModels.get(0).getTemplateName()))) {
                     ruleIds.addAll(ruleSetModels.get(0).getRuleIds());
                 } else {
                     return new MultiResponse().code(400).message("ruleSet is error");
@@ -119,14 +116,23 @@ public class PoisonServiceImpl implements PoisonService {
             antiEntity.setBranch(repoInfo.getRepoBranchName());
             antiEntity.setRepoUrl(repoInfo.getRepoUrl());
             antiEntity.setRepoName(repoInfo.getRepoName());
-            antiEntity.setLanguage(languageList.toString());
+            StringBuffer stringBuffer = new StringBuffer();
+            for (int i = 0; i < languageList.size(); i++) {
+                stringBuffer.append(languageList.get(i));
+                if (i < languageList.size() - 1) {
+                    stringBuffer.append(" ");
+                }
+            }
+            //同步同社区同仓库的语言配置
+            poisonTaskOperation.updateTaskLanguage(antiEntity, stringBuffer.toString());
+            antiEntity.setLanguage(stringBuffer.toString());
             antiEntity.setIsScan(true);
             antiEntity.setProjectName(repoInfo.getProjectName());
             antiEntity.setRulesName(tableName + ".yaml");
             antiEntity.setExecutorId(repoInfo.getExecutorId());
             antiEntity.setExecutorName(repoInfo.getExecutorName());
             // 下载目标仓库代码
-            antiService.downloadRepo(antiEntity);
+            antiService.downloadRepo(antiEntity, repoInfo.getId());
             // 防投毒扫描
             antiService.scanRepo(scanId);
         } else {
@@ -145,12 +151,6 @@ public class PoisonServiceImpl implements PoisonService {
     public MultiResponse queryResultsDetail(AntiEntity antiEntity) {
         List<ResultEntity> resultEntity = poisonResultOperation.queryResultEntity(antiEntity.getScanId());
         return new MultiResponse().code(200).result(resultEntity);
-    }
-
-    @Override
-    public MultiResponse selectLog(AntiEntity antiEntity) throws IOException {
-        String url = "/usr/local/anti-poisoning/tools/SoftwareSupplyChainSecurity-v1/poison_logs";
-        return new MultiResponse().code(200).result(AntiMainUtil.getTxtContent(url, antiEntity.getScanId()));
     }
 
     /**
@@ -202,47 +202,64 @@ public class PoisonServiceImpl implements PoisonService {
         repoInfoTask.setProjectName(taskEntity.getProjectName());
         repoInfoTask.setRepoName(taskEntity.getRepoName());
         repoInfoTask.setRepoBranchName(taskEntity.getBranch());
-        List<RepoInfo> repoInfos = repoOperation.getRepoByInfo(repoInfoTask);
+        HttpUtil httpUtil = new HttpUtil(ConstantsArgs.MAJUN_BETA_URL);
+        LOGGER.info(ConstantsArgs.MAJUN_BETA_URL);
+        String url = "/api/ci-backend/webhook/schedule/v1/poison/get-repo-infos";
+        JSONObject jsonObject = (JSONObject) JSONObject.toJSON(repoInfoTask);
+        String body = httpUtil.doPost(jsonObject, url);
+        List<RepoInfo> repoInfos = new ArrayList<>();
+        if (StringUtils.isNotEmpty(body)
+                && (JSONObject.parseObject(body).get("result") != null
+                || JSONObject.parseObject(body).get("result") != "")
+                && "200".equals(JSONObject.parseObject(body).get("code").toString())) {
+            repoInfos = (List<RepoInfo>) JSONObject.parseObject(body).get("result");
+        }
         // 查询任务所用的规则集信息
         //给所有已启动过的任务匹配一个仓库信息，以便检测中心启动
         for (TaskEntity task : taskEntities) {
             List<TaskRuleSetVo> taskRuleSet = checkRuleOperation.getTaskRuleSet("", task.getProjectName(), task.getRepoName());
             if (taskRuleSet.size() == CommonConstants.CommonNumber.NUMBER_ONE) {
                 task.setTaskRuleSetVo(taskRuleSet.get(0));
-                RepoInfo repoInfo2 = new RepoInfo();
-                repoInfo2.setProjectName(task.getProjectName());
-                repoInfo2.setRepoName(task.getRepoName());
-                repoInfo2.setRepoBranchName(task.getBranch());
-                List<RepoInfo> result = repoOperation.getRepoByInfo(repoInfo2);
-                task.setBranchRepositoryId(result.get(0).getId());
+                for (RepoInfo repoInfo : repoInfos){
+                    if (StringUtils.isNotBlank(repoInfo.getPoisonTaskId()) && repoInfo.getPoisonTaskId().equals(task.getTaskId())){
+                        task.setBranchRepositoryId(repoInfo.getId());
+                    }
+                }
+                List<CheckRuleSet> checkRuleSet = taskRuleSet.get(0).getAntiCheckRules();
+                List<String> language = new ArrayList<>();
+                for (CheckRuleSet checkRuleSet1 : checkRuleSet) {
+                    language.add(checkRuleSet1.getLanguage());
+                }
+                task.setLanguage(language.toString());
             }
         }
-        if (Objects.nonNull(taskEntity.getIsSuccess())){
-            return new MultiResponse().code(200).result(taskEntities);
+        if (taskEntity.getExecutionStatus() != null && taskEntity.getExecutionStatus() != 0) {
+            return new MultiResponse().code(200).result(
+                    new PageVo(Long.valueOf(taskEntities.size()), manualPaging(taskEntities, taskEntity)));
         }
         List<TaskEntity> result = new ArrayList<>();
-        for (RepoInfo repoInfo : repoInfos){
-            if(taskEntities.size()==0){
-                TaskEntity taskEntityNew = new TaskEntity();
-                taskEntityNew.setProjectName(repoInfo.getProjectName());
-                taskEntityNew.setRepoName(repoInfo.getRepoName());
-                taskEntityNew.setBranch(repoInfo.getRepoBranchName());
-                result.add(taskEntityNew);
+        outer:
+        for (RepoInfo repoInfo : repoInfos) {
+            if(taskEntities.size() == 0 && StringUtils.isNotBlank(repoInfo.getPoisonTaskId())){
+                continue outer;
             }
-            for (TaskEntity taskEntity1 : taskEntities){
+            for (TaskEntity taskEntity1 : taskEntities) {
                 //筛选出没跑过任务的仓库信息，赋予初始值
-                if (repoInfo.getId().equals(taskEntity1.getBranchRepositoryId())){
+                if (taskEntity1.getTaskId().equals(repoInfo.getPoisonTaskId())) {
                     result.add(taskEntity1);
-                }else {
-                    TaskEntity taskEntityNew = new TaskEntity();
-                    taskEntityNew.setProjectName(repoInfo.getProjectName());
-                    taskEntityNew.setRepoName(repoInfo.getRepoName());
-                    taskEntityNew.setBranch(repoInfo.getRepoBranchName());
-                    result.add(taskEntityNew);
+                    continue outer;
                 }
             }
+            TaskEntity taskEntityNew = new TaskEntity();
+            taskEntityNew.setProjectName(repoInfo.getProjectName());
+            taskEntityNew.setRepoName(repoInfo.getRepoName());
+            taskEntityNew.setBranch(repoInfo.getRepoBranchName());
+            taskEntityNew.setExecutionStatus(0);
+            taskEntityNew.setBranchRepositoryId(repoInfo.getId());
+            result.add(taskEntityNew);
         }
-        return new MultiResponse().code(200).result(result);
+        return new MultiResponse().code(200).result(
+                new PageVo(Long.valueOf(result.size()), manualPaging(result, taskEntity)));
     }
 
     /**
@@ -270,9 +287,67 @@ public class PoisonServiceImpl implements PoisonService {
         return new MultiResponse().code(200).message("success");
     }
 
+    /**
+     * 获取PR增量文件信息。
+     *
+     * @param info pr信息
+     * @return
+     */
     @Override
-    public MultiResponse queryTaskById(TaskEntity taskEntity) {
-        TaskEntity result = poisonTaskOperation.queryTaskEntityById(taskEntity.getId());
-        return new MultiResponse().code(200).result(result);
+    public MultiResponse getPrDiff(PullRequestInfo info) {
+        JGitUtil jGitUtil = new JGitUtil(info.getPullInfo(), info.getUser(), info.getPassword(),
+                info.getBranch(), info.getVersion(), info.getWorkspace());
+        jGitUtil.pullPr(info.getGitUrl());
+        StringBuffer sb = jGitUtil.cmdOfPullRequest(info.getWorkspace(), info.getTarget());
+        List<String> strList = new ArrayList<String>();
+        try {
+            LOGGER.info("get diff tree start!");
+            Process process = Runtime.getRuntime().exec(new String[]{"/bin/sh", "-c", sb.toString()},null,null);
+            InputStreamReader ir = new InputStreamReader(process.getInputStream());
+            LineNumberReader input = new LineNumberReader(ir);
+            String line;
+            process.waitFor();
+            while ((line = input.readLine()) != null){
+                strList.add(line);
+                LOGGER.info(line);
+            }
+            LOGGER.info("get diff tree end!");
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        return MultiResponse.success(200, "success");
+    }
+
+
+    /**
+     * 检查中心列表手动分页
+     *
+     * @param results List<TaskEntity>
+     *                * @param results List<TaskEntity>
+     */
+    public List<TaskEntity> manualPaging(List<TaskEntity> results, TaskEntity taskEntity) {
+        int pageNum = taskEntity.getPageNum();
+        int pageSize = taskEntity.getPageSize();
+        if (pageSize == 1) {
+            return results;
+        } else if (pageSize >= 2) {
+            int listSize = results.size();
+            if (pageSize >= listSize && pageNum == 1) {
+                return results;
+            } else {
+                int index = pageNum * pageSize - pageSize;
+                List<TaskEntity> newResults = new ArrayList<>();
+                for (int i = 0; i < pageSize; i++) {
+                    if (index + i >= results.size()) {
+                        break;
+                    }
+                    newResults.add(results.get(i + index));
+                }
+                return newResults;
+            }
+        }
+        return Collections.emptyList();
     }
 }

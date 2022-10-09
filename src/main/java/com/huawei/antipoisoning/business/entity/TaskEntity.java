@@ -1,9 +1,11 @@
 package com.huawei.antipoisoning.business.entity;
 
+import com.huawei.antipoisoning.business.enmu.CollectionTableName;
 import com.huawei.antipoisoning.business.entity.checkRule.TaskRuleSetVo;
 import lombok.Data;
 import lombok.ToString;
 import org.springframework.data.annotation.Transient;
+import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
 /**
@@ -11,6 +13,7 @@ import org.springframework.data.mongodb.core.mapping.Field;
  */
 @Data
 @ToString
+@Document(collection = CollectionTableName.POISON_VERSION_TASK)
 public class TaskEntity {
     /**
      * id
@@ -113,6 +116,18 @@ public class TaskEntity {
     private Integer resultCount;
 
     /**
+     * 已解决问题数
+     */
+    @Field("solve_Count")
+    private Integer solveCount;
+
+    /**
+     * 未解决问题数
+     */
+    @Field("issue_count")
+    private Integer issueCount;
+
+    /**
      * 总耗时
      */
     @Field("time_consuming")
@@ -155,10 +170,22 @@ public class TaskEntity {
     private TaskRuleSetVo taskRuleSetVo;
 
     /**
-     * 该任务所用的规则集参数体
+     * 仓库id
      */
     @Transient
     private String branchRepositoryId;
+
+    /**
+     * 本次执行日志
+     */
+    @Field("logs")
+    private String logs;
+
+    /**
+     * 执行状态
+     */
+    @Field("execution_status")
+    private Integer executionStatus;
 
     @Transient
     private Integer pageNum;

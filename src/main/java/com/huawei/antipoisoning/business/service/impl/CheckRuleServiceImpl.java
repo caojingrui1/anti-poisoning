@@ -87,9 +87,6 @@ public class CheckRuleServiceImpl implements CheckRuleService {
      */
     @Override
     public MultiResponse queryRuleSet(RuleSetModel ruleSetModel) {
-        if (StringUtils.isBlank(ruleSetModel.getProjectName())) {
-            return new MultiResponse().code(400).message("projectName is error");
-        }
         // 查出所有的系统规则集
         RuleSetModel ruleSets = new RuleSetModel();
         ruleSets.setDefaultTemplate(0);
@@ -102,7 +99,17 @@ public class CheckRuleServiceImpl implements CheckRuleService {
         }
         // 得到每个规则集的规则个数
         for (RuleSetModel ruleSet : ruleSetModels) {
-            ruleSet.setRuleCount(ruleSet.getRuleIds().size());
+            if (ruleSet.getRuleIds().size() > 0) {
+                List<RuleModel> ruleByIds = checkRuleOperation.getRuleByIds(ruleSet.getRuleIds());
+                ruleSet.setRuleCount(ruleByIds.size());
+                if (ruleByIds.size() != ruleSet.getRuleIds().size()) {
+                    // 更换该规则集的规则id
+                    List<String> ruleIds = ruleByIds.stream().map(RuleModel::getRuleId).distinct().collect(Collectors.toList());
+                    checkRuleOperation.updateRuleSetToRuleIds(ruleSet.getId(), ruleIds);
+                }
+            } else {
+                ruleSet.setRuleCount(0);
+            }
             // 判断是否在使用中
             List<TaskRuleSetVo> taskRuleSet = checkRuleOperation.getTaskRuleSet(ruleSet.getId(), "", "");
             if (taskRuleSet.size() != 0) {
@@ -135,6 +142,28 @@ public class CheckRuleServiceImpl implements CheckRuleService {
             return new MultiResponse().code(400).message("ruleSet is error");
         }
         checkRuleOperation.delRuleSet(ruleSetModel.getId());
+        return new MultiResponse().code(200).message("success");
+    }
+
+    /**
+     * 查找任务规则
+     *
+     * @param ruleSetModel 查找id
+     */
+    @Override
+    public MultiResponse queryTaskById(RuleSetModel ruleSetModel) {
+        return new MultiResponse().code(200).
+                result(checkRuleOperation.queryRuleById(ruleSetModel));
+    }
+
+    /**
+     * 更改任务规则
+     *
+     * @param taskRuleSetVo 修改后的任务规则信息
+     */
+    @Override
+    public MultiResponse updateTaskRule(TaskRuleSetVo taskRuleSetVo) {
+        checkRuleOperation.updateTaskRule(taskRuleSetVo);
         return new MultiResponse().code(200).message("success");
     }
 }

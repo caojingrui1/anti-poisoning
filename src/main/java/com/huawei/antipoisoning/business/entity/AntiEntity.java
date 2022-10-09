@@ -4,7 +4,6 @@ import lombok.Data;
 import lombok.ToString;
 import org.springframework.data.mongodb.core.mapping.Field;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -74,6 +73,18 @@ public class AntiEntity {
      */
     @Field("result_count")
     private Integer resultCount;
+
+    /**
+     * 已解决问题数
+     */
+    @Field("solve_Count")
+    private Integer solveCount;
+
+    /**
+     * 未解决问题数
+     */
+    @Field("issue_count")
+    private Integer issueCount;
 
     /**
      * 问题详情列表

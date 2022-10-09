@@ -136,4 +136,15 @@ public class PoisonResultOperation {
         return mongoTemplate.find(Query.query(criteria), ResultEntity.class,
                 CollectionTableName.SCAN_RESULT_DETAILS).size();
     }
+
+    /**
+     * 查询状态为已屏蔽的问题数
+     *
+     * @param status 屏蔽状态
+     */
+    public int getCountByStatus(String status, String scanId) {
+        Criteria criteria = Criteria.where("status").is(status).and("scan_id").is(scanId);
+        return mongoTemplate.find(Query.query(criteria), ResultEntity.class, CollectionTableName.SCAN_RESULT_DETAILS)
+                .size();
+    }
 }

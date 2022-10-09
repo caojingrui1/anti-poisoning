@@ -6,6 +6,8 @@ import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.lib.Ref;
 import org.eclipse.jgit.transport.RefSpec;
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.Serializable;
@@ -19,6 +21,8 @@ import java.util.List;
  * @author zyx
  */
 public class JGitUtil implements Serializable {
+    private static final Logger LOGGER = LoggerFactory.getLogger(JGitUtil.class);
+
     private String repo;
     private String user;
     private String pass;
@@ -79,7 +83,7 @@ public class JGitUtil implements Serializable {
             pullMsg = "未找到相应的类文件异常，failed";
             pullFlag = 4;
         } finally {
-//            LOGGER.info("{} --code-- {}", pullMsg, pullFlag);
+            LOGGER.info("{} --code-- {}", pullMsg, pullFlag);
             if (git != null) {
                 git.close();
             }
@@ -132,7 +136,7 @@ public class JGitUtil implements Serializable {
             pullMsg = "未找到相应的类文件异常，failed";
             pullFlag = 4;
         } finally {
-//            LOGGER.info("{} --code-- {}", pullMsg, pullFlag);
+            LOGGER.info("{} --code-- {}", pullMsg, pullFlag);
             if (git != null) {
                 git.close();
             }
@@ -152,7 +156,7 @@ public class JGitUtil implements Serializable {
 
         if (this.branch.equals("master")) {
             checkoutMsg = "Check out code OK. ->" + this.branch;
-            System.out.println(checkoutMsg +"--code--"+ checkoutFlag);
+            LOGGER.info(checkoutMsg + "--code--" + checkoutFlag);
             return checkoutFlag;
         }
         Git git = null;
@@ -162,7 +166,7 @@ public class JGitUtil implements Serializable {
             List<Ref> branchList = git.branchList().setListMode(ListBranchCommand.ListMode.ALL).call();
             for (Ref ref : branchList){
                 if (this.branch.equals(ref.getName())) {
-                    System.out.println("代码分支列表中存在给定分支");
+                    LOGGER.info("代码分支列表中存在给定分支");
                 }
             }
             git.checkout().setName("origin/" + this.branch).setForce(true).call();
@@ -172,7 +176,7 @@ public class JGitUtil implements Serializable {
             checkoutMsg = "检出分支代码 failed ! ->" + this.branch;
             checkoutFlag = 6;
         } finally {
-            System.out.println(checkoutMsg +"--code--"+ checkoutFlag);
+            LOGGER.info(checkoutMsg + "--code--" + checkoutFlag);
             if (git != null) {
                 git.close();
             }
@@ -190,13 +194,12 @@ public class JGitUtil implements Serializable {
         int checkoutFlag = 0;
         if (this.revision == null || this.revision.length() == 0) {
             checkoutMsg = "Check out code OK. ->" + this.revision;
-            System.out.println(checkoutMsg +"--code--"+ checkoutFlag);
+            LOGGER.info(checkoutMsg + "--code--" + checkoutFlag);
             return checkoutFlag;
         }
         Git git = null;
         try {
             git = Git.open( new File(this.git_config) );
-//            git.checkout().setUpstreamMode()
             git.checkout().setName( this.revision ).setForce(true).call();
             checkoutMsg = "检出代码版本 success! code OK. ->" + this.revision;
         } catch (Exception e) {
@@ -204,13 +207,44 @@ public class JGitUtil implements Serializable {
             checkoutMsg = "检出代码版本 failed ! ->" + this.revision;
             checkoutFlag = 8;
         } finally {
-            System.out.println(checkoutMsg +"--code--"+ checkoutFlag);
+            LOGGER.info(checkoutMsg + "--code--" + checkoutFlag);
             if (git != null) {
                 git.close();
             }
         }
         return checkoutFlag;
     }
+
+
+    /**
+     * git指令获取PR差异文件。
+     *
+     * @param workspace 工作区间
+     * @param giteeSourceBranch 源分支
+     * @return sb shell指令
+     */
+    public StringBuffer cmdOfPullRequest (String workspace, String giteeSourceBranch) {
+        StringBuffer sb = new StringBuffer();
+        sb.append("mkdir -p " + workspace +  File.separator + "modify_dirs && ");
+        sb.append("cd " + workspace + " && ");
+        sb.append("git diff-tree -r --name-only --no-commit-id origin/" + giteeSourceBranch
+                + " HEAD > modify_list.txt  && ");
+        sb.append("cat modify_list.txt && ");
+        sb.append("while read -r line;  " ).append("do ").append("dir_name=${line%/*}; ")
+                .append("file_name=${line##*/};  ");
+        sb.append("if [ $(echo $line |grep '/') ]; then  ");
+        sb.append("mkdir -p modify_dirs" + File.separator + "${dir_name} ; ");
+        sb.append("if [ -f ${line} ]; then  ");
+        sb.append("cp -rf ${line} modify_dirs" + File.separator + "${dir_name};  ");
+        sb.append("fi; " ).append("else ");
+        sb.append("mkdir -p modify_dirs; ");
+        sb.append("if [ -f ${line} ]; then  ");
+        sb.append("cp -rf ${line} modify_dirs;  " );
+        sb.append("fi;  " ).append("fi; ");
+        sb.append("done < modify_list.txt ");
+        return sb;
+    }
+
     /**
      * 删除目录
      * @param file
@@ -221,7 +255,7 @@ public class JGitUtil implements Serializable {
                 file.delete();
             } else {
                 File[] files = file.listFiles();
-                for (File getFile: files) {
+                for (File getFile : files) {
                     deleteFolder(getFile);
                     getFile.delete();
                 }
@@ -232,60 +266,10 @@ public class JGitUtil implements Serializable {
     }
 
     public static void main(String[] args) {
-//        String baseUrl = "http://git/url";
-//        String baseUrl = "https://gitee.com/ZYX_95/scanoss-pr";
-        String baseUrl = "https://gitee.com/openeuler/";
-//        String baseUrl = "https://gitee.com/openlookeng/";
-//        String module = args[0];
-//        String module = "scanoss-pr";
-        String repo = "A-Ops";
-//        String module = "hetu-core";
-        String user = "openlibing@163.com";
-        String pass = "Jszb2022h1";
-        String branch = "master";
-//        String branch = "pull/1198/MERGE";
-//        String branch = args[1];
-//        String revision = "e87e01a5c77d29ad340a5e7e1c771dd64d9ad9c2";
-        String revision = "7c2f9fa05ec24426a289d881814745d8f2482f4b";
-        String workspace = "c:/Temp/build/" + repo;
-//        String workspace = "c:/Temp/build1/"+module;
-//        String workspace = "/usr/test/down/" + repo;
-//        String revision = args[2];
-//        JGitUtil gfxly = new JGitUtil(user, pass, branch, workspace);
-        JGitUtil gfxly = new JGitUtil(repo, user, pass, branch, revision, workspace);
+        JGitUtil gfxly = new JGitUtil("pull/2/MERGE", "", "", "master",
+                "b19cf211470cb6841cd5f3340e62db74b61849b2", "C:\\workspace\\poison-test");
+        gfxly.pullPr("https://gitee.com/zzyy95_1/helper.git");
+        StringBuffer sb = gfxly.cmdOfPullRequest("C:\\workspace\\poison-test", "master");
 
-        int getPullCode = gfxly.pullVersion(baseUrl  + repo + ".git");
-        if (getPullCode == 0) {
-            System.out.println("检出代码成功===0");
-        } else if (getPullCode == 1) {
-            System.exit(1);
-        } else if (getPullCode == 2) {
-            System.exit(2);
-        } else if (getPullCode == 3) {
-            System.exit(3);
-        } else if (getPullCode == 4) {
-            System.exit(4);
-        } else {
-            System.out.println("检出代码未知异常===5");
-            System.exit(5);
-        }
-        int getBranchCode = gfxly.checkoutBranch();
-        if (getBranchCode == 0) {
-            System.out.println("检出分支成功===0");
-        } else if (getBranchCode == 6) {
-            System.exit(6);
-        } else {
-            System.out.println("检出分支未知异常===7");
-            System.exit(7);
-        }
-//        int getRevisionCode = gfxly.checkoutRevision();
-//        if (getRevisionCode == 0) {
-//            System.out.println("检出版本成功===0");
-//        } else if (getBranchCode == 8) {
-//            System.exit(8);
-//        } else {
-//            System.out.println("检出版本未知异常===9");
-//            System.exit(9);
-//        }
     }
 }

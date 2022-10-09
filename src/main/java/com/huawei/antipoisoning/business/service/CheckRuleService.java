@@ -3,6 +3,7 @@ package com.huawei.antipoisoning.business.service;
 
 import com.huawei.antipoisoning.business.entity.checkRule.RuleModel;
 import com.huawei.antipoisoning.business.entity.checkRule.RuleSetModel;
+import com.huawei.antipoisoning.business.entity.checkRule.TaskRuleSetVo;
 import com.huawei.antipoisoning.common.entity.MultiResponse;
 
 /**
@@ -21,4 +22,8 @@ public interface CheckRuleService {
     MultiResponse queryRuleSetConfig(RuleSetModel ruleSetModel);
 
     MultiResponse delRuleSet(RuleSetModel ruleSetModel);
+
+    MultiResponse queryTaskById(RuleSetModel ruleSetModel);
+
+    MultiResponse updateTaskRule(TaskRuleSetVo taskRuleSetVo);
 }

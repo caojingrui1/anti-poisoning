@@ -29,21 +29,6 @@ public class YamlUtil {
 
     private static final String CONFIG_PATH = "/tools/SoftwareSupplyChainSecurity-v1/ruleYaml/";
 
-//    private static final String CONFIG_PATH = "ruleYaml\\";
-
-//    public static void main(String[] args) {
-//        List<LinkedHashMap<String, Object>> rulesMaps = new ArrayList<>();
-//        LinkedHashMap<String, Object> rulesMap = new LinkedHashMap<>();
-//        rulesMap.put("rule", "demo_scan_rules/test.yar");
-//        rulesMap.put("type", Arrays.asList(".c", ".cpp").toString());
-//        rulesMaps.add(rulesMap);
-//        LinkedHashMap<String, Object> rulesMap1 = new LinkedHashMap<>();
-//        rulesMap1.put("rule", "demo_scan_rules/test2.yar");
-//        rulesMap1.put("type", Collections.singletonList(".java").toString());
-//        rulesMaps.add(rulesMap1);
-//        yamlFile(rulesMaps, "openeuler-test");
-//    }
-
     private static final DumperOptions OPTIONS = new DumperOptions();
 
     static {
@@ -82,7 +67,9 @@ public class YamlUtil {
     public static void yamlFile(List<LinkedHashMap<String, Object>> rulesMap, String tableName) {
         // 生成Filter类
         String path = CONFIG_PATH + tableName + ".yaml";
-        FileWriter fileWriter = new FileWriter(new File(getToolPath() + path));
+        logger.info("filepath is : {}" + getToolPath() + path);
+        FileWriter fileWriter = new FileWriter(new File(getToolPath()
+                 + path));
         // 生成yaml类
         Yaml yaml = new Yaml(OPTIONS);
         // 拼接参数
@@ -134,7 +121,7 @@ public class YamlUtil {
         String[] keys = key.split("[.]");
         Object obj = yamlMap.get(keys[0]);
         if (key.contains(".")) {
-            System.out.println(key.substring(key.indexOf(".") + 1));
+            logger.info(key.substring(key.indexOf(".") + 1));
             if (obj instanceof Map) {
                 return getValue(key.substring(key.indexOf(".") + 1), (Map<String, Object>) obj);
             } else if (obj instanceof List) {
@@ -252,8 +239,9 @@ public class YamlUtil {
         path = path.replace("file:", "");
         if (path.contains("jar")) {
             path = path.substring(0, path.lastIndexOf("."));
-            return path.substring(0, path.lastIndexOf("/"));
+            path = path.substring(0, path.lastIndexOf("/"));
+            return path.replace("/target", "");
         }
-        return path.replace("target/classes/", "");
+        return path.replace("/target", "").replace("/classes", "");
     }
 }

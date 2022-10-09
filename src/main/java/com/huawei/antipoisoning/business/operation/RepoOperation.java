@@ -1,11 +1,13 @@
 package com.huawei.antipoisoning.business.operation;
 
 import com.huawei.antipoisoning.business.enmu.CollectionTableName;
+import com.huawei.antipoisoning.business.entity.AntiEntity;
 import com.huawei.antipoisoning.business.entity.RepoInfo;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -56,5 +58,19 @@ public class RepoOperation {
             criteria.and("repo_branch_name").is(repoInfo.getRepoBranchName());
         }
         return mongoTemplate.find(Query.query(criteria), RepoInfo.class, CollectionTableName.BRANCH_REPO);
+    }
+
+    /**
+     * @param id 仓库id
+     * @param taskId 任务id
+     * @return Long
+     */
+    public Long updateRepo(String id, String taskId){
+        Query query = Query.query(Criteria.where("_id").is(id));
+        Update update = new Update();
+        if (StringUtils.isNotBlank(taskId)) {
+            update.set("poison_task_id", taskId);
+        }
+        return mongoTemplate.updateFirst(query, update, CollectionTableName.BRANCH_REPO).getModifiedCount();
     }
 }
