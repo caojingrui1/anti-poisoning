@@ -203,7 +203,6 @@ public class PoisonServiceImpl implements PoisonService {
         repoInfoTask.setRepoName(taskEntity.getRepoName());
         repoInfoTask.setRepoBranchName(taskEntity.getBranch());
         HttpUtil httpUtil = new HttpUtil(ConstantsArgs.MAJUN_BETA_URL);
-        LOGGER.info(ConstantsArgs.MAJUN_BETA_URL);
         String url = "/api/ci-backend/webhook/schedule/v1/poison/get-repo-infos";
         JSONObject jsonObject = (JSONObject) JSONObject.toJSON(repoInfoTask);
         String body = httpUtil.doPost(jsonObject, url);
