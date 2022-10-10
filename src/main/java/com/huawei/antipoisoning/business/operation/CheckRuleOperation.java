@@ -284,7 +284,7 @@ public class CheckRuleOperation {
         if (!taskRuleSetVo.getAntiCheckRules().isEmpty()) {
             update.set("anti_check_rules", taskRuleSetVo.getAntiCheckRules());
         }
-        mongoTemplate.updateFirst(query, update, CollectionTableName.ANTI_TASK_RULE_SET).getModifiedCount();
+        mongoTemplate.upsert(query, update, CollectionTableName.ANTI_TASK_RULE_SET).getModifiedCount();
     }
 
     /**
