@@ -1,15 +1,15 @@
 package com.huawei.antipoisoning.business.service.impl;
 
 
+import com.alibaba.fastjson.JSONObject;
 import com.huawei.antipoisoning.business.enmu.CommonConstants;
-import com.huawei.antipoisoning.business.entity.AntiEntity;
-import com.huawei.antipoisoning.business.entity.RepoInfo;
-import com.huawei.antipoisoning.business.entity.ResultEntity;
-import com.huawei.antipoisoning.business.entity.TaskEntity;
+import com.huawei.antipoisoning.business.enmu.ConstantsArgs;
+import com.huawei.antipoisoning.business.entity.*;
 import com.huawei.antipoisoning.business.entity.checkRule.CheckRuleSet;
 import com.huawei.antipoisoning.business.entity.checkRule.RuleModel;
 import com.huawei.antipoisoning.business.entity.checkRule.RuleSetModel;
 import com.huawei.antipoisoning.business.entity.checkRule.TaskRuleSetVo;
+import com.huawei.antipoisoning.business.entity.pr.PullRequestInfo;
 import com.huawei.antipoisoning.business.entity.vo.PageVo;
 import com.huawei.antipoisoning.business.operation.CheckRuleOperation;
 import com.huawei.antipoisoning.business.operation.PoisonResultOperation;
@@ -20,13 +20,17 @@ import com.huawei.antipoisoning.business.service.AntiService;
 import com.huawei.antipoisoning.business.service.PoisonService;
 import com.huawei.antipoisoning.business.util.YamlUtil;
 import com.huawei.antipoisoning.common.entity.MultiResponse;
+import com.huawei.antipoisoning.common.util.HttpUtil;
+import com.huawei.antipoisoning.common.util.JGitUtil;
+import org.apache.commons.collections4.MapUtils;
+import org.apache.commons.lang.ObjectUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
@@ -36,6 +40,7 @@ import java.util.Objects;
 
 @Service
 public class PoisonServiceImpl implements PoisonService {
+    private static final Logger LOGGER = LoggerFactory.getLogger(PoisonServiceImpl.class);
 
     @Autowired
     private AntiService antiService;
@@ -63,13 +68,6 @@ public class PoisonServiceImpl implements PoisonService {
      */
     @Override
     public MultiResponse poisonScan(RepoInfo repoInfo) {
-//        String path = this.getClass().getProtectionDomain().getCodeSource().getLocation().getPath();
-//        System.out.println("linux path --- " + path.replace("file:", ""));
-//        System.out.println(System.getProperty("user.dir"));
-//        RepoInfo info = repoOperation.getById(repoInfo);
-//        info.setExecutorId(repoInfo.getExecutorId());
-//        info.setExecutorName(repoInfo.getExecutorName());
-//        repoInfo = info;
         // 查询仓库语言和规则集
         List<TaskRuleSetVo> taskRuleSet = checkRuleOperation.getTaskRuleSet("", repoInfo.getProjectName(), repoInfo.getRepoName());
         List<String> ruleIds = new ArrayList<>();
@@ -204,7 +202,18 @@ public class PoisonServiceImpl implements PoisonService {
         repoInfoTask.setProjectName(taskEntity.getProjectName());
         repoInfoTask.setRepoName(taskEntity.getRepoName());
         repoInfoTask.setRepoBranchName(taskEntity.getBranch());
-        List<RepoInfo> repoInfos = repoOperation.getRepoByInfo(repoInfoTask);
+        HttpUtil httpUtil = new HttpUtil(ConstantsArgs.MAJUN_BETA_URL);
+        LOGGER.info(ConstantsArgs.MAJUN_BETA_URL);
+        String url = "/api/ci-backend/webhook/schedule/v1/poison/get-repo-infos";
+        JSONObject jsonObject = (JSONObject) JSONObject.toJSON(repoInfoTask);
+        String body = httpUtil.doPost(jsonObject, url);
+        List<RepoInfo> repoInfos = new ArrayList<>();
+        if (StringUtils.isNotEmpty(body)
+                && (JSONObject.parseObject(body).get("result") != null
+                || JSONObject.parseObject(body).get("result") != "")
+                && "200".equals(JSONObject.parseObject(body).get("code").toString())) {
+            repoInfos = JSONObject.parseArray(JSONObject.parseObject(body).get("result").toString(), RepoInfo.class);
+        }
         // 查询任务所用的规则集信息
         //给所有已启动过的任务匹配一个仓库信息，以便检测中心启动
         for (TaskEntity task : taskEntities) {
@@ -276,6 +285,39 @@ public class PoisonServiceImpl implements PoisonService {
             }
         }
         return new MultiResponse().code(200).message("success");
+    }
+
+    /**
+     * 获取PR增量文件信息。
+     *
+     * @param info pr信息
+     * @return
+     */
+    @Override
+    public MultiResponse getPrDiff(PullRequestInfo info) {
+        JGitUtil jGitUtil = new JGitUtil(info.getPullInfo(), info.getUser(), info.getPassword(),
+                info.getBranch(), info.getVersion(), info.getWorkspace());
+        jGitUtil.pullPr(info.getGitUrl());
+        StringBuffer sb = jGitUtil.cmdOfPullRequest(info.getWorkspace(), info.getTarget());
+        List<String> strList = new ArrayList<String>();
+        try {
+            LOGGER.info("get diff tree start!");
+            Process process = Runtime.getRuntime().exec(new String[]{"/bin/sh", "-c", sb.toString()},null,null);
+            InputStreamReader ir = new InputStreamReader(process.getInputStream());
+            LineNumberReader input = new LineNumberReader(ir);
+            String line;
+            process.waitFor();
+            while ((line = input.readLine()) != null){
+                strList.add(line);
+                LOGGER.info(line);
+            }
+            LOGGER.info("get diff tree end!");
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        return MultiResponse.success(200, "success");
     }
 
 

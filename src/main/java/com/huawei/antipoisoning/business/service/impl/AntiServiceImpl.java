@@ -1,6 +1,7 @@
 package com.huawei.antipoisoning.business.service.impl;
 
 import com.alibaba.fastjson.JSONArray;
+import com.huawei.antipoisoning.business.enmu.ConstantsArgs;
 import com.huawei.antipoisoning.business.entity.AntiEntity;
 import com.huawei.antipoisoning.business.entity.ResultEntity;
 import com.huawei.antipoisoning.business.entity.TaskEntity;
@@ -12,6 +13,7 @@ import com.huawei.antipoisoning.business.service.AntiService;
 import com.huawei.antipoisoning.business.util.YamlUtil;
 import com.huawei.antipoisoning.common.entity.MultiResponse;
 import com.huawei.antipoisoning.common.util.AntiMainUtil;
+import com.huawei.antipoisoning.common.util.HttpUtil;
 import com.huawei.antipoisoning.common.util.JGitUtil;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -201,7 +203,10 @@ public class AntiServiceImpl implements AntiService {
         antiEntity.setCreateTime(createTime);
         //生成任务id
         TaskEntity taskEntity = taskIdGenerate(antiEntity);
-        repoOperation.updateRepo(id, taskEntity.getTaskId());
+        String url = "/api/ci-backend/webhook/schedule/v1/poison/update-repo?id="
+                + id + "&taskId=" + taskEntity.getTaskId();
+        HttpUtil httpUtil = new HttpUtil(ConstantsArgs.MAJUN_BETA_URL);
+        httpUtil.doPost(null, url);
         if (StringUtils.isEmpty(antiEntity.getBranch())) {
             antiEntity.setBranch("master");
         }

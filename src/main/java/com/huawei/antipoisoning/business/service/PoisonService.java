@@ -2,11 +2,10 @@ package com.huawei.antipoisoning.business.service;
 
 
 import com.huawei.antipoisoning.business.entity.AntiEntity;
+import com.huawei.antipoisoning.business.entity.pr.PullRequestInfo;
 import com.huawei.antipoisoning.business.entity.RepoInfo;
 import com.huawei.antipoisoning.business.entity.TaskEntity;
 import com.huawei.antipoisoning.common.entity.MultiResponse;
-
-import java.io.IOException;
 
 public interface PoisonService {
 
@@ -19,4 +18,6 @@ public interface PoisonService {
     MultiResponse queryTaskInfo(TaskEntity taskEntity);
 
     MultiResponse delTask(TaskEntity taskEntity);
+
+    MultiResponse getPrDiff(PullRequestInfo info);
 }

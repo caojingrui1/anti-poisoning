@@ -27,19 +27,34 @@ public class CollectionTableName {
     public static final String BRANCH_REPO = "branch_repository";
 
     /**
-     * 扫描结果
+     * 版本扫描结果
      */
     public static final String SCAN_RESULTS = "scan_result";
 
     /**
-     * 扫描结果详情表
+     * 门禁扫描结果
+     */
+    public static final String SCAN_PR_RESULTS = "scan_pr_result";
+
+    /**
+     * 版本扫描结果详情表
      */
     public static final String SCAN_RESULT_DETAILS = "scan_result_details";
 
     /**
-     * 扫描任务表
+     * 门禁扫描结果详情表
+     */
+    public static final String SCAN_PR_RESULT_DETAILS = "scan_pr_result_details";
+
+    /**
+     * 版本扫描任务表
      */
     public static final String POISON_VERSION_TASK = "poison_version_task";
+
+    /**
+     * 门禁扫描任务表
+     */
+    public static final String POISON_PR_TASK = "poison_pr_task";
 
     /**
      * 屏蔽问题详情
