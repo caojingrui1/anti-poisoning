@@ -27,7 +27,7 @@ import java.text.SimpleDateFormat;
 import java.util.List;
 
 /**
- * vms接口服务实现类
+ * 下载仓库、扫描
  *
  * @since: 2022/5/30 16:22
  */
@@ -65,8 +65,9 @@ public class AntiServiceImpl implements AntiService {
     private RepoOperation repoOperation;
 
     /**
-     * 执行漏洞
+     * 扫描仓库
      *
+     * @param uuid 任务id
      * @return MultiResponse
      */
     @Override
@@ -194,6 +195,13 @@ public class AntiServiceImpl implements AntiService {
         return MultiResponse.success(200, "success");
     }
 
+    /**
+     * 下载仓库
+     *
+     * @param antiEntity 扫描任务实体
+     * @param id 仓库id
+     * @return MultiResponse
+     */
     @Override
     public MultiResponse downloadRepo(AntiEntity antiEntity, String id) {
         SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss:SSS");

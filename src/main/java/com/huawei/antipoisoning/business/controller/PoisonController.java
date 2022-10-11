@@ -48,6 +48,12 @@ public class PoisonController {
         return queueService(repoInfo);
     }
 
+    /**
+     * 查询结果
+     *
+     * @param repoInfo 查询条件
+     * @return MultiResponse
+     */
     @RequestMapping(value = "/query-results",
             produces = {"application/json"},
             consumes = {"application/json"},
@@ -56,6 +62,12 @@ public class PoisonController {
         return poisonService.queryResults(repoInfo);
     }
 
+    /**
+     * 查询结果详情
+     *
+     * @param antiEntity 参数
+     * @return MultiResponse
+     */
     @RequestMapping(value = "/query-results-detail",
             produces = {"application/json"},
             consumes = {"application/json"},
@@ -93,7 +105,7 @@ public class PoisonController {
      * @return MultiResponse
      */
     public MultiResponse queueService(RepoInfo repoInfo) throws InterruptedException, ExecutionException {
-        if (Objects.isNull(repoInfo) || BLOCKING_QUEUE.remainingCapacity() <= 0) {
+        if (Objects.isNull(repoInfo) || BLOCKING_QUEUE.remainingCapacity() <= 0) { // 无数据/剩余容量<=0
             LOGGER.error("Blocking queue is full.");
         }
 
