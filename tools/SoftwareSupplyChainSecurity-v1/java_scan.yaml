@@ -1,0 +1,16 @@
+scan_tasks:
+  - name: Yara scan (c)
+    rule_dir: java_scan
+    rules:
+      - rule: download_exec.yar
+        description: "检测下载执行木马行为"
+        type: [ .java ]
+      - rule: info_leak.yar
+        description: "检测敏感信息外传行为"
+        type: [ .java ]
+
+exclude:
+  - test
+  - demo
+  - example
+shebang_exam: no

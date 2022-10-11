@@ -1,0 +1,49 @@
+def git_address = "https://gitee.com/openMajun_enterprise/anti-poisoning.git"
+def git_auth = "0ecab2a3-034c-4b18-9464-190dcbb7c149"
+def registry_url = "192.168.0.81:18080"
+def repository = "openmajun"
+def registry_auth = "dc837f6d-704e-4e69-99ac-180fd3ec98f2"
+def project_name = "openmajun-poisoning"
+def image_name = "${project_name}:slave"
+
+pipeline {
+    agent none
+    stages {
+        stage('下载代码') {
+            steps {
+                echo "branch = ${branch}"
+                checkout([$class: 'GitSCM', branches: [[name: '${branch}']],
+                userRemoteConfigs: [[credentialsId: "${git_auth}", url: "${git_address}"]]])
+            }
+        }
+        stage('编译构建') {
+            steps {
+                sh '''
+                pwd
+                mvn --version
+                mvn  -gs ./setting-new.xml clean install -Dmaven.test.skip=true
+                touch entrypoint.sh
+                echo "#!/bin/bash\n nohup java -jar ./target/anti-poisoning-0.0.1-SNAPSHOT.jar &" >>  /usr/local/entrypoint.sh
+                chmod u+x /usr/local/entrypoint.sh
+                '''
+            }
+        }
+
+        stage('镜像制作上传') {
+            steps {
+                dir(""){
+                    sh "pwd"
+                    echo "image name: ${image_name}"
+                    withCredentials(
+                        [usernamePassword(credentialsId: "${registry_auth}", usernameVariable: 'username', passwordVariable: 'password')]
+                    ){
+                        sh "docker build -t ${image_name} ."
+                        sh "docker login -u ${username} -p ${password} ${registry_url}"
+                        sh "docker push ${image_name}"
+                        sh "echo 镜像 ${image_name} 上传成功"
+                    }
+                }
+            }
+        }
+    }
+}
