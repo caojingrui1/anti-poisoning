@@ -14,7 +14,7 @@ VOLUME /tmp
 
 
 # 拉取代码
-RUN git clone -b dev https://gitee.com/openMajun_enterprise/anti-poisoning.git $PROJECT_HOME
+RUN git clone -b master https://gitee.com/openMajun_enterprise/anti-poisoning.git $PROJECT_HOME
 WORKDIR $PROJECT_HOME/
 RUN mvn clean install -s setting-new.xml
 
