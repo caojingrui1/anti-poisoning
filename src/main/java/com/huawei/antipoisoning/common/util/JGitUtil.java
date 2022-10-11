@@ -83,7 +83,7 @@ public class JGitUtil implements Serializable {
             pullMsg = "未找到相应的类文件异常，failed";
             pullFlag = 4;
         } finally {
-//            LOGGER.info("{} --code-- {}", pullMsg, pullFlag);
+            LOGGER.info("{} --code-- {}", pullMsg, pullFlag);
             if (git != null) {
                 git.close();
             }
@@ -214,6 +214,37 @@ public class JGitUtil implements Serializable {
         }
         return checkoutFlag;
     }
+
+
+    /**
+     * git指令获取PR差异文件。
+     *
+     * @param workspace 工作区间
+     * @param giteeSourceBranch 源分支
+     * @return sb shell指令
+     */
+    public StringBuffer cmdOfPullRequest (String workspace, String giteeSourceBranch) {
+        StringBuffer sb = new StringBuffer();
+        sb.append("mkdir -p " + workspace +  File.separator + "modify_dirs && ");
+        sb.append("cd " + workspace + " && ");
+        sb.append("git diff-tree -r --name-only --no-commit-id origin/" + giteeSourceBranch
+                + " HEAD > modify_list.txt  && ");
+        sb.append("cat modify_list.txt && ");
+        sb.append("while read -r line;  " ).append("do ").append("dir_name=${line%/*}; ")
+                .append("file_name=${line##*/};  ");
+        sb.append("if [ $(echo $line |grep '/') ]; then  ");
+        sb.append("mkdir -p modify_dirs" + File.separator + "${dir_name} ; ");
+        sb.append("if [ -f ${line} ]; then  ");
+        sb.append("cp -rf ${line} modify_dirs" + File.separator + "${dir_name};  ");
+        sb.append("fi; " ).append("else ");
+        sb.append("mkdir -p modify_dirs; ");
+        sb.append("if [ -f ${line} ]; then  ");
+        sb.append("cp -rf ${line} modify_dirs;  " );
+        sb.append("fi;  " ).append("fi; ");
+        sb.append("done < modify_list.txt ");
+        return sb;
+    }
+
     /**
      * 删除目录
      * @param file
@@ -232,5 +263,13 @@ public class JGitUtil implements Serializable {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    public static void main(String[] args) {
+        JGitUtil gfxly = new JGitUtil("pull/2/MERGE", "", "", "master",
+                "b19cf211470cb6841cd5f3340e62db74b61849b2", "C:\\workspace\\poison-test");
+        gfxly.pullPr("https://gitee.com/zzyy95_1/helper.git");
+        StringBuffer sb = gfxly.cmdOfPullRequest("C:\\workspace\\poison-test", "master");
+
     }
 }

@@ -1,10 +1,13 @@
 package com.huawei.antipoisoning.business.controller;
 
 
+import com.alibaba.fastjson.JSONObject;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.huawei.antipoisoning.business.entity.AntiEntity;
+import com.huawei.antipoisoning.business.entity.pr.PullRequestInfo;
 import com.huawei.antipoisoning.business.entity.RepoInfo;
 import com.huawei.antipoisoning.business.entity.TaskEntity;
+import com.huawei.antipoisoning.business.entity.vo.AntiPoisonModel;
 import com.huawei.antipoisoning.business.service.PoisonService;
 import com.huawei.antipoisoning.common.entity.MultiResponse;
 import org.slf4j.Logger;
@@ -16,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.*;
 
@@ -79,12 +83,12 @@ public class PoisonController {
     /**
      * 获取检测中心（主界面）
      *
-     * @param taskEntity 查询参数
+     * @param jsonObject 查询参数
      * @return queryRuleSet
      */
     @PostMapping(value = "poison/query/task")
-    public MultiResponse queryTaskInfo(@RequestBody TaskEntity taskEntity) {
-        return poisonService.queryTaskInfo(taskEntity);
+    public MultiResponse queryTaskInfo(@RequestBody JSONObject jsonObject) {
+        return poisonService.queryTaskInfo(jsonObject);
     }
 
     /**
@@ -108,7 +112,6 @@ public class PoisonController {
         if (Objects.isNull(repoInfo) || BLOCKING_QUEUE.remainingCapacity() <= 0) { // 无数据/剩余容量<=0
             LOGGER.error("Blocking queue is full.");
         }
-
         try {
             BLOCKING_QUEUE.put(repoInfo);
         } catch (InterruptedException e) {
@@ -127,6 +130,20 @@ public class PoisonController {
             return new MultiResponse().code(200).message("success");
         }
         return response;
+    }
+
+    /**
+     * 启动扫描任务
+     *
+     * @param info pullRequest 信息
+     * @return MultiResponse
+     */
+    @RequestMapping(value = "/pr-diff",
+            produces = {"application/json"},
+            consumes = {"application/json"},
+            method = RequestMethod.POST)
+    public MultiResponse getPrDiff(@RequestBody PullRequestInfo info) throws InterruptedException {
+        return poisonService.getPrDiff(info);
     }
 }
 
