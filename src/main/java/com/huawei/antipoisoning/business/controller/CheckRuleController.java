@@ -124,4 +124,15 @@ public class CheckRuleController {
         checkRuleService.updateTaskRule(taskRuleSetVo);
         return new MultiResponse().code(200).message("success");
     }
+
+    /**
+     * 获取仓库的规则集
+     *
+     * @param taskRuleSetVo 任务规则集实体类
+     * @return createRuleSet
+     */
+    @PostMapping(value = "/get/taskRule")
+    public MultiResponse getTaskRule(@RequestBody TaskRuleSetVo taskRuleSetVo) {
+        return checkRuleService.getTaskRule(taskRuleSetVo);
+    }
 }
