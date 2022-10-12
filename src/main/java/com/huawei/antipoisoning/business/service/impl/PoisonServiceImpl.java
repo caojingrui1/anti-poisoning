@@ -1,6 +1,7 @@
 package com.huawei.antipoisoning.business.service.impl;
 
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.huawei.antipoisoning.business.enmu.CommonConstants;
 import com.huawei.antipoisoning.business.enmu.ConstantsArgs;
@@ -10,6 +11,7 @@ import com.huawei.antipoisoning.business.entity.checkRule.RuleModel;
 import com.huawei.antipoisoning.business.entity.checkRule.RuleSetModel;
 import com.huawei.antipoisoning.business.entity.checkRule.TaskRuleSetVo;
 import com.huawei.antipoisoning.business.entity.pr.PullRequestInfo;
+import com.huawei.antipoisoning.business.entity.vo.AntiPoisonModel;
 import com.huawei.antipoisoning.business.entity.vo.PageVo;
 import com.huawei.antipoisoning.business.operation.CheckRuleOperation;
 import com.huawei.antipoisoning.business.operation.PoisonResultOperation;
@@ -33,10 +35,7 @@ import org.springframework.stereotype.Service;
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 @Service
 public class PoisonServiceImpl implements PoisonService {
@@ -190,31 +189,21 @@ public class PoisonServiceImpl implements PoisonService {
     /**
      * 检测中心主界面
      *
-     * @param taskEntity 查询参数
+     * @param jsonObject 查询参数
      * @return queryTaskInfo
      */
     @Override
-    public MultiResponse queryTaskInfo(TaskEntity taskEntity) {
+    public MultiResponse queryTaskInfo(JSONObject jsonObject) {
+        Map<String, String> params = (Map<String, String>) jsonObject.get("antiModel");
+        JSONObject json = new JSONObject();
+        json.putAll(params);
+        TaskEntity taskEntity = JSONObject.toJavaObject(json, TaskEntity.class);
         PageVo pageVo = poisonTaskOperation.queryTaskInfo(taskEntity);
         List<TaskEntity> taskEntities = pageVo.getList();
         //获取所有仓库信息
-        RepoInfo repoInfoTask = new RepoInfo();
-        repoInfoTask.setProjectName(taskEntity.getProjectName());
-        repoInfoTask.setRepoName(taskEntity.getRepoName());
-        repoInfoTask.setRepoBranchName(taskEntity.getBranch());
-        HttpUtil httpUtil = new HttpUtil(ConstantsArgs.MAJUN_BETA_URL);
-        LOGGER.info(ConstantsArgs.MAJUN_BETA_URL);
-        String url = "/api/ci-backend/webhook/schedule/v1/poison/get-repo-infos";
-        JSONObject jsonObject = (JSONObject) JSONObject.toJSON(repoInfoTask);
-        String body = httpUtil.doPost(jsonObject, url);
-        List<RepoInfo> repoInfos = new ArrayList<>();
-        if (StringUtils.isNotEmpty(body)
-                && (JSONObject.parseObject(body).get("result") != null
-                || JSONObject.parseObject(body).get("result") != "")
-                && "200".equals(JSONObject.parseObject(body).get("code").toString())) {
-            repoInfos = JSONObject.parseArray(JSONObject.parseObject(body).get("result").toString(), RepoInfo.class);
-        }
         // 查询任务所用的规则集信息
+        List<RepoInfo> repoInfos = JSONObject.parseArray(
+                JSON.toJSONString(jsonObject.get("repoInfos")), RepoInfo.class);
         //给所有已启动过的任务匹配一个仓库信息，以便检测中心启动
         for (TaskEntity task : taskEntities) {
             List<TaskRuleSetVo> taskRuleSet = checkRuleOperation.getTaskRuleSet("", task.getProjectName(), task.getRepoName());
