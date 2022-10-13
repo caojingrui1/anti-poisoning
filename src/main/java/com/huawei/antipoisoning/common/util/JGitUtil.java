@@ -14,6 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.List;
 
@@ -170,12 +171,12 @@ public class JGitUtil implements Serializable {
             List<Ref> branchList = git.branchList().setListMode(ListBranchCommand.ListMode.ALL).call();
             for (Ref ref : branchList){
                 if (this.branch.equals(ref.getName())) {
-                    LOGGER.info("代码分支列表中存在给定分支");
+                    LOGGER.info("The branch is exist!");
                 }
             }
             git.checkout().setName("origin/" + this.branch).setForce(true).call();
             checkoutMsg = "检出分支代码 success! code OK ->" + this.branch;
-        } catch (Exception e) {
+        } catch (GitAPIException | IOException e) {
             LOGGER.error("errInfo is {}", e.getMessage());
             checkoutMsg = "检出分支代码 failed ! ->" + this.branch;
             checkoutFlag = 6;
@@ -206,7 +207,7 @@ public class JGitUtil implements Serializable {
             git = Git.open( new File(this.git_config) );
             git.checkout().setName( this.revision ).setForce(true).call();
             checkoutMsg = "检出代码版本 success! code OK. ->" + this.revision;
-        } catch (Exception e) {
+        } catch (GitAPIException | IOException e) {
             LOGGER.error("errInfo is {}", e.getMessage());
             checkoutMsg = "检出代码版本 failed ! ->" + this.revision;
             checkoutFlag = 8;

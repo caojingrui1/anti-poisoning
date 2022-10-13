@@ -45,6 +45,8 @@ public class PoisonResultOperation {
      * 保存扫描结果
      *
      * @param antiEntity 扫描数据
+     * @param taskId 任务ID
+     * @return long
      */
     public long updateTaskResult(AntiEntity antiEntity, String taskId) {
         if (ObjectUtils.isEmpty(antiEntity)) {
@@ -77,8 +79,9 @@ public class PoisonResultOperation {
      * 保存扫描结果
      *
      * @param query 查询参数
+     * @return AntiEntity
      */
-    public AntiEntity queryScanResult(Query query) { //查询入库结果
+    public AntiEntity queryScanResult(Query query) { // 查询入库结果
         return mongoTemplate.findOne(query, AntiEntity.class, CollectionTableName.SCAN_RESULT_DETAILS);
     }
 
@@ -103,6 +106,7 @@ public class PoisonResultOperation {
     /**
      * 查询一条结果
      *
+     * @param uuid 扫描ID
      * @return AntiEntity
      */
     public List<ResultEntity> queryResultEntity(String uuid) {
@@ -113,7 +117,8 @@ public class PoisonResultOperation {
     /**
      * 查询taskId结果
      *
-     * @return AntiEntity
+     * @param antiEntity 参数
+     * @return List<TaskEntity>
      */
     public List<TaskEntity> queryTaskId(AntiEntity antiEntity) {
         Criteria criteria = new Criteria();
@@ -133,6 +138,8 @@ public class PoisonResultOperation {
      * 根据hash获取屏蔽数据量
      *
      * @param hash 问题的唯一hash值
+     * @param taskId 任务ID
+     * @return int
      */
     public int getResultDetailByHash(String hash, String taskId) {
         Criteria criteria = Criteria.where("hash").is(hash).and("status").is("2");
@@ -145,6 +152,8 @@ public class PoisonResultOperation {
      * 查询状态为已屏蔽的问题数
      *
      * @param status 屏蔽状态
+     * @param scanId 扫描ID
+     * @return int
      */
     public int getCountByStatus(String status, String scanId) {
         Criteria criteria = Criteria.where("status").is(status).and("scan_id").is(scanId);

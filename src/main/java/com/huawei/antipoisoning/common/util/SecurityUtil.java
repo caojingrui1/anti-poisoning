@@ -22,9 +22,8 @@ public class SecurityUtil {
     public static String decrypt(String data){
         BasicTextEncryptor basicTextEncryptor=new BasicTextEncryptor();
         basicTextEncryptor.setPassword(System.getProperty("jasypt.encryptor.password"));
-        String decryptData=basicTextEncryptor.decrypt(data);
-        return decryptData;
-    };
+        return basicTextEncryptor.decrypt(data);
+    }
 
     /**
      * 加密
@@ -35,7 +34,6 @@ public class SecurityUtil {
     public static String encrypt(String data){
         BasicTextEncryptor basicTextEncryptor=new BasicTextEncryptor();
         basicTextEncryptor.setPassword(System.getProperty("jasypt.encryptor.password"));
-        String encryptData=basicTextEncryptor.encrypt(data);
-        return encryptData;
+        return basicTextEncryptor.encrypt(data);
     }
 }

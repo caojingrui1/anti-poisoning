@@ -71,7 +71,8 @@ public class CheckRuleOperation {
             query.skip((long) (rule.getPageNum() - 1) * rule.getPageSize());
             query.limit(rule.getPageSize());
         }
-        List<RuleModel> codeCheckRuleVos = mongoTemplate.find(query, RuleModel.class, CollectionTableName.ANTI_CHECK_RULE);
+        List<RuleModel> codeCheckRuleVos = mongoTemplate.find(query, RuleModel.class,
+                CollectionTableName.ANTI_CHECK_RULE);
         return new PageVo(count, codeCheckRuleVos);
     }
 

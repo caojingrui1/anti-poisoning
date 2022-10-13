@@ -118,6 +118,8 @@ public class PoisonController {
      *
      * @param repoInfo 任务实体类
      * @return MultiResponse
+     * @throws InterruptedException 中断异常
+     * @throws ExecutionException 执行异常
      */
     public MultiResponse queueService(RepoInfo repoInfo) throws InterruptedException, ExecutionException {
         if (Objects.isNull(repoInfo) || BLOCKING_QUEUE.remainingCapacity() <= 0) {

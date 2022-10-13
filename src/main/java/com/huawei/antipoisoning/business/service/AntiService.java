@@ -23,13 +23,6 @@ public interface AntiService {
     MultiResponse scanRepo(String uuid);
 
     /**
-     * 查询外部源漏洞
-     *
-     * @return MultiResponse<List<VmsExternalCveSourceDTO>>
-     */
-    MultiResponse setEnv();
-
-    /**
      * 下载仓库
      *
      * @param antiEntity 扫描任务实体

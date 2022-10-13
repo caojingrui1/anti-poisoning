@@ -57,14 +57,4 @@ public class AntiController {
         }
         return antiService.downloadRepo(antiEntity, id);
     }
-
-    /**
-     * 测试
-     *
-     * @return MultiResponse@PathVariable("id") String id
-     */
-    @RequestMapping(value = "/setEnv")
-    public MultiResponse scanRepo1() {
-        return antiService.setEnv();
-    }
 }

@@ -41,8 +41,9 @@ public class AntiOperation {
      * 保存扫描结果
      *
      * @param query 查询参数
+     * @return AntiEntity
      */
-    public AntiEntity queryScanResult(Query query) { //查询入库结果
+    public AntiEntity queryScanResult(Query query) { // 查询入库结果
         return mongoTemplate.findOne(query, AntiEntity.class, CollectionTableName.SCAN_RESULTS);
     }
 
@@ -53,7 +54,6 @@ public class AntiOperation {
      * @@return 结果
      */
     public long updateScanResult(AntiEntity antiEntity) {
-        Query query = Query.query(Criteria.where("scan_id").is(antiEntity.getScanId()));
         Update update = new Update();
         if (antiEntity.getIsScan() != null) {
             update.set("isScan", antiEntity.getIsScan());
@@ -73,6 +73,7 @@ public class AntiOperation {
         if (antiEntity.getTimeConsuming() != null) {
             update.set("time_consuming", antiEntity.getTimeConsuming());
         }
+        Query query = Query.query(Criteria.where("scan_id").is(antiEntity.getScanId()));
         return mongoTemplate.updateFirst(query, update, CollectionTableName.SCAN_RESULTS).getModifiedCount();
     }
 
@@ -80,6 +81,8 @@ public class AntiOperation {
      * 更新下载结果
      *
      * @param uuid 参数
+     * @param isDownloaded 是否下载成功
+     * @return long
      */
     public long updateDownloadResult(String uuid, boolean isDownloaded) {
         Query query = Query.query(Criteria.where("scan_id").is(uuid));
@@ -91,6 +94,7 @@ public class AntiOperation {
     /**
      * 查询一条结果
      *
+     * @param uuid 扫描ID
      * @return AntiEntity
      */
     public AntiEntity queryAntiEntity(String uuid) {
