@@ -208,7 +208,7 @@ public class AntiServiceImpl implements AntiService {
         param.put("id", id);
         param.put("taskId", taskEntity.getTaskId());
         String url = "/api/ci-backend/webhook/schedule/v1/poison/update-repo";
-        HttpUtil httpUtil = new HttpUtil(ConstantsArgs.MAJUN_BETA_URL);
+        HttpUtil httpUtil = new HttpUtil(ConstantsArgs.MAJUN_URL);
         String body = httpUtil.doPost(param, url);
         LOGGER.info("update info : {}" + body);
         if (StringUtils.isEmpty(antiEntity.getBranch())) {
