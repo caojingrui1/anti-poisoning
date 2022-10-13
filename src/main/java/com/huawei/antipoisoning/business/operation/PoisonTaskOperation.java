@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) Huawei Technologies Co., Ltd. 2012-2020. All rights reserved.
+ */
+
 package com.huawei.antipoisoning.business.operation;
 
 import com.huawei.antipoisoning.business.enmu.CollectionTableName;
@@ -16,6 +20,7 @@ import org.springframework.util.ObjectUtils;
 
 import javax.annotation.Resource;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * 扫描结果包裹数据存档
@@ -222,10 +227,6 @@ public class PoisonTaskOperation {
         // 总数量
         query.with(Sort.by(Sort.Direction.DESC, "_id"));
         long count = mongoTemplate.count(query, TaskEntity.class, CollectionTableName.POISON_VERSION_TASK);
-//        if (taskEntity.getPageNum() != null && taskEntity.getPageSize() != null && count > 0) {
-//            query.skip((long) (taskEntity.getPageNum() - 1) * taskEntity.getPageSize());
-//            query.limit(taskEntity.getPageSize());
-//        }
         List<TaskEntity> list = mongoTemplate.find(query, TaskEntity.class, CollectionTableName.POISON_VERSION_TASK);
         return new PageVo(count, list);
     }

@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) Huawei Technologies Co., Ltd. 2012-2020. All rights reserved.
+ */
+
 package com.huawei.antipoisoning.business.service.impl;
 
 import com.alibaba.fastjson.JSONArray;
@@ -9,7 +13,6 @@ import com.huawei.antipoisoning.business.entity.TaskEntity;
 import com.huawei.antipoisoning.business.operation.AntiOperation;
 import com.huawei.antipoisoning.business.operation.PoisonResultOperation;
 import com.huawei.antipoisoning.business.operation.PoisonTaskOperation;
-import com.huawei.antipoisoning.business.operation.RepoOperation;
 import com.huawei.antipoisoning.business.service.AntiService;
 import com.huawei.antipoisoning.business.util.YamlUtil;
 import com.huawei.antipoisoning.common.entity.MultiResponse;
@@ -25,7 +28,6 @@ import org.springframework.stereotype.Service;
 
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.Field;
 import java.text.SimpleDateFormat;
 import java.util.List;
 
@@ -63,9 +65,6 @@ public class AntiServiceImpl implements AntiService {
 
     @Autowired
     private PoisonResultOperation poisonResultOperation;
-
-    @Autowired
-    private RepoOperation repoOperation;
 
     /**
      * 执行漏洞

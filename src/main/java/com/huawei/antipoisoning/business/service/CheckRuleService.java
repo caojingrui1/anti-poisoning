@@ -1,5 +1,8 @@
-package com.huawei.antipoisoning.business.service;
+/*
+ * Copyright (c) Huawei Technologies Co., Ltd. 2012-2020. All rights reserved.
+ */
 
+package com.huawei.antipoisoning.business.service;
 
 import com.huawei.antipoisoning.business.entity.checkRule.RuleModel;
 import com.huawei.antipoisoning.business.entity.checkRule.RuleSetModel;

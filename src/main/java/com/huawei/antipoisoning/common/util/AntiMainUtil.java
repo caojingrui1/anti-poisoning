@@ -1,6 +1,9 @@
+/*
+ * Copyright (c) Huawei Technologies Co., Ltd. 2012-2020. All rights reserved.
+ */
+
 package com.huawei.antipoisoning.common.util;
 
-import com.huawei.antipoisoning.business.service.impl.AntiServiceImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

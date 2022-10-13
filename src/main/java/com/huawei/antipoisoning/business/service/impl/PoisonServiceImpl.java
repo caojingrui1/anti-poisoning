@@ -1,41 +1,48 @@
-package com.huawei.antipoisoning.business.service.impl;
+/*
+ * Copyright (c) Huawei Technologies Co., Ltd. 2012-2020. All rights reserved.
+ */
 
+package com.huawei.antipoisoning.business.service.impl;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.huawei.antipoisoning.business.enmu.CommonConstants;
-import com.huawei.antipoisoning.business.enmu.ConstantsArgs;
-import com.huawei.antipoisoning.business.entity.*;
+import com.huawei.antipoisoning.business.entity.AntiEntity;
+import com.huawei.antipoisoning.business.entity.RepoInfo;
+import com.huawei.antipoisoning.business.entity.ResultEntity;
+import com.huawei.antipoisoning.business.entity.TaskEntity;
 import com.huawei.antipoisoning.business.entity.checkRule.CheckRuleSet;
 import com.huawei.antipoisoning.business.entity.checkRule.RuleModel;
 import com.huawei.antipoisoning.business.entity.checkRule.RuleSetModel;
 import com.huawei.antipoisoning.business.entity.checkRule.TaskRuleSetVo;
 import com.huawei.antipoisoning.business.entity.pr.PullRequestInfo;
-import com.huawei.antipoisoning.business.entity.vo.AntiPoisonModel;
 import com.huawei.antipoisoning.business.entity.vo.PageVo;
 import com.huawei.antipoisoning.business.operation.CheckRuleOperation;
 import com.huawei.antipoisoning.business.operation.PoisonResultOperation;
 import com.huawei.antipoisoning.business.operation.PoisonScanOperation;
 import com.huawei.antipoisoning.business.operation.PoisonTaskOperation;
-import com.huawei.antipoisoning.business.operation.RepoOperation;
 import com.huawei.antipoisoning.business.service.AntiService;
 import com.huawei.antipoisoning.business.service.PoisonService;
 import com.huawei.antipoisoning.business.util.YamlUtil;
 import com.huawei.antipoisoning.common.entity.MultiResponse;
-import com.huawei.antipoisoning.common.util.HttpUtil;
 import com.huawei.antipoisoning.common.util.JGitUtil;
-import org.apache.commons.collections4.MapUtils;
-import org.apache.commons.lang.ObjectUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.LineNumberReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Collections;
 
 @Service
 public class PoisonServiceImpl implements PoisonService {
@@ -49,9 +56,6 @@ public class PoisonServiceImpl implements PoisonService {
 
     @Autowired
     private PoisonResultOperation poisonResultOperation;
-
-    @Autowired
-    private RepoOperation repoOperation;
 
     @Autowired
     private CheckRuleOperation checkRuleOperation;
@@ -180,7 +184,6 @@ public class PoisonServiceImpl implements PoisonService {
             }
             br.close();
         } catch (IOException e) {
-            // TODO Auto-generated catch block
             readStr = e.toString();
         }
         return readStr;
@@ -301,9 +304,7 @@ public class PoisonServiceImpl implements PoisonService {
                 LOGGER.info(line);
             }
             LOGGER.info("get diff tree end!");
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (InterruptedException e) {
+        } catch (IOException | InterruptedException e) {
             e.printStackTrace();
         }
         return MultiResponse.success(200, "success");
