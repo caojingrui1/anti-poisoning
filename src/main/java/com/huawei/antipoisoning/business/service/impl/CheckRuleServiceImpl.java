@@ -166,4 +166,20 @@ public class CheckRuleServiceImpl implements CheckRuleService {
         checkRuleOperation.updateTaskRule(taskRuleSetVo);
         return new MultiResponse().code(200).message("success");
     }
+
+    /**
+     * 获取仓库的所选规则集
+     *
+     * @param taskRuleSetVo 查询实体类
+     * @return getTaskRule
+     */
+    @Override
+    public MultiResponse getTaskRule(TaskRuleSetVo taskRuleSetVo) {
+        List<TaskRuleSetVo> taskRuleSet = checkRuleOperation.getTaskRuleSet("", taskRuleSetVo.getProjectName(),
+                taskRuleSetVo.getRepoNameEn());
+        if (taskRuleSet.size() == 0) {
+            return new MultiResponse().code(400).message("data is null");
+        }
+        return new MultiResponse().code(200).message("succedss").result(taskRuleSet);
+    }
 }
