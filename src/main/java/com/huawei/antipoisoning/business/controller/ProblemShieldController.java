@@ -145,6 +145,4 @@ public class ProblemShieldController {
     public MultiResponse getPoisoningSelect() {
         return problemShieldService.getPoisoningSelect();
     }
-
-
 }

@@ -48,6 +48,7 @@ public class AntiEntity {
      */
     @Field("tips")
     private String tips;
+
     /**
      * 仓库名
      */

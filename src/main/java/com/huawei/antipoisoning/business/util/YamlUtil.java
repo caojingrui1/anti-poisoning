@@ -4,7 +4,7 @@
 
 package com.huawei.antipoisoning.business.util;
 
-import com.huawei.antipoisoning.business.entity.checkRule.RuleModel;
+import com.huawei.antipoisoning.business.entity.checkrule.RuleModel;
 import com.mongodb.lang.Nullable;
 import lombok.Cleanup;
 import lombok.SneakyThrows;

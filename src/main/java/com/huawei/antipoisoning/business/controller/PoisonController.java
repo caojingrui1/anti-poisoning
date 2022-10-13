@@ -4,7 +4,6 @@
 
 package com.huawei.antipoisoning.business.controller;
 
-
 import com.alibaba.fastjson.JSONObject;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.huawei.antipoisoning.business.entity.AntiEntity;
@@ -53,6 +52,8 @@ public class PoisonController {
      *
      * @param repoInfo 检查仓库
      * @return MultiResponse
+     * @throws InterruptedException 中断异常
+     * @throws ExecutionException 执行异常
      */
     @RequestMapping(value = "/poisonScan",
             produces = {"application/json"},
@@ -136,7 +137,7 @@ public class PoisonController {
         MultiResponse response;
         try {
             response = objectMapper.convertValue(future.get(3, TimeUnit.SECONDS), MultiResponse.class);
-        }catch (TimeoutException e){
+        } catch (TimeoutException e) {
             return new MultiResponse().code(200).message("success");
         }
         return response;

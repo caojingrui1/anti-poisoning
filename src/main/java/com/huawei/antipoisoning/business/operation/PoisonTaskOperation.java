@@ -35,6 +35,7 @@ public class PoisonTaskOperation {
      * 保存扫描结果
      *
      * @param antiEntity 扫描数据
+     * @param newtaskEntity 新参数
      */
     public void insertTaskResult(AntiEntity antiEntity, TaskEntity newtaskEntity) {
         if (ObjectUtils.isEmpty(antiEntity)) {
@@ -61,6 +62,7 @@ public class PoisonTaskOperation {
      * 保存扫描结果
      *
      * @param antiEntity 扫描数据
+     * @param taskId 任务ID
      */
     public long updateTaskResult(AntiEntity antiEntity, String taskId) {
         if (ObjectUtils.isEmpty(antiEntity)) {
@@ -107,6 +109,7 @@ public class PoisonTaskOperation {
     /**
      * 下载完更新扫描结果
      *
+     * @param antiEntity 参数
      * @param taskEntity 参数
      * @@return 结果
      */
@@ -138,6 +141,7 @@ public class PoisonTaskOperation {
     /**
      * ID更新扫描结果
      *
+     * @param antiEntity 参数
      * @param taskEntity 参数
      * @@return 结果
      */
@@ -183,6 +187,7 @@ public class PoisonTaskOperation {
     /**
      * 查询一条结果
      *
+     * @param uuid 扫描ID
      * @return AntiEntity
      */
     public TaskEntity queryTaskEntity(String uuid) {
@@ -193,6 +198,7 @@ public class PoisonTaskOperation {
     /**
      * 查询taskId结果
      *
+     * @param antiEntity 参数
      * @return AntiEntity
      */
     public List<TaskEntity> queryTaskId(AntiEntity antiEntity) {
@@ -243,7 +249,8 @@ public class PoisonTaskOperation {
      * 修改同社区统仓的语言
      *
      * @param antiEntity 扫描数据
-     * @return
+     * @param language 语言
+     * @return UpdateResult
      */
     public UpdateResult updateTaskLanguage(AntiEntity antiEntity, String language) {
         if (ObjectUtils.isEmpty(antiEntity)) {

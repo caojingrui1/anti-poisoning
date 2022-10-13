@@ -12,16 +12,51 @@ import com.huawei.antipoisoning.business.entity.TaskEntity;
 import com.huawei.antipoisoning.common.entity.MultiResponse;
 
 public interface PoisonService {
-
+    /**
+     * 启动扫扫描任务
+     *
+     * @param repoInfo 仓库主键id
+     * @return poisonScan
+     */
     MultiResponse poisonScan(RepoInfo repoInfo);
 
+    /**
+     * 查询版本扫描任务列表信息。
+     *
+     * @param repoInfo 参数
+     * @return MultiResponse
+     */
     MultiResponse queryResults(RepoInfo repoInfo);
 
+    /**
+     * 查询版本扫描任务结果详情信息。
+     *
+     * @param antiEntity 参数
+     * @return MultiResponse
+     */
     MultiResponse queryResultsDetail(AntiEntity antiEntity);
 
+    /**
+     * 检测中心主界面
+     *
+     * @param jsonObject 查询参数
+     * @return queryTaskInfo
+     */
     MultiResponse queryTaskInfo(JSONObject jsonObject);
 
+    /**
+     * 删除防投毒任务以及相关规则集
+     *
+     * @param taskEntity 删除参数体
+     * @return MultiResponse
+     */
     MultiResponse delTask(TaskEntity taskEntity);
 
+    /**
+     * 获取PR增量文件信息。
+     *
+     * @param info pr信息
+     * @return MultiResponse
+     */
     MultiResponse getPrDiff(PullRequestInfo info);
 }

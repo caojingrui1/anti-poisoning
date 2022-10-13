@@ -11,10 +11,10 @@ import com.huawei.antipoisoning.business.entity.AntiEntity;
 import com.huawei.antipoisoning.business.entity.RepoInfo;
 import com.huawei.antipoisoning.business.entity.ResultEntity;
 import com.huawei.antipoisoning.business.entity.TaskEntity;
-import com.huawei.antipoisoning.business.entity.checkRule.CheckRuleSet;
-import com.huawei.antipoisoning.business.entity.checkRule.RuleModel;
-import com.huawei.antipoisoning.business.entity.checkRule.RuleSetModel;
-import com.huawei.antipoisoning.business.entity.checkRule.TaskRuleSetVo;
+import com.huawei.antipoisoning.business.entity.checkrule.CheckRuleSet;
+import com.huawei.antipoisoning.business.entity.checkrule.RuleModel;
+import com.huawei.antipoisoning.business.entity.checkrule.RuleSetModel;
+import com.huawei.antipoisoning.business.entity.checkrule.TaskRuleSetVo;
 import com.huawei.antipoisoning.business.entity.pr.PullRequestInfo;
 import com.huawei.antipoisoning.business.entity.vo.PageVo;
 import com.huawei.antipoisoning.business.operation.CheckRuleOperation;
@@ -144,12 +144,24 @@ public class PoisonServiceImpl implements PoisonService {
         return new MultiResponse().code(200).result("poisonScan start");
     }
 
+    /**
+     * 查询版本扫描任务列表信息。
+     *
+     * @param repoInfo 参数
+     * @return MultiResponse
+     */
     @Override
     public MultiResponse queryResults(RepoInfo repoInfo) {
         PageVo summaryVos = poisonScanOperation.queryResults(repoInfo);
         return new MultiResponse().code(200).result(summaryVos);
     }
 
+    /**
+     * 查询版本扫描任务结果详情信息。
+     *
+     * @param antiEntity 参数
+     * @return MultiResponse
+     */
     @Override
     public MultiResponse queryResultsDetail(AntiEntity antiEntity) {
         List<ResultEntity> resultEntity = poisonResultOperation.queryResultEntity(antiEntity.getScanId());
@@ -257,6 +269,7 @@ public class PoisonServiceImpl implements PoisonService {
      * 删除防投毒任务以及相关规则集
      *
      * @param taskEntity 删除参数体
+     * @return MultiResponse
      */
     @Override
     public MultiResponse delTask(TaskEntity taskEntity) {
@@ -282,7 +295,7 @@ public class PoisonServiceImpl implements PoisonService {
      * 获取PR增量文件信息。
      *
      * @param info pr信息
-     * @return
+     * @return MultiResponse
      */
     @Override
     public MultiResponse getPrDiff(PullRequestInfo info) {

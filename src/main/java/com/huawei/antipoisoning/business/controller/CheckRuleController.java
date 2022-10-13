@@ -4,9 +4,9 @@
 
 package com.huawei.antipoisoning.business.controller;
 
-import com.huawei.antipoisoning.business.entity.checkRule.RuleModel;
-import com.huawei.antipoisoning.business.entity.checkRule.RuleSetModel;
-import com.huawei.antipoisoning.business.entity.checkRule.TaskRuleSetVo;
+import com.huawei.antipoisoning.business.entity.checkrule.RuleModel;
+import com.huawei.antipoisoning.business.entity.checkrule.RuleSetModel;
+import com.huawei.antipoisoning.business.entity.checkrule.TaskRuleSetVo;
 import com.huawei.antipoisoning.business.service.CheckRuleService;
 import com.huawei.antipoisoning.common.entity.MultiResponse;
 import org.springframework.beans.factory.annotation.Autowired;

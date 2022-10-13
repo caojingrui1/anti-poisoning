@@ -82,6 +82,13 @@ public class ProblemShieldServiceImpl implements ProblemShieldService {
         return new MultiResponse().code(200).result(result);
     }
 
+    /**
+     * 获取扫描结果报告。
+     *
+     * @param userId 用户ID
+     * @param paramModel 参数
+     * @return MultiResponse
+     */
     @Override
     public MultiResponse getScanReport(String userId, ParamModel paramModel) {
         List<PoisonReportModel> resultEntityList = scanResultDetailOperation.getGroupResult(userId, paramModel);
@@ -196,6 +203,12 @@ public class ProblemShieldServiceImpl implements ProblemShieldService {
         return new MultiResponse().code(200).message("success");
     }
 
+    /**
+     * 屏蔽。
+     *
+     * @param paramModel 参数
+     * @return MultiResponse
+     */
     @Override
     public MultiResponse shieldReferral(ParamModel paramModel) {
         List<ResultEntity> resultEntityList = shieldResultDetailOperation.getShieldById(paramModel.getDetailsId());

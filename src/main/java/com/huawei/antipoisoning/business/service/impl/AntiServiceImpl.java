@@ -225,32 +225,32 @@ public class AntiServiceImpl implements AntiService {
         taskEntity.setDownloadConsuming(downloadConsuming);
         poisonTaskOperation.updateTaskDownloadTime(taskEntity);
         if (getPullCode == 0) {
-            LOGGER.info("检出代码成功==={}", getPullCode);
+            LOGGER.info("检出代码成功===" + getPullCode);
             antiEntity.setIsDownloaded(true);
             antiOperation.updateScanResult(antiEntity);
             return MultiResponse.success(200, "success");
         } else if (getPullCode == 1) {
-            LOGGER.info("检出代码未知异常==={}", getPullCode);
+            LOGGER.info("检出代码未知异常===" + getPullCode);
             antiEntity.setIsDownloaded(false);
             antiOperation.updateScanResult(antiEntity);
             return MultiResponse.error(400, "downloadRepo error");
         } else if (getPullCode == 2) {
-            LOGGER.info("检出代码未知异常==={}", getPullCode);
+            LOGGER.info("检出代码未知异常===" + getPullCode);
             antiEntity.setIsDownloaded(false);
             antiOperation.updateScanResult(antiEntity);
             return MultiResponse.error(400, "downloadRepo error");
         } else if (getPullCode == 3) {
-            LOGGER.info("检出代码未知异常==={}", getPullCode);
+            LOGGER.info("检出代码未知异常===" + getPullCode);
             antiEntity.setIsDownloaded(false);
             antiOperation.updateScanResult(antiEntity);
             return MultiResponse.error(400, "downloadRepo error");
         } else if (getPullCode == 4) {
-            LOGGER.info("检出代码未知异常==={}", getPullCode);
+            LOGGER.info("检出代码未知异常===" + getPullCode);
             antiEntity.setIsDownloaded(false);
             antiOperation.updateScanResult(antiEntity);
             return MultiResponse.error(400, "downloadRepo error");
         } else {
-            LOGGER.info("检出代码未知异常==={}", getPullCode);
+            LOGGER.info("检出代码未知异常===" + getPullCode);
             antiEntity.setIsDownloaded(false);
             antiOperation.updateScanResult(antiEntity);
             return MultiResponse.error(400, "downloadRepo error");

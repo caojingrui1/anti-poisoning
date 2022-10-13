@@ -4,7 +4,7 @@
 
 package com.huawei.antipoisoning.schedule;
 
-import com.huawei.antipoisoning.business.entity.checkRule.RuleModel;
+import com.huawei.antipoisoning.business.entity.checkrule.RuleModel;
 import com.huawei.antipoisoning.business.operation.CheckRuleOperation;
 import lombok.SneakyThrows;
 import org.apache.poi.ss.usermodel.Row;
