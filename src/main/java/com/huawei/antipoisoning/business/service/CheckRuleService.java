@@ -26,4 +26,6 @@ public interface CheckRuleService {
     MultiResponse queryTaskById(RuleSetModel ruleSetModel);
 
     MultiResponse updateTaskRule(TaskRuleSetVo taskRuleSetVo);
+
+    MultiResponse getTaskRule(TaskRuleSetVo taskRuleSetVo);
 }
