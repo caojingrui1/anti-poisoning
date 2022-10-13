@@ -7,6 +7,7 @@ package com.huawei.antipoisoning.business.controller;
 import com.huawei.antipoisoning.business.entity.AntiEntity;
 import com.huawei.antipoisoning.business.service.AntiService;
 import com.huawei.antipoisoning.common.entity.MultiResponse;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -28,6 +29,7 @@ public class AntiController {
     /**
      * 扫描已下载的仓库
      *
+     * @param uuid 扫描任务编号
      * @return MultiResponse
      */
     @RequestMapping("/scanRepo/{uuid}")
@@ -37,18 +39,20 @@ public class AntiController {
 
     /**
      * 下载仓库
+     *
      * @param  antiEntity 参数
+     * @param  id 扫描任务id
      * @return MultiResponse
      */
     @RequestMapping(value = "/downloadRepo", method = RequestMethod.POST)
     public MultiResponse downloadRepo(@RequestBody AntiEntity antiEntity, String id) {
-        if (null == antiEntity.getScanId() || "".equals(antiEntity.getScanId())) {
+        if (StringUtils.isEmpty(antiEntity.getScanId())) {
             return MultiResponse.error(400,"error: no scanId detected!");
         }
-        if (null == antiEntity.getRepoUrl() || "".equals(antiEntity.getRepoUrl())) {
+        if (StringUtils.isEmpty(antiEntity.getRepoUrl())) {
             return MultiResponse.error(400,"error: no repoUrl detected!");
         }
-        if (null == antiEntity.getLanguage() || "".equals(antiEntity.getLanguage())) {
+        if (StringUtils.isEmpty(antiEntity.getLanguage())) {
             return MultiResponse.error(400,"error: no language detected!");
         }
         return antiService.downloadRepo(antiEntity, id);

@@ -5,6 +5,7 @@
 package com.huawei.antipoisoning.common.util;
 
 import com.alibaba.fastjson.JSONObject;
+import com.huawei.antipoisoning.business.service.impl.AntiServiceImpl;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.HttpResponseException;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -16,6 +17,8 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicHeader;
 import org.apache.http.protocol.HTTP;
 import org.apache.http.util.EntityUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 
@@ -26,6 +29,9 @@ import java.io.IOException;
  * @since 2022-01-05
  */
 public class HttpUtil {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(HttpUtil.class);
+
     // 访问url
     private String url;
 
@@ -70,7 +76,7 @@ public class HttpUtil {
             response.close();
             return body;
         } catch (IOException e) {
-            e.printStackTrace();
+            LOGGER.error("errInfo is {}", e.getMessage());
             return body;
         }
     }
@@ -109,7 +115,7 @@ public class HttpUtil {
             response.close();
             return body;
         } catch (IOException e) {
-            e.printStackTrace();
+            LOGGER.error("errInfo is {}", e.getMessage());
             return body;
         }
     }

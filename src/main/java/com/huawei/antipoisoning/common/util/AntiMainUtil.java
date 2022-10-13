@@ -50,7 +50,7 @@ public class AntiMainUtil {
             p.destroy();
             return sb.toString();
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.error("errInfo is {}", e.getMessage());
             return null;
         }
     }

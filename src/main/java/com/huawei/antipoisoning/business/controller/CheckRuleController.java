@@ -19,12 +19,12 @@ import org.springframework.web.bind.annotation.RestController;
 /**
  * 防投毒规则维护
  *
+ * @since 2022-09-11
  * @author cqx
  */
 @RestController
 @RequestMapping(value = "/checkRule")
 public class CheckRuleController {
-
     @Autowired
     private CheckRuleService checkRuleService;
 

@@ -44,7 +44,7 @@ class InputStreamRunnable implements Runnable {
         int num = 0;
         try {
             while ((line = bReader.readLine()) != null) {
-                LOGGER.info("---->{} {}"+ String.format("%02d", num++) + line);
+                LOGGER.info("---->{}", String.format("%02d", num++) + line);
             }
             bReader.close();
         } catch (Exception ex) {

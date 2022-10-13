@@ -166,8 +166,7 @@ public class PoisonServiceImpl implements PoisonService {
      */
     public String ScanIdGenerate(String community, String repoName, String branch) {
         long time = System.currentTimeMillis();
-        String scanId = community + "-" + repoName + "-" + branch + "-" + time;
-        return scanId;
+        return community + "-" + repoName + "-" + branch + "-" + time;
     }
 
     public String readUrl(String uuid) {
@@ -305,7 +304,7 @@ public class PoisonServiceImpl implements PoisonService {
             }
             LOGGER.info("get diff tree end!");
         } catch (IOException | InterruptedException e) {
-            e.printStackTrace();
+            LOGGER.error("errInfo is {}", e.getMessage());
         }
         return MultiResponse.success(200, "success");
     }

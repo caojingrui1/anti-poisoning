@@ -22,11 +22,18 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-
 import java.util.Objects;
-import java.util.concurrent.*;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeoutException;
 
 /**
+ * 防投毒controller。
+ *
+ * @since 2022-09-12
  * @author zhangshengjie
  */
 @RestController
@@ -55,14 +62,26 @@ public class PoisonController {
         return queueService(repoInfo);
     }
 
+    /**
+     * 查询任务列表。
+     *
+     * @param repoInfo 参数
+     * @return MultiResponse
+     */
     @RequestMapping(value = "/query-results",
             produces = {"application/json"},
             consumes = {"application/json"},
             method = RequestMethod.POST)
-    public MultiResponse queryResults(@RequestBody RepoInfo repoInfo){
+    public MultiResponse queryResults(@RequestBody RepoInfo repoInfo) {
         return poisonService.queryResults(repoInfo);
     }
 
+    /**
+     * 查询扫描结果详情信息。
+     *
+     * @param antiEntity 参数
+     * @return MultiResponse
+     */
     @RequestMapping(value = "/query-results-detail",
             produces = {"application/json"},
             consumes = {"application/json"},
@@ -133,7 +152,7 @@ public class PoisonController {
             produces = {"application/json"},
             consumes = {"application/json"},
             method = RequestMethod.POST)
-    public MultiResponse getPrDiff(@RequestBody PullRequestInfo info) throws InterruptedException {
+    public MultiResponse getPrDiff(@RequestBody PullRequestInfo info) {
         return poisonService.getPrDiff(info);
     }
 }

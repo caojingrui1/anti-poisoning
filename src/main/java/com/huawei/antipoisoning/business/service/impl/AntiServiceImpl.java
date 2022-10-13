@@ -75,11 +75,11 @@ public class AntiServiceImpl implements AntiService {
     public MultiResponse scanRepo(String uuid) {
         AntiEntity antiEntity = antiOperation.queryAntiEntity(uuid);
         TaskEntity taskEntity = poisonTaskOperation.queryTaskEntity(uuid);
-        System.out.println(taskEntity);
+        LOGGER.info("taskEntity is {}", taskEntity);
         //扫描指定仓库 下载后放入文件夹 扫描 产生报告
         if (null != antiEntity) {
             try {
-                if (antiEntity.getIsDownloaded() == true) {
+                if (antiEntity.getIsDownloaded()) {
                     String[] arguments = new String[]{"/bin/sh", "-c",
                             "python3 " + YamlUtil.getToolPath() + SCANTOOLPATH
                                     // 仓库下载后存放地址
@@ -118,7 +118,7 @@ public class AntiServiceImpl implements AntiService {
                     }
                     String result = AntiMainUtil.getJsonContent(YamlUtil.getToolPath() + SCANRESULTPATH,
                             antiEntity.getRepoName());
-                    LOGGER.info("The scan result is : {}" + result);
+                    LOGGER.info("The scan result is : {}", result);
                     List<ResultEntity> results = JSONArray.parseArray(result, ResultEntity.class);
                     //扫描结果详情
                     for (ResultEntity resultEntity : results) {
@@ -209,7 +209,7 @@ public class AntiServiceImpl implements AntiService {
         String url = "/api/ci-backend/webhook/schedule/v1/poison/update-repo";
         HttpUtil httpUtil = new HttpUtil(ConstantsArgs.MAJUN_URL);
         String body = httpUtil.doPost(param, url);
-        LOGGER.info("update info : {}" + body);
+        LOGGER.info("update info : {}", body);
         if (StringUtils.isEmpty(antiEntity.getBranch())) {
             antiEntity.setBranch("master");
         }
@@ -225,32 +225,32 @@ public class AntiServiceImpl implements AntiService {
         taskEntity.setDownloadConsuming(downloadConsuming);
         poisonTaskOperation.updateTaskDownloadTime(taskEntity);
         if (getPullCode == 0) {
-            LOGGER.info("检出代码成功===0");
+            LOGGER.info("检出代码成功==={}", getPullCode);
             antiEntity.setIsDownloaded(true);
             antiOperation.updateScanResult(antiEntity);
             return MultiResponse.success(200, "success");
         } else if (getPullCode == 1) {
-            LOGGER.info("检出代码未知异常===1");
+            LOGGER.info("检出代码未知异常==={}", getPullCode);
             antiEntity.setIsDownloaded(false);
             antiOperation.updateScanResult(antiEntity);
             return MultiResponse.error(400, "downloadRepo error");
         } else if (getPullCode == 2) {
-            LOGGER.info("检出代码未知异常===2");
+            LOGGER.info("检出代码未知异常==={}", getPullCode);
             antiEntity.setIsDownloaded(false);
             antiOperation.updateScanResult(antiEntity);
             return MultiResponse.error(400, "downloadRepo error");
         } else if (getPullCode == 3) {
-            LOGGER.info("检出代码未知异常===3");
+            LOGGER.info("检出代码未知异常==={}", getPullCode);
             antiEntity.setIsDownloaded(false);
             antiOperation.updateScanResult(antiEntity);
             return MultiResponse.error(400, "downloadRepo error");
         } else if (getPullCode == 4) {
-            LOGGER.info("检出代码未知异常===4");
+            LOGGER.info("检出代码未知异常==={}", getPullCode);
             antiEntity.setIsDownloaded(false);
             antiOperation.updateScanResult(antiEntity);
             return MultiResponse.error(400, "downloadRepo error");
         } else {
-            LOGGER.info("检出代码未知异常===5");
+            LOGGER.info("检出代码未知异常==={}", getPullCode);
             antiEntity.setIsDownloaded(false);
             antiOperation.updateScanResult(antiEntity);
             return MultiResponse.error(400, "downloadRepo error");

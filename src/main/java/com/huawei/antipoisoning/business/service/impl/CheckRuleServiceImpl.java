@@ -38,7 +38,8 @@ public class CheckRuleServiceImpl implements CheckRuleService {
      */
     @Override
     public MultiResponse getAllRules(RuleModel ruleModel) {
-        return new MultiResponse().code(200).message("success").result(checkRuleOperation.getAllRules(ruleModel, new ArrayList<>()));
+        return new MultiResponse().code(200).message("success")
+                .result(checkRuleOperation.getAllRules(ruleModel, new ArrayList<>()));
     }
 
     /**
@@ -108,14 +109,16 @@ public class CheckRuleServiceImpl implements CheckRuleService {
                 ruleSet.setRuleCount(ruleByIds.size());
                 if (ruleByIds.size() != ruleSet.getRuleIds().size()) {
                     // 更换该规则集的规则id
-                    List<String> ruleIds = ruleByIds.stream().map(RuleModel::getRuleId).distinct().collect(Collectors.toList());
+                    List<String> ruleIds = ruleByIds.stream()
+                            .map(RuleModel::getRuleId).distinct().collect(Collectors.toList());
                     checkRuleOperation.updateRuleSetToRuleIds(ruleSet.getId(), ruleIds);
                 }
             } else {
                 ruleSet.setRuleCount(0);
             }
             // 判断是否在使用中
-            List<TaskRuleSetVo> taskRuleSet = checkRuleOperation.getTaskRuleSet(ruleSet.getId(), "", "");
+            List<TaskRuleSetVo> taskRuleSet =
+                    checkRuleOperation.getTaskRuleSet(ruleSet.getId(), "", "");
             if (taskRuleSet.size() != 0) {
                 ruleSet.setUsed(true);
             }

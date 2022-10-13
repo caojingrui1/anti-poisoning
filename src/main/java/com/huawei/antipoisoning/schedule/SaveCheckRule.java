@@ -83,7 +83,6 @@ public class SaveCheckRule {
             }
             // 将规则存入数据库
             checkRuleOperation.createRule(ruleModels);
-            System.out.println(ruleModels);
         }
     }
 }

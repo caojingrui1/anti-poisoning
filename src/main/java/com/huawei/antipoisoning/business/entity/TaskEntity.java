@@ -13,6 +13,9 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
 /**
+ * 版本扫描任务实体类。
+ *
+ * @since 2022-09-03
  * @author zhangshengjie
  */
 @Data
