@@ -321,9 +321,12 @@ public class CheckRuleOperation {
         TaskRuleSetVo taskRuleSetVo1 = mongoTemplate.findOne(Query.query(Criteria.where("_id").is("63313feba1506f131b5dd29a")),
                 TaskRuleSetVo.class, CollectionTableName.ANTI_TASK_RULE_SET);
         LOGGER.info("taskRuleSetVo1 : {}", taskRuleSetVo1);
-        TaskRuleSetVo taskRuleSetVo2 = mongoTemplate.findOne(Query.query(Criteria.where("repo_name_en").is("pkgship")),
+        TaskRuleSetVo taskRuleSetVo2 = mongoTemplate.findById("63313feba1506f131b5dd29a",
                 TaskRuleSetVo.class, CollectionTableName.ANTI_TASK_RULE_SET);
         LOGGER.info("taskRuleSetVo2 : {}", taskRuleSetVo2);
+        TaskRuleSetVo taskRuleSetVo3 = mongoTemplate.findOne(Query.query(Criteria.where("repo_name_en").is("pkgship")),
+                TaskRuleSetVo.class, CollectionTableName.ANTI_TASK_RULE_SET);
+        LOGGER.info("taskRuleSetVo3 : {}", taskRuleSetVo3);
         return mongoTemplate.findOne(Query.query(Criteria.where("_id").is(ruleSetModel.getId())),
                 TaskRuleSetVo.class, CollectionTableName.ANTI_TASK_RULE_SET);
     }
