@@ -21,6 +21,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class TaskRuleSetVo {
+    @Field("_id")
     private String id;
 
     @Field("repo_name_en")
