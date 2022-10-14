@@ -25,4 +25,4 @@ ENV TZ=Asia/Shanghai
 
 WORKDIR $PROJECT_HOME/tools/SoftwareSupplyChainSecurity-v1/
 
-ENTRYPOINT /usr/bin/java -jar -Xms1536m -Xmx1536m $PROJECT_HOME/target/$PROJECT_NAME-0.0.1-SNAPSHOT.jar > $PROJECT_HOME/tools/SoftwareSupplyChainSecurity-v1/sysMsg.log &
+ENTRYPOINT /usr/bin/java -jar -Xms1536m -Xmx1536m $PROJECT_HOME/target/$PROJECT_NAME-0.0.1-SNAPSHOT.jar --logging.file.name=$PROJECT_HOME/tools/SoftwareSupplyChainSecurity-v1/service.out

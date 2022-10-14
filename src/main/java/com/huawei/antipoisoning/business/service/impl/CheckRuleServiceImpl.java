@@ -12,6 +12,8 @@ import com.huawei.antipoisoning.business.operation.CheckRuleOperation;
 import com.huawei.antipoisoning.business.service.CheckRuleService;
 import com.huawei.antipoisoning.common.entity.MultiResponse;
 import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -27,6 +29,8 @@ import java.util.stream.Collectors;
  */
 @Service
 public class CheckRuleServiceImpl implements CheckRuleService {
+    private static final Logger LOGGER = LoggerFactory.getLogger(CheckRuleServiceImpl.class);
+
     @Autowired
     private CheckRuleOperation checkRuleOperation;
 
@@ -159,6 +163,7 @@ public class CheckRuleServiceImpl implements CheckRuleService {
      */
     @Override
     public MultiResponse queryTaskById(RuleSetModel ruleSetModel) {
+        LOGGER.info("The rule id {}", ruleSetModel.getId());
         return new MultiResponse().code(200).
                 result(checkRuleOperation.queryRuleById(ruleSetModel));
     }
@@ -182,6 +187,7 @@ public class CheckRuleServiceImpl implements CheckRuleService {
      */
     @Override
     public MultiResponse getTaskRule(TaskRuleSetVo taskRuleSetVo) {
+        LOGGER.info("The rule id {}", taskRuleSetVo.getId());
         List<TaskRuleSetVo> taskRuleSet = checkRuleOperation.getTaskRuleSet("", taskRuleSetVo.getProjectName(),
                 taskRuleSetVo.getRepoNameEn());
         if (taskRuleSet.size() == 0) {
