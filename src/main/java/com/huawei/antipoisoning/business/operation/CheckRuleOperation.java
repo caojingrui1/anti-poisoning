@@ -301,10 +301,10 @@ public class CheckRuleOperation {
     /**
      * 查找自定义规则集
      *
-     * @param ruleSetModel updateRuleSet
+     * @param taskRuleSetVo updateRuleSet
      */
-    public TaskRuleSetVo queryRuleById(RuleSetModel ruleSetModel) {
-        return mongoTemplate.findOne(Query.query(Criteria.where("_id").is(ruleSetModel.getId())),
+    public TaskRuleSetVo queryRuleById(TaskRuleSetVo taskRuleSetVo) {
+        return mongoTemplate.findOne(Query.query(Criteria.where("_id").is(taskRuleSetVo.getId())),
                 TaskRuleSetVo.class, CollectionTableName.ANTI_TASK_RULE_SET);
     }
 
