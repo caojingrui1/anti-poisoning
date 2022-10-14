@@ -163,6 +163,7 @@ public class CheckRuleServiceImpl implements CheckRuleService {
      */
     @Override
     public MultiResponse queryTaskById(RuleSetModel ruleSetModel) {
+        LOGGER.info("The rule id {}", ruleSetModel.getId());
         return new MultiResponse().code(200).
                 result(checkRuleOperation.queryRuleById(ruleSetModel));
     }
