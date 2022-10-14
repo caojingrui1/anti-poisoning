@@ -13,6 +13,7 @@ RUN yum update -y && yum install -y python3 python3-pip python3-devel gcc java-1
 VOLUME /tmp
 
 
+LABEL ms="sd"
 # 拉取代码
 RUN git clone -b master https://gitee.com/openMajun_enterprise/anti-poisoning.git $PROJECT_HOME
 WORKDIR $PROJECT_HOME/
