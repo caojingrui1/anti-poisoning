@@ -314,10 +314,6 @@ public class CheckRuleOperation {
      * @return TaskRuleSetVo
      */
     public TaskRuleSetVo queryRuleById(RuleSetModel ruleSetModel) {
-        Set<String> tables = mongoTemplate.getCollectionNames();
-        for (String table : tables) {
-            LOGGER.info("dbTable : {}", table);
-        }
         TaskRuleSetVo taskRuleSetVo1 = mongoTemplate.findOne(Query.query(Criteria.where("_id").is("63313feba1506f131b5dd29a")),
                 TaskRuleSetVo.class, CollectionTableName.ANTI_TASK_RULE_SET);
         LOGGER.info("taskRuleSetVo1 : {}", taskRuleSetVo1);
