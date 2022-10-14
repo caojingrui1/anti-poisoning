@@ -11,7 +11,10 @@ import com.huawei.antipoisoning.business.entity.checkrule.RuleResultDetailsVo;
 import com.huawei.antipoisoning.business.entity.checkrule.RuleSetModel;
 import com.huawei.antipoisoning.business.entity.checkrule.TaskRuleSetVo;
 import com.huawei.antipoisoning.business.entity.vo.PageVo;
+import com.huawei.antipoisoning.business.service.impl.CheckRuleServiceImpl;
 import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
 import org.springframework.data.mongodb.core.aggregation.AggregationOperation;
@@ -24,6 +27,7 @@ import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import java.util.regex.Pattern;
 
 /**
@@ -33,6 +37,8 @@ import java.util.regex.Pattern;
  */
 @Component
 public class CheckRuleOperation {
+    private static final Logger LOGGER = LoggerFactory.getLogger(CheckRuleOperation.class);
+
     @Resource
     private MongoTemplate mongoTemplate;
 
@@ -308,6 +314,10 @@ public class CheckRuleOperation {
      * @return TaskRuleSetVo
      */
     public TaskRuleSetVo queryRuleById(RuleSetModel ruleSetModel) {
+        Set<String> tables = mongoTemplate.getCollectionNames();
+        for (String table : tables) {
+            LOGGER.info("dbTable : {}", table);
+        }
         return mongoTemplate.findOne(Query.query(Criteria.where("_id").is(ruleSetModel.getId())),
                 TaskRuleSetVo.class, CollectionTableName.ANTI_TASK_RULE_SET);
     }
