@@ -318,6 +318,12 @@ public class CheckRuleOperation {
         for (String table : tables) {
             LOGGER.info("dbTable : {}", table);
         }
+        TaskRuleSetVo taskRuleSetVo1 = mongoTemplate.findOne(Query.query(Criteria.where("_id").is("63313feba1506f131b5dd29a")),
+                TaskRuleSetVo.class, CollectionTableName.ANTI_TASK_RULE_SET);
+        LOGGER.info("taskRuleSetVo1 : {}", taskRuleSetVo1);
+        TaskRuleSetVo taskRuleSetVo2 = mongoTemplate.findOne(Query.query(Criteria.where("repo_name_en").is("pkgship")),
+                TaskRuleSetVo.class, CollectionTableName.ANTI_TASK_RULE_SET);
+        LOGGER.info("taskRuleSetVo2 : {}", taskRuleSetVo2);
         return mongoTemplate.findOne(Query.query(Criteria.where("_id").is(ruleSetModel.getId())),
                 TaskRuleSetVo.class, CollectionTableName.ANTI_TASK_RULE_SET);
     }
