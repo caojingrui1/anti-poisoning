@@ -1,4 +1,8 @@
-package com.huawei.antipoisoning.business.entity.checkRule;
+/*
+ * Copyright (c) Huawei Technologies Co., Ltd. 2012-2020. All rights reserved.
+ */
+
+package com.huawei.antipoisoning.business.entity.checkrule;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

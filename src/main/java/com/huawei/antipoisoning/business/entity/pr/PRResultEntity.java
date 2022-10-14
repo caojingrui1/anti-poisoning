@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) Huawei Technologies Co., Ltd. 2012-2020. All rights reserved.
+ */
+
 package com.huawei.antipoisoning.business.entity.pr;
 
 import com.huawei.antipoisoning.business.enmu.CollectionTableName;
@@ -20,8 +24,9 @@ import java.util.Map;
 @Document(collection = CollectionTableName.SCAN_PR_RESULT_DETAILS)
 public class PRResultEntity {
     private String id;
+
     /**
-     * id
+     * 任务id
      */
     @Field("task_id")
     private String taskId;
@@ -50,7 +55,7 @@ public class PRResultEntity {
     private String status;
 
     /**
-     * id
+     * 扫描id
      */
     @Field("scan_id")
     private String scanId;

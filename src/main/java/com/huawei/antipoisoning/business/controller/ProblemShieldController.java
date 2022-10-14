@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) Huawei Technologies Co., Ltd. 2012-2020. All rights reserved.
+ */
+
 package com.huawei.antipoisoning.business.controller;
 
 import com.huawei.antipoisoning.business.entity.shield.ParamModel;
@@ -141,6 +145,4 @@ public class ProblemShieldController {
     public MultiResponse getPoisoningSelect() {
         return problemShieldService.getPoisoningSelect();
     }
-
-
 }

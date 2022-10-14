@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) Huawei Technologies Co., Ltd. 2012-2020. All rights reserved.
+ */
+
 package com.huawei.antipoisoning.business.entity;
 
 import com.huawei.antipoisoning.business.enmu.CollectionTableName;
@@ -10,15 +14,22 @@ import org.springframework.data.mongodb.core.mapping.Field;
 import java.util.Map;
 
 /**
+ * 扫描任务列表实体类。
+ *
+ * @since 2022-09-03
  * @author zhangshengjie
  */
 @Data
 @ToString
 @Document(collection = CollectionTableName.SCAN_RESULT_DETAILS)
 public class ResultEntity {
-    private String id;
     /**
      * id
+     */
+    private String id;
+
+    /**
+     * 任务ID
      */
     @Field("task_id")
     private String taskId;

@@ -1,9 +1,16 @@
+/*
+ * Copyright (c) Huawei Technologies Co., Ltd. 2012-2020. All rights reserved.
+ */
+
 package com.huawei.antipoisoning.business.entity;
 
 import lombok.Data;
 import org.springframework.data.mongodb.core.mapping.Field;
 
 /**
+ * 仓库信息实体类。
+ *
+ * @since 2022-09-03
  * @author zhangshengjie
  */
 @Data

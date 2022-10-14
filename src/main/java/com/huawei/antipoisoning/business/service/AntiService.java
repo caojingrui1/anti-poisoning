@@ -1,10 +1,12 @@
-package com.huawei.antipoisoning.business.service;
+/*
+ * Copyright (c) Huawei Technologies Co., Ltd. 2012-2020. All rights reserved.
+ */
 
+package com.huawei.antipoisoning.business.service;
 
 import com.huawei.antipoisoning.business.entity.AntiEntity;
 import com.huawei.antipoisoning.common.entity.MultiResponse;
 
-import java.util.List;
 
 /**
  * vms接口服务
@@ -19,13 +21,6 @@ public interface AntiService {
      * @return MultiResponse<List<VmsExternalCveSourceDTO>>
      */
     MultiResponse scanRepo(String uuid);
-
-    /**
-     * 查询外部源漏洞
-     *
-     * @return MultiResponse<List<VmsExternalCveSourceDTO>>
-     */
-    MultiResponse setEnv();
 
     /**
      * 下载仓库

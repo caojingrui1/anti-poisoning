@@ -1,11 +1,15 @@
+/*
+ * Copyright (c) Huawei Technologies Co., Ltd. 2012-2020. All rights reserved.
+ */
+
 package com.huawei.antipoisoning.business.operation;
 
 import com.huawei.antipoisoning.business.enmu.CollectionTableName;
 import com.huawei.antipoisoning.business.entity.TaskEntity;
-import com.huawei.antipoisoning.business.entity.checkRule.RuleModel;
-import com.huawei.antipoisoning.business.entity.checkRule.RuleResultDetailsVo;
-import com.huawei.antipoisoning.business.entity.checkRule.RuleSetModel;
-import com.huawei.antipoisoning.business.entity.checkRule.TaskRuleSetVo;
+import com.huawei.antipoisoning.business.entity.checkrule.RuleModel;
+import com.huawei.antipoisoning.business.entity.checkrule.RuleResultDetailsVo;
+import com.huawei.antipoisoning.business.entity.checkrule.RuleSetModel;
+import com.huawei.antipoisoning.business.entity.checkrule.TaskRuleSetVo;
 import com.huawei.antipoisoning.business.entity.vo.PageVo;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -31,7 +35,6 @@ import java.util.regex.Pattern;
 public class CheckRuleOperation {
     @Resource
     private MongoTemplate mongoTemplate;
-
 
     /**
      * 根据条件获取规则详情
@@ -68,7 +71,8 @@ public class CheckRuleOperation {
             query.skip((long) (rule.getPageNum() - 1) * rule.getPageSize());
             query.limit(rule.getPageSize());
         }
-        List<RuleModel> codeCheckRuleVos = mongoTemplate.find(query, RuleModel.class, CollectionTableName.ANTI_CHECK_RULE);
+        List<RuleModel> codeCheckRuleVos = mongoTemplate.find(query, RuleModel.class,
+                CollectionTableName.ANTI_CHECK_RULE);
         return new PageVo(count, codeCheckRuleVos);
     }
 
@@ -199,7 +203,8 @@ public class CheckRuleOperation {
         }
         if (StringUtils.isNotBlank(ruleSetModel.getRuleName())) {
             Pattern pattern = Pattern
-                    .compile("^.*" + escapeSpecialWord(ruleSetModel.getRuleName()) + ".*$", Pattern.CASE_INSENSITIVE);
+                    .compile("^.*" +
+                            escapeSpecialWord(ruleSetModel.getRuleName()) + ".*$", Pattern.CASE_INSENSITIVE);
             criteria.and("rule_name").regex(pattern);
         }
         Query query = Query.query(criteria);
@@ -221,7 +226,6 @@ public class CheckRuleOperation {
                     ruleModel.setIsUsed("0");
                 }
             }
-
         }
         List<RuleModel> ruleModelList = mongoTemplate.find(query, RuleModel.class, CollectionTableName.ANTI_CHECK_RULE);
         return new RuleResultDetailsVo(Long.valueOf(ruleVosCount.size()).intValue(), enableCount, ruleModelList);
@@ -274,8 +278,8 @@ public class CheckRuleOperation {
         if (StringUtils.isNotBlank(taskRuleSetVo.getId())) {
             criteria.and("_id").is(taskRuleSetVo.getId());
         }
-        if (StringUtils.isNotBlank(taskRuleSetVo.getProjectName()) &&
-                StringUtils.isNotBlank(taskRuleSetVo.getRepoNameEn())) {
+        if (StringUtils.isNotBlank(taskRuleSetVo.getProjectName())
+                && StringUtils.isNotBlank(taskRuleSetVo.getRepoNameEn())) {
             criteria.and("project_name").is(taskRuleSetVo.getProjectName()).and("repo_name_en")
                     .is(taskRuleSetVo.getRepoNameEn());
         }
@@ -295,18 +299,16 @@ public class CheckRuleOperation {
     public void delTaskRuleSet(TaskEntity taskEntity) {
         mongoTemplate.remove(Query.query(Criteria.where("project_name").is(taskEntity.getProjectName())
                 .and("repo_name_en").is(taskEntity.getRepoName())), CollectionTableName.ANTI_TASK_RULE_SET);
-
     }
 
     /**
      * 查找自定义规则集
      *
      * @param ruleSetModel updateRuleSet
+     * @return TaskRuleSetVo
      */
     public TaskRuleSetVo queryRuleById(RuleSetModel ruleSetModel) {
         return mongoTemplate.findOne(Query.query(Criteria.where("_id").is(ruleSetModel.getId())),
                 TaskRuleSetVo.class, CollectionTableName.ANTI_TASK_RULE_SET);
     }
-
-
 }

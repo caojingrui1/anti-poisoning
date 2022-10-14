@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) Huawei Technologies Co., Ltd. 2012-2020. All rights reserved.
+ */
+
 package com.huawei.antipoisoning.business.operation;
 
 import com.huawei.antipoisoning.business.enmu.CollectionTableName;
@@ -45,7 +49,6 @@ public class PoisonScanOperation {
      * @return repoInfo 查询条件
      */
     private Criteria getCommonCriteria(RepoInfo repoInfo) {
-        Criteria criteria = new Criteria();
-        return criteria;
+        return new Criteria();
     }
 }

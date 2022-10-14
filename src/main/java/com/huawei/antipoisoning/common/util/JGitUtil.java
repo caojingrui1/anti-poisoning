@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) Huawei Technologies Co., Ltd. 2012-2020. All rights reserved.
+ */
+
 package com.huawei.antipoisoning.common.util;
 
 import org.eclipse.jgit.api.Git;
@@ -10,6 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.List;
 
@@ -67,19 +72,19 @@ public class JGitUtil implements Serializable {
                     .setDirectory(dir).setCredentialsProvider(provider).call();
             pullMsg = "检出代码成功 success";
         } catch (org.eclipse.jgit.api.errors.TransportException e) {
-            e.printStackTrace();
+            LOGGER.error("errInfo is {}", e.getMessage());
             pullMsg = "用户名NAME或密码PASSWORD错误或远程链接URL错误 failed";
             pullFlag = 1;
         } catch (org.eclipse.jgit.api.errors.JGitInternalException e) {
-            e.printStackTrace();
+            LOGGER.error("errInfo is {}", e.getMessage());
             pullMsg = "已经存在了项目的下载目录，并且目录正在被操作 failed";
             pullFlag = 2;
         } catch (GitAPIException e) {
-            e.printStackTrace();
+            LOGGER.error("errInfo is {}", e.getMessage());
             pullMsg = "调用GitAPI异常，failed";
             pullFlag = 3;
         } catch (NoClassDefFoundError e) {
-            e.printStackTrace();
+            LOGGER.error("errInfo is {}", e.getMessage());
             pullMsg = "未找到相应的类文件异常，failed";
             pullFlag = 4;
         } finally {
@@ -120,19 +125,19 @@ public class JGitUtil implements Serializable {
             pullMsg = "检出代码成功 success";
 
         } catch (org.eclipse.jgit.api.errors.TransportException e) {
-            e.printStackTrace();
+            LOGGER.error("errInfo is {}", e.getMessage());
             pullMsg = "用户名NAME或密码PASSWORD错误或远程链接URL错误 failed";
             pullFlag = 1;
         } catch (org.eclipse.jgit.api.errors.JGitInternalException e) {
-            e.printStackTrace();
+            LOGGER.error("errInfo is {}", e.getMessage());
             pullMsg = "已经存在了项目的下载目录，并且目录正在被操作 failed";
             pullFlag = 2;
         } catch (GitAPIException e) {
-            e.printStackTrace();
+            LOGGER.error("errInfo is {}", e.getMessage());
             pullMsg = "调用GitAPI异常，failed";
             pullFlag = 3;
         } catch (NoClassDefFoundError e) {
-            e.printStackTrace();
+            LOGGER.error("errInfo is {}", e.getMessage());
             pullMsg = "未找到相应的类文件异常，failed";
             pullFlag = 4;
         } finally {
@@ -156,7 +161,7 @@ public class JGitUtil implements Serializable {
 
         if (this.branch.equals("master")) {
             checkoutMsg = "Check out code OK. ->" + this.branch;
-            LOGGER.info(checkoutMsg + "--code--" + checkoutFlag);
+            LOGGER.info("{} --code-- {}",checkoutMsg, checkoutFlag);
             return checkoutFlag;
         }
         Git git = null;
@@ -166,17 +171,17 @@ public class JGitUtil implements Serializable {
             List<Ref> branchList = git.branchList().setListMode(ListBranchCommand.ListMode.ALL).call();
             for (Ref ref : branchList){
                 if (this.branch.equals(ref.getName())) {
-                    LOGGER.info("代码分支列表中存在给定分支");
+                    LOGGER.info("The branch is exist!");
                 }
             }
             git.checkout().setName("origin/" + this.branch).setForce(true).call();
             checkoutMsg = "检出分支代码 success! code OK ->" + this.branch;
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (GitAPIException | IOException e) {
+            LOGGER.error("errInfo is {}", e.getMessage());
             checkoutMsg = "检出分支代码 failed ! ->" + this.branch;
             checkoutFlag = 6;
         } finally {
-            LOGGER.info(checkoutMsg + "--code--" + checkoutFlag);
+            LOGGER.info("{} --code-- {}",checkoutMsg, checkoutFlag);
             if (git != null) {
                 git.close();
             }
@@ -194,7 +199,7 @@ public class JGitUtil implements Serializable {
         int checkoutFlag = 0;
         if (this.revision == null || this.revision.length() == 0) {
             checkoutMsg = "Check out code OK. ->" + this.revision;
-            LOGGER.info(checkoutMsg + "--code--" + checkoutFlag);
+            LOGGER.info("{} --code-- {}",checkoutMsg, checkoutFlag);
             return checkoutFlag;
         }
         Git git = null;
@@ -202,12 +207,12 @@ public class JGitUtil implements Serializable {
             git = Git.open( new File(this.git_config) );
             git.checkout().setName( this.revision ).setForce(true).call();
             checkoutMsg = "检出代码版本 success! code OK. ->" + this.revision;
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (GitAPIException | IOException e) {
+            LOGGER.error("errInfo is {}", e.getMessage());
             checkoutMsg = "检出代码版本 failed ! ->" + this.revision;
             checkoutFlag = 8;
         } finally {
-            LOGGER.info(checkoutMsg + "--code--" + checkoutFlag);
+            LOGGER.info("{} --code-- {}",checkoutMsg, checkoutFlag);
             if (git != null) {
                 git.close();
             }
@@ -261,7 +266,7 @@ public class JGitUtil implements Serializable {
                 }
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.error("errInfo is {}", e.getMessage());
         }
     }
 

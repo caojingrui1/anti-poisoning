@@ -1,7 +1,11 @@
+/*
+ * Copyright (c) Huawei Technologies Co., Ltd. 2012-2020. All rights reserved.
+ */
+
 package com.huawei.antipoisoning.business.entity.pr;
 
 import com.huawei.antipoisoning.business.enmu.CollectionTableName;
-import com.huawei.antipoisoning.business.entity.checkRule.TaskRuleSetVo;
+import com.huawei.antipoisoning.business.entity.checkrule.TaskRuleSetVo;
 import lombok.Data;
 import lombok.ToString;
 import org.springframework.data.annotation.Transient;
@@ -22,6 +26,7 @@ public class PRTaskEntity {
      * id
      */
     private String id;
+
     /**
      * 任务id
      */

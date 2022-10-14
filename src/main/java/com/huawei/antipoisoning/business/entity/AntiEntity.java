@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) Huawei Technologies Co., Ltd. 2012-2020. All rights reserved.
+ */
+
 package com.huawei.antipoisoning.business.entity;
 
 import lombok.Data;
@@ -44,6 +48,7 @@ public class AntiEntity {
      */
     @Field("tips")
     private String tips;
+
     /**
      * 仓库名
      */

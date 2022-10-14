@@ -1,41 +1,48 @@
-package com.huawei.antipoisoning.business.service.impl;
+/*
+ * Copyright (c) Huawei Technologies Co., Ltd. 2012-2020. All rights reserved.
+ */
 
+package com.huawei.antipoisoning.business.service.impl;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.huawei.antipoisoning.business.enmu.CommonConstants;
-import com.huawei.antipoisoning.business.enmu.ConstantsArgs;
-import com.huawei.antipoisoning.business.entity.*;
-import com.huawei.antipoisoning.business.entity.checkRule.CheckRuleSet;
-import com.huawei.antipoisoning.business.entity.checkRule.RuleModel;
-import com.huawei.antipoisoning.business.entity.checkRule.RuleSetModel;
-import com.huawei.antipoisoning.business.entity.checkRule.TaskRuleSetVo;
+import com.huawei.antipoisoning.business.entity.AntiEntity;
+import com.huawei.antipoisoning.business.entity.RepoInfo;
+import com.huawei.antipoisoning.business.entity.ResultEntity;
+import com.huawei.antipoisoning.business.entity.TaskEntity;
+import com.huawei.antipoisoning.business.entity.checkrule.CheckRuleSet;
+import com.huawei.antipoisoning.business.entity.checkrule.RuleModel;
+import com.huawei.antipoisoning.business.entity.checkrule.RuleSetModel;
+import com.huawei.antipoisoning.business.entity.checkrule.TaskRuleSetVo;
 import com.huawei.antipoisoning.business.entity.pr.PullRequestInfo;
-import com.huawei.antipoisoning.business.entity.vo.AntiPoisonModel;
 import com.huawei.antipoisoning.business.entity.vo.PageVo;
 import com.huawei.antipoisoning.business.operation.CheckRuleOperation;
 import com.huawei.antipoisoning.business.operation.PoisonResultOperation;
 import com.huawei.antipoisoning.business.operation.PoisonScanOperation;
 import com.huawei.antipoisoning.business.operation.PoisonTaskOperation;
-import com.huawei.antipoisoning.business.operation.RepoOperation;
 import com.huawei.antipoisoning.business.service.AntiService;
 import com.huawei.antipoisoning.business.service.PoisonService;
 import com.huawei.antipoisoning.business.util.YamlUtil;
 import com.huawei.antipoisoning.common.entity.MultiResponse;
-import com.huawei.antipoisoning.common.util.HttpUtil;
 import com.huawei.antipoisoning.common.util.JGitUtil;
-import org.apache.commons.collections4.MapUtils;
-import org.apache.commons.lang.ObjectUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.LineNumberReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Collections;
 
 @Service
 public class PoisonServiceImpl implements PoisonService {
@@ -49,9 +56,6 @@ public class PoisonServiceImpl implements PoisonService {
 
     @Autowired
     private PoisonResultOperation poisonResultOperation;
-
-    @Autowired
-    private RepoOperation repoOperation;
 
     @Autowired
     private CheckRuleOperation checkRuleOperation;
@@ -140,12 +144,24 @@ public class PoisonServiceImpl implements PoisonService {
         return new MultiResponse().code(200).result("poisonScan start");
     }
 
+    /**
+     * 查询版本扫描任务列表信息。
+     *
+     * @param repoInfo 参数
+     * @return MultiResponse
+     */
     @Override
     public MultiResponse queryResults(RepoInfo repoInfo) {
         PageVo summaryVos = poisonScanOperation.queryResults(repoInfo);
         return new MultiResponse().code(200).result(summaryVos);
     }
 
+    /**
+     * 查询版本扫描任务结果详情信息。
+     *
+     * @param antiEntity 参数
+     * @return MultiResponse
+     */
     @Override
     public MultiResponse queryResultsDetail(AntiEntity antiEntity) {
         List<ResultEntity> resultEntity = poisonResultOperation.queryResultEntity(antiEntity.getScanId());
@@ -162,8 +178,7 @@ public class PoisonServiceImpl implements PoisonService {
      */
     public String ScanIdGenerate(String community, String repoName, String branch) {
         long time = System.currentTimeMillis();
-        String scanId = community + "-" + repoName + "-" + branch + "-" + time;
-        return scanId;
+        return community + "-" + repoName + "-" + branch + "-" + time;
     }
 
     public String readUrl(String uuid) {
@@ -180,7 +195,6 @@ public class PoisonServiceImpl implements PoisonService {
             }
             br.close();
         } catch (IOException e) {
-            // TODO Auto-generated catch block
             readStr = e.toString();
         }
         return readStr;
@@ -255,6 +269,7 @@ public class PoisonServiceImpl implements PoisonService {
      * 删除防投毒任务以及相关规则集
      *
      * @param taskEntity 删除参数体
+     * @return MultiResponse
      */
     @Override
     public MultiResponse delTask(TaskEntity taskEntity) {
@@ -280,7 +295,7 @@ public class PoisonServiceImpl implements PoisonService {
      * 获取PR增量文件信息。
      *
      * @param info pr信息
-     * @return
+     * @return MultiResponse
      */
     @Override
     public MultiResponse getPrDiff(PullRequestInfo info) {
@@ -301,10 +316,8 @@ public class PoisonServiceImpl implements PoisonService {
                 LOGGER.info(line);
             }
             LOGGER.info("get diff tree end!");
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
+        } catch (IOException | InterruptedException e) {
+            LOGGER.error("errInfo is {}", e.getMessage());
         }
         return MultiResponse.success(200, "success");
     }
