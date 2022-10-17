@@ -17,8 +17,16 @@ import org.springframework.data.mongodb.core.mapping.Field;
 public class PoisonReportModel {
     @Field("scan_id")
     private String scanId;
+
+    @Field("status")
     private String status;
+
+    @Field("fileName")
     private String fileName;
+
+    @Field("ruleName")
     private String ruleName;
+
+    @Field("total")
     private Integer total;
 }
