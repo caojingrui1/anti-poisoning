@@ -4,10 +4,7 @@
 
 package com.huawei.antipoisoning.business.service.impl;
 
-import com.huawei.antipoisoning.business.entity.checkrule.RuleModel;
-import com.huawei.antipoisoning.business.entity.checkrule.RuleResultDetailsVo;
-import com.huawei.antipoisoning.business.entity.checkrule.RuleSetModel;
-import com.huawei.antipoisoning.business.entity.checkrule.TaskRuleSetVo;
+import com.huawei.antipoisoning.business.entity.checkrule.*;
 import com.huawei.antipoisoning.business.operation.CheckRuleOperation;
 import com.huawei.antipoisoning.business.service.CheckRuleService;
 import com.huawei.antipoisoning.common.entity.MultiResponse;
@@ -66,7 +63,7 @@ public class CheckRuleServiceImpl implements CheckRuleService {
             RuleSetModel ruleSet = new RuleSetModel();
             ruleSet.setProjectName(ruleSetModel.getProjectName());
             ruleSet.setTemplateName(ruleSetModel.getTemplateName());
-            List<RuleSetModel> models = checkRuleOperation.queryRuleSet(ruleSet);
+            List<RuleSetResult> models = checkRuleOperation.queryRuleSet(ruleSet);
             if (models.size() != 0) {
                 return new MultiResponse().code(400).message("templateName is repeat");
             }
@@ -99,15 +96,15 @@ public class CheckRuleServiceImpl implements CheckRuleService {
         // 查出所有的系统规则集
         RuleSetModel ruleSets = new RuleSetModel();
         ruleSets.setDefaultTemplate(0);
-        List<RuleSetModel> ruleSetModels = checkRuleOperation.queryRuleSet(ruleSets);
+        List<RuleSetResult> ruleSetModels = checkRuleOperation.queryRuleSet(ruleSets);
         // 查询该社区自定义的规则集
         ruleSetModel.setDefaultTemplate(1);
-        List<RuleSetModel> modelList = checkRuleOperation.queryRuleSet(ruleSetModel);
+        List<RuleSetResult> modelList = checkRuleOperation.queryRuleSet(ruleSetModel);
         if (modelList.size() > 0) {
             ruleSetModels.addAll(modelList);
         }
         // 得到每个规则集的规则个数
-        for (RuleSetModel ruleSet : ruleSetModels) {
+        for (RuleSetResult ruleSet : ruleSetModels) {
             if (ruleSet.getRuleIds().size() > 0) {
                 List<RuleModel> ruleByIds = checkRuleOperation.getRuleByIds(ruleSet.getRuleIds());
                 ruleSet.setRuleCount(ruleByIds.size());
@@ -163,7 +160,6 @@ public class CheckRuleServiceImpl implements CheckRuleService {
      */
     @Override
     public MultiResponse queryTaskById(RuleSetModel ruleSetModel) {
-        LOGGER.info("The rule id {}", ruleSetModel.getId());
         return new MultiResponse().code(200).
                 result(checkRuleOperation.queryRuleById(ruleSetModel));
     }
