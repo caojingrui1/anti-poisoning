@@ -21,10 +21,10 @@ public class PoisonReportModel {
     @Field("status")
     private String status;
 
-    @Field("fileName")
+    @Field("suspicious_file_name")
     private String fileName;
 
-    @Field("ruleName")
+    @Field("rule_name")
     private String ruleName;
 
     @Field("total")
