@@ -11,6 +11,8 @@ import com.huawei.antipoisoning.business.entity.shield.ParamModel;
 import com.huawei.antipoisoning.business.entity.shield.PoisonReportModel;
 import com.huawei.antipoisoning.common.entity.MultiResponse;
 import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
@@ -34,6 +36,8 @@ import java.util.Map;
  */
 @Component
 public class ScanResultDetailOperation {
+    private static final Logger LOGGER = LoggerFactory.getLogger(ScanResultDetailOperation.class);
+
     @Resource
     private MongoTemplate mongoTemplate;
 
@@ -67,6 +71,7 @@ public class ScanResultDetailOperation {
      * @return List<ResultEntity>
      */
     public List<ResultEntity> getResultDetail(String scanId, String userId, ParamModel resultDetail) {
+        LOGGER.info("scanId is {}, userId is {}, resultDeail is {}", scanId, userId, resultDetail);
         String tableName = CollectionTableName.SCAN_RESULT_DETAILS;
         Criteria criteria = Criteria.where("scan_id").is(scanId);
         if (StringUtils.isNotBlank(resultDetail.getStatus())) {
@@ -171,6 +176,7 @@ public class ScanResultDetailOperation {
      * @return List<PoisonReportModel>
      */
     public List<PoisonReportModel> getGroupResult(String userId, ParamModel reportModel) {
+        LOGGER.info("userId is {}, reportModel is {}", userId, reportModel);
         String tableName = CollectionTableName.SCAN_RESULT_DETAILS;
         Criteria criteria = Criteria.where("scan_id").is(reportModel.getScanId());
         if (StringUtils.isNotBlank(reportModel.getStatus())) {
