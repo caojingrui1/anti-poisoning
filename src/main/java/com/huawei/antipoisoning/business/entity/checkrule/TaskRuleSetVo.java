@@ -7,8 +7,9 @@ package com.huawei.antipoisoning.business.entity.checkrule;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.data.annotation.Id;
+import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.core.mapping.Field;
+import org.springframework.data.mongodb.core.mapping.MongoId;
 
 import java.util.List;
 
@@ -22,8 +23,8 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class TaskRuleSetVo {
-    @Id
-    private String id;
+    @MongoId
+    private ObjectId id;
 
     @Field("repo_name_en")
     private String repoNameEn;
