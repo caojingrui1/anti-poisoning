@@ -11,10 +11,7 @@ import com.huawei.antipoisoning.business.entity.AntiEntity;
 import com.huawei.antipoisoning.business.entity.RepoInfo;
 import com.huawei.antipoisoning.business.entity.ResultEntity;
 import com.huawei.antipoisoning.business.entity.TaskEntity;
-import com.huawei.antipoisoning.business.entity.checkrule.CheckRuleSet;
-import com.huawei.antipoisoning.business.entity.checkrule.RuleModel;
-import com.huawei.antipoisoning.business.entity.checkrule.RuleSetModel;
-import com.huawei.antipoisoning.business.entity.checkrule.TaskRuleSetVo;
+import com.huawei.antipoisoning.business.entity.checkrule.*;
 import com.huawei.antipoisoning.business.entity.pr.PullRequestInfo;
 import com.huawei.antipoisoning.business.entity.vo.PageVo;
 import com.huawei.antipoisoning.business.operation.CheckRuleOperation;
@@ -78,7 +75,7 @@ public class PoisonServiceImpl implements PoisonService {
             for (CheckRuleSet checkRuleSet : taskRuleSet.get(0).getAntiCheckRules()) {
                 RuleSetModel ruleSetModel = new RuleSetModel();
                 ruleSetModel.setId(checkRuleSet.getRuleSetId());
-                List<RuleSetModel> ruleSetModels = checkRuleOperation.queryRuleSet(ruleSetModel);
+                List<RuleSetResult> ruleSetModels = checkRuleOperation.queryRuleSet(ruleSetModel);
                 if (ruleSetModels.size() == 1 && (!("通用检查规则集").equals(ruleSetModels.get(0).getTemplateName()))) {
                     ruleIds.addAll(ruleSetModels.get(0).getRuleIds());
                 } else {
