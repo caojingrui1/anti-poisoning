@@ -22,6 +22,7 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Component;
+import org.springframework.util.ObjectUtils;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
@@ -280,7 +281,7 @@ public class CheckRuleOperation {
      */
     public void updateTaskRule(TaskRuleSetVo taskRuleSetVo) {
         Criteria criteria = new Criteria();
-        if (StringUtils.isNotEmpty(taskRuleSetVo.getId())) {
+        if (!ObjectUtils.isEmpty(taskRuleSetVo.getId())) {
             criteria.and("_id").is(taskRuleSetVo.getId());
         }
         if (StringUtils.isNotBlank(taskRuleSetVo.getProjectName())
