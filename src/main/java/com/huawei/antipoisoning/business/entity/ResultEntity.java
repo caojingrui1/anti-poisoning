@@ -55,6 +55,7 @@ public class ResultEntity {
     /**
      * 问题状态（0：未屏蔽 1：屏蔽中 2：已屏蔽）
      */
+    @Field("status")
     private String status;
 
     /**
