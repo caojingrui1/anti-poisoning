@@ -11,7 +11,6 @@ import com.huawei.antipoisoning.business.entity.checkrule.RuleResultDetailsVo;
 import com.huawei.antipoisoning.business.entity.checkrule.RuleSetModel;
 import com.huawei.antipoisoning.business.entity.checkrule.TaskRuleSetVo;
 import com.huawei.antipoisoning.business.entity.vo.PageVo;
-import com.huawei.antipoisoning.business.service.impl.CheckRuleServiceImpl;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,13 +21,11 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Component;
-import org.springframework.util.ObjectUtils;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.Set;
 import java.util.regex.Pattern;
 
 /**
@@ -282,7 +279,7 @@ public class CheckRuleOperation {
      */
     public void updateTaskRule(TaskRuleSetVo taskRuleSetVo) {
         Criteria criteria = new Criteria();
-        if (!ObjectUtils.isEmpty(taskRuleSetVo.getId())) {
+        if (StringUtils.isNotEmpty(taskRuleSetVo.getId())) {
             criteria.and("_id").is(taskRuleSetVo.getId());
         }
         if (StringUtils.isNotBlank(taskRuleSetVo.getProjectName())
@@ -315,7 +312,7 @@ public class CheckRuleOperation {
      * @return TaskRuleSetVo
      */
     public TaskRuleSetVo queryRuleById(RuleSetModel ruleSetModel) {
-        TaskRuleSetVo taskRuleSetVo1 = mongoTemplate.findOne(Query.query(Criteria.where("_id").is("63313feba1506f131b5dd29a")),
+        TaskRuleSetVo taskRuleSetVo1 = mongoTemplate.findOne(Query.query(new Criteria("_id").is("63313feba1506f131b5dd29a")),
                 TaskRuleSetVo.class, CollectionTableName.ANTI_TASK_RULE_SET);
         LOGGER.info("taskRuleSetVo1 : {}", taskRuleSetVo1);
         TaskRuleSetVo taskRuleSetVo2 = mongoTemplate.findById("63313feba1506f131b5dd29a",
