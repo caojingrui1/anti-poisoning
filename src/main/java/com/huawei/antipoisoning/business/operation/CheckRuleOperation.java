@@ -12,6 +12,7 @@ import com.huawei.antipoisoning.business.entity.checkrule.RuleSetModel;
 import com.huawei.antipoisoning.business.entity.checkrule.TaskRuleSetVo;
 import com.huawei.antipoisoning.business.entity.vo.PageVo;
 import org.apache.commons.lang.StringUtils;
+import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -312,10 +313,11 @@ public class CheckRuleOperation {
      * @return TaskRuleSetVo
      */
     public TaskRuleSetVo queryRuleById(RuleSetModel ruleSetModel) {
-        TaskRuleSetVo taskRuleSetVo1 = mongoTemplate.findOne(Query.query(new Criteria("_id").is("63313feba1506f131b5dd29a")),
+        TaskRuleSetVo taskRuleSetVo1 = mongoTemplate.findOne(Query.query(new Criteria("_id")
+                        .is(new ObjectId("63313feba1506f131b5dd29a"))),
                 TaskRuleSetVo.class, CollectionTableName.ANTI_TASK_RULE_SET);
         LOGGER.info("taskRuleSetVo1 : {}", taskRuleSetVo1);
-        TaskRuleSetVo taskRuleSetVo2 = mongoTemplate.findById("63313feba1506f131b5dd29a",
+        TaskRuleSetVo taskRuleSetVo2 = mongoTemplate.findById(new ObjectId("63313feba1506f131b5dd29a"),
                 TaskRuleSetVo.class, CollectionTableName.ANTI_TASK_RULE_SET);
         LOGGER.info("taskRuleSetVo2 : {}", taskRuleSetVo2);
         TaskRuleSetVo taskRuleSetVo3 = mongoTemplate.findOne(Query.query(Criteria.where("repo_name_en").is("pkgship")),
