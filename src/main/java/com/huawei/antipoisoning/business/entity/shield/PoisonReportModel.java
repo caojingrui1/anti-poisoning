@@ -5,7 +5,6 @@
 package com.huawei.antipoisoning.business.entity.shield;
 
 import lombok.Data;
-import org.springframework.data.mongodb.core.mapping.Field;
 
 /**
  * 查询report筛选栏实体类
@@ -15,18 +14,8 @@ import org.springframework.data.mongodb.core.mapping.Field;
  */
 @Data
 public class PoisonReportModel {
-    @Field("scan_id")
-    private String scanId;
-
-    @Field("status")
     private String status;
-
-    @Field("suspicious_file_name")
     private String fileName;
-
-    @Field("rule_name")
     private String ruleName;
-
-    @Field("total")
     private Integer total;
 }
