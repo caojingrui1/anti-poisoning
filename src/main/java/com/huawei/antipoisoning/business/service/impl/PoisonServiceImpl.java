@@ -75,7 +75,7 @@ public class PoisonServiceImpl implements PoisonService {
             for (CheckRuleSet checkRuleSet : taskRuleSet.get(0).getAntiCheckRules()) {
                 RuleSetModel ruleSetModel = new RuleSetModel();
                 ruleSetModel.setId(checkRuleSet.getRuleSetId());
-                List<RuleSetResult> ruleSetModels = checkRuleOperation.queryRuleSet(ruleSetModel);
+                List<RuleSetModel> ruleSetModels = checkRuleOperation.queryRuleSet(ruleSetModel);
                 if (ruleSetModels.size() == 1 && (!("通用检查规则集").equals(ruleSetModels.get(0).getTemplateName()))) {
                     ruleIds.addAll(ruleSetModels.get(0).getRuleIds());
                 } else {

@@ -10,6 +10,8 @@ import com.huawei.antipoisoning.business.entity.TaskEntity;
 import com.huawei.antipoisoning.business.entity.vo.PageVo;
 import com.mongodb.client.result.UpdateResult;
 import org.apache.commons.lang.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -28,8 +30,11 @@ import java.util.List;
  */
 @Component
 public class PoisonTaskOperation {
-    @Resource
+    @Autowired
+    @Qualifier("poisonMongoTemplate")
     private MongoTemplate mongoTemplate;
+//    @Resource
+//    private MongoTemplate mongoTemplate;
 
     /**
      * 保存扫描结果
