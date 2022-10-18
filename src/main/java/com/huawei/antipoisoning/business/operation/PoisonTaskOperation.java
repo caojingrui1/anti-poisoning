@@ -20,7 +20,6 @@ import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Component;
 import org.springframework.util.ObjectUtils;
 
-import javax.annotation.Resource;
 import java.util.List;
 
 /**
@@ -33,8 +32,6 @@ public class PoisonTaskOperation {
     @Autowired
     @Qualifier("poisonMongoTemplate")
     private MongoTemplate mongoTemplate;
-//    @Resource
-//    private MongoTemplate mongoTemplate;
 
     /**
      * 保存扫描结果

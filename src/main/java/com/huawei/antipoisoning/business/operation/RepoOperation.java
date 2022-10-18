@@ -15,7 +15,6 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.Resource;
 import java.util.List;
 
 /**
@@ -29,8 +28,6 @@ public class RepoOperation {
     @Autowired
     @Qualifier("poisonMongoTemplate")
     private MongoTemplate mongoTemplate;
-//    @Resource
-//    private MongoTemplate mongoTemplate;
 
     /**
      * @param repoInfo 仓库参数

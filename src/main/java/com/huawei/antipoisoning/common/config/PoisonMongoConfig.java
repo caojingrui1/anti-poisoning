@@ -24,7 +24,8 @@ public class PoisonMongoConfig {
             System.getProperty("spring.data.mongodb.uri");
 
     private final String dbName =
-            System.getProperty("spring.data.mongodb.dbname");
+            "anti-poison";
+//            System.getProperty("spring.data.mongodb.dbname");
 
 
     /**
@@ -47,7 +48,7 @@ public class PoisonMongoConfig {
      */
     @Bean("poisonMongoTemplate")
     public MongoTemplate mongoTemplate() {
-        return new MongoTemplate(new SimpleMongoClientDatabaseFactory(mongoClient(), "anti-poison"));
+        return new MongoTemplate(new SimpleMongoClientDatabaseFactory(mongoClient(), dbName));
     }
 
 }

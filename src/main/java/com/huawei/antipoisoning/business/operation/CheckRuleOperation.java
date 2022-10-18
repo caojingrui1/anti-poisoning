@@ -38,8 +38,6 @@ public class CheckRuleOperation {
     @Autowired
     @Qualifier("poisonMongoTemplate")
     private MongoTemplate mongoTemplate;
-//    @Resource
-//    private MongoTemplate mongoTemplate;
     /**
      * 根据条件获取规则详情
      *
