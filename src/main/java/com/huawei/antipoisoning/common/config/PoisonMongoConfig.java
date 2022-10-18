@@ -21,7 +21,7 @@ public class PoisonMongoConfig {
             System.getenv("spring.data.mongodb.uri");
 
     private final String dbName =
-            "anti-poison";
+            "majun-anti-poisoning";
 //            System.getenv("spring.data.mongodb.dbname");
 
 
