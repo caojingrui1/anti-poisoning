@@ -11,6 +11,7 @@ import com.huawei.antipoisoning.business.entity.shield.ParamModel;
 import com.huawei.antipoisoning.business.entity.shield.Revision;
 import com.huawei.antipoisoning.common.entity.MultiResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -31,8 +32,11 @@ import java.util.stream.Collectors;
  */
 @Component
 public class ShieldResultDetailOperation {
-    @Resource
+    @Autowired
+    @Qualifier("poisonMongoTemplate")
     private MongoTemplate mongoTemplate;
+//    @Resource
+//    private MongoTemplate mongoTemplate;
 
     @Autowired
     private ScanResultDetailOperation scanResultDetailOperation;

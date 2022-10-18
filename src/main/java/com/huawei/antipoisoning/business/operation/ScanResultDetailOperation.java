@@ -13,6 +13,8 @@ import com.huawei.antipoisoning.common.entity.MultiResponse;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
@@ -38,8 +40,11 @@ import java.util.Map;
 public class ScanResultDetailOperation {
     private static final Logger LOGGER = LoggerFactory.getLogger(ScanResultDetailOperation.class);
 
-    @Resource
+    @Autowired
+    @Qualifier("poisonMongoTemplate")
     private MongoTemplate mongoTemplate;
+//    @Resource
+//    private MongoTemplate mongoTemplate;
 
     /**
      * 根据id获取问题详情

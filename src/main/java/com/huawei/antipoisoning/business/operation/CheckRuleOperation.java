@@ -9,9 +9,10 @@ import com.huawei.antipoisoning.business.entity.TaskEntity;
 import com.huawei.antipoisoning.business.entity.checkrule.*;
 import com.huawei.antipoisoning.business.entity.vo.PageVo;
 import org.apache.commons.lang.StringUtils;
-import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
 import org.springframework.data.mongodb.core.aggregation.AggregationOperation;
@@ -20,7 +21,6 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -35,9 +35,11 @@ import java.util.regex.Pattern;
 public class CheckRuleOperation {
     private static final Logger LOGGER = LoggerFactory.getLogger(CheckRuleOperation.class);
 
-    @Resource
+    @Autowired
+    @Qualifier("poisonMongoTemplate")
     private MongoTemplate mongoTemplate;
-
+//    @Resource
+//    private MongoTemplate mongoTemplate;
     /**
      * 根据条件获取规则详情
      *
@@ -134,7 +136,7 @@ public class CheckRuleOperation {
      * @param ruleSetModel 查询参数
      * @return queryRuleSet
      */
-    public List<RuleSetResult> queryRuleSet(RuleSetModel ruleSetModel) {
+    public List<RuleSetModel> queryRuleSet(RuleSetModel ruleSetModel) {
         Criteria criteria = new Criteria();
         if (StringUtils.isNotBlank(ruleSetModel.getId())) {
             criteria.and("_id").is(ruleSetModel.getId());
@@ -151,7 +153,7 @@ public class CheckRuleOperation {
         if (StringUtils.isNotBlank(ruleSetModel.getProjectName())) {
             criteria.and("project_name").is(ruleSetModel.getProjectName());
         }
-        return mongoTemplate.find(Query.query(criteria), RuleSetResult.class, CollectionTableName.ANTI_CHECK_RULE_SET);
+        return mongoTemplate.find(Query.query(criteria), RuleSetModel.class, CollectionTableName.ANTI_CHECK_RULE_SET);
     }
 
     /**
@@ -309,8 +311,8 @@ public class CheckRuleOperation {
      * @param ruleSetModel updateRuleSet
      * @return TaskRuleSetVo
      */
-    public TaskRuleResultVo queryRuleById(RuleSetModel ruleSetModel) {
+    public TaskRuleSetVo queryRuleById(RuleSetModel ruleSetModel) {
         return mongoTemplate.findOne(Query.query(Criteria.where("_id").is(ruleSetModel.getId())),
-                TaskRuleResultVo.class, CollectionTableName.ANTI_TASK_RULE_SET);
+                TaskRuleSetVo.class, CollectionTableName.ANTI_TASK_RULE_SET);
     }
 }
