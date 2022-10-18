@@ -8,7 +8,7 @@ ENV PROJECT_HOME /usr/local/${PROJECT_NAME}
 
 RUN rm -f $PROJECT_HOME
 RUN mkdir $PROJECT_HOME
-RUN yum update -y && yum install -y python3 python3-pip python3-devel gcc java-1.8.0-openjdk rpm rubygems git maven && \
+RUN yum update -y && yum install -y python3 python3-pip python3-devel gcc java-1.8.0-openjdk rpm rubygems git maven mongo-java-driver && \
     pip3 install pyyaml wheel yara_python
 VOLUME /tmp
 
