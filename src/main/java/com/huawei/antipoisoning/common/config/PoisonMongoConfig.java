@@ -4,9 +4,6 @@ package com.huawei.antipoisoning.common.config;
 import com.mongodb.*;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
-import com.mongodb.client.MongoDatabase;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -21,11 +18,11 @@ import org.springframework.data.mongodb.core.SimpleMongoClientDatabaseFactory;
 @Configuration
 public class PoisonMongoConfig {
     private final String mongouri =
-            System.getProperty("spring.data.mongodb.uri");
+            System.getenv("spring.data.mongodb.uri");
 
     private final String dbName =
             "anti-poison";
-//            System.getProperty("spring.data.mongodb.dbname");
+//            System.getenv("spring.data.mongodb.dbname");
 
 
     /**
