@@ -15,8 +15,6 @@ import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Component;
 import org.springframework.util.ObjectUtils;
 
-import javax.annotation.Resource;
-
 /**
  * 扫描结果包裹数据存档
  *
@@ -27,8 +25,6 @@ public class AntiOperation {
     @Autowired
     @Qualifier("poisonMongoTemplate")
     private MongoTemplate mongoTemplate;
-//    @Resource
-//    private MongoTemplate mongoTemplate;
 
     /**
      * 保存扫描结果

@@ -30,8 +30,6 @@ public class PoisonScanOperation {
     @Autowired
     @Qualifier("poisonMongoTemplate")
     private MongoTemplate mongoTemplate;
-//    @Resource
-//    private MongoTemplate mongoTemplate;
 
 
     public PageVo queryResults(RepoInfo repoInfo) {

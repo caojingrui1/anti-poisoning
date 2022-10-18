@@ -31,8 +31,6 @@ public class PoisonResultOperation {
     @Autowired
     @Qualifier("poisonMongoTemplate")
     private MongoTemplate mongoTemplate;
-//    @Resource
-//    private MongoTemplate mongoTemplate;
 
     /**
      * 保存扫描结果
