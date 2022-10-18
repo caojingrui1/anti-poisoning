@@ -114,6 +114,7 @@ public class ScanResultDetailOperation {
                     * resultDetail.getPageSize()));
             operations.add(Aggregation.limit(resultDetail.getPageSize()));
         }
+        LOGGER.info("query details sql : {}" , operations.toString());
         return mongoTemplate.aggregate(Aggregation.newAggregation(operations), tableName, ResultEntity.class)
                 .getMappedResults();
     }
@@ -208,6 +209,7 @@ public class ScanResultDetailOperation {
                 .first("suspicious_file_name").as("fileName")
                 .first("rule_name").as("ruleName")
                 .count().as("total"));
+        LOGGER.info("query group sql : {}" , operations.toString());
         return mongoTemplate.aggregate(Aggregation.newAggregation(operations),
                 tableName, PoisonReportModel.class).getMappedResults();
     }
