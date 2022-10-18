@@ -24,7 +24,6 @@ public class PoisonMongoConfig {
             "anti-poison";
 //            System.getenv("spring.data.mongodb.dbname");
 
-
     /**
      * mongodb客户端
      *
