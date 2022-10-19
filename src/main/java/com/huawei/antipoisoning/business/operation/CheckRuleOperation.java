@@ -310,14 +310,8 @@ public class CheckRuleOperation {
      * @param ruleSetModel updateRuleSet
      * @return TaskRuleSetVo
      */
-    public TaskRuleSetVo queryRuleById(RuleSetModel ruleSetModel) {
-        TaskRuleSetVo taskRuleSetVo1 = mongoTemplate.findOne(Query.query(Criteria.where("_id").is(new ObjectId(ruleSetModel.getId()))),
-                TaskRuleSetVo.class, CollectionTableName.ANTI_TASK_RULE_SET);
-        LOGGER.info("taskRuleSetVo1 is {]", taskRuleSetVo1);
-        TaskRuleResultVo taskRuleResultVo1 = mongoTemplate.findOne(Query.query(Criteria.where("_id").is(new ObjectId(ruleSetModel.getId()))),
-                TaskRuleResultVo.class, CollectionTableName.ANTI_TASK_RULE_SET);
-        LOGGER.info("taskRuleResultVo1 is {]", taskRuleResultVo1);
+    public TaskRuleResultVo queryRuleById(RuleSetModel ruleSetModel) {
         return mongoTemplate.findOne(Query.query(Criteria.where("_id").is(new ObjectId(ruleSetModel.getId()))),
-                TaskRuleSetVo.class, CollectionTableName.ANTI_TASK_RULE_SET);
+                TaskRuleResultVo.class, CollectionTableName.ANTI_TASK_RULE_SET);
     }
 }
