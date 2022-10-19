@@ -118,7 +118,7 @@ public class CheckRuleServiceImpl implements CheckRuleService {
                 ruleSet.setRuleCount(0);
             }
             // 判断是否在使用中
-            List<TaskRuleSetVo> taskRuleSet =
+            List<TaskRuleResultVo> taskRuleSet =
                     checkRuleOperation.getTaskRuleSet(ruleSet.getId(), "", "");
             if (taskRuleSet.size() != 0) {
                 ruleSet.setUsed(true);
@@ -184,7 +184,7 @@ public class CheckRuleServiceImpl implements CheckRuleService {
     @Override
     public MultiResponse getTaskRule(TaskRuleSetVo taskRuleSetVo) {
         LOGGER.info("The rule id {}", taskRuleSetVo.getId());
-        List<TaskRuleSetVo> taskRuleSet = checkRuleOperation.getTaskRuleSet(null, taskRuleSetVo.getProjectName(),
+        List<TaskRuleResultVo> taskRuleSet = checkRuleOperation.getTaskRuleSet(null, taskRuleSetVo.getProjectName(),
                 taskRuleSetVo.getRepoNameEn());
         if (taskRuleSet.size() == 0) {
             return new MultiResponse().code(400).message("data is null");
