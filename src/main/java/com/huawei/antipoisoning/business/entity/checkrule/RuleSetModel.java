@@ -8,6 +8,7 @@ import com.huawei.antipoisoning.business.enmu.CollectionTableName;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -27,7 +28,7 @@ import java.util.List;
 @Document(collection = CollectionTableName.ANTI_CHECK_RULE_SET)
 public class RuleSetModel {
     @Id
-    private String id;
+    private ObjectId id;
 
     // 所属社区
     @Field("project_name")

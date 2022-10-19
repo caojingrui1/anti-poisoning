@@ -8,11 +8,11 @@ import com.huawei.antipoisoning.business.entity.checkrule.*;
 import com.huawei.antipoisoning.business.operation.CheckRuleOperation;
 import com.huawei.antipoisoning.business.service.CheckRuleService;
 import com.huawei.antipoisoning.common.entity.MultiResponse;
-import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.ObjectUtils;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -51,7 +51,7 @@ public class CheckRuleServiceImpl implements CheckRuleService {
      */
     @Override
     public MultiResponse createRuleSet(RuleSetModel ruleSetModel) {
-        if (StringUtils.isNotBlank(ruleSetModel.getId())) {
+        if (!ObjectUtils.isEmpty(ruleSetModel.getId())) {
             // 修改规则集
             checkRuleOperation.updateRuleSet(ruleSetModel);
         } else {
@@ -146,7 +146,7 @@ public class CheckRuleServiceImpl implements CheckRuleService {
      */
     @Override
     public MultiResponse delRuleSet(RuleSetModel ruleSetModel) {
-        if (StringUtils.isBlank(ruleSetModel.getId())) {
+        if (!ObjectUtils.isEmpty(ruleSetModel.getId())) {
             return new MultiResponse().code(400).message("ruleSet is error");
         }
         checkRuleOperation.delRuleSet(ruleSetModel.getId());
@@ -184,7 +184,7 @@ public class CheckRuleServiceImpl implements CheckRuleService {
     @Override
     public MultiResponse getTaskRule(TaskRuleSetVo taskRuleSetVo) {
         LOGGER.info("The rule id {}", taskRuleSetVo.getId());
-        List<TaskRuleSetVo> taskRuleSet = checkRuleOperation.getTaskRuleSet("", taskRuleSetVo.getProjectName(),
+        List<TaskRuleSetVo> taskRuleSet = checkRuleOperation.getTaskRuleSet(null, taskRuleSetVo.getProjectName(),
                 taskRuleSetVo.getRepoNameEn());
         if (taskRuleSet.size() == 0) {
             return new MultiResponse().code(400).message("data is null");
