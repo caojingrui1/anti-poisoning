@@ -1,7 +1,11 @@
+/*
+ * Copyright (c) Huawei Technologies Co., Ltd. 2012-2020. All rights reserved.
+ */
+
 package com.huawei.antipoisoning.common.config;
 
-
-import com.mongodb.*;
+import com.mongodb.ConnectionString;
+import com.mongodb.MongoClientSettings;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
 import org.springframework.context.annotation.Bean;
@@ -9,6 +13,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.SimpleMongoClientDatabaseFactory;
 
+import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 
 /**
@@ -21,11 +26,9 @@ import java.net.URLDecoder;
 public class PoisonMongoConfig {
     private final String mongouri =
             System.getenv("spring.data.mongodb.uri");
-//            System.getProperty("spring.data.mongodb.uri");
 
     private final String dbName =
-            "majun-anti-poisoning";
-//            System.getenv("spring.data.mongodb.dbname");
+            System.getenv("spring.data.mongodb.dbname");
 
     /**
      * mongodb客户端
@@ -37,7 +40,11 @@ public class PoisonMongoConfig {
         String uri = mongouri;
         uri = uri.replaceAll("%(?![0-9a-fA-F]{2})", "%25");
         uri = uri.replaceAll("\\+", "%2B");
-        uri = URLDecoder.decode(uri);
+        try {
+            uri = URLDecoder.decode(uri, "utf-8");
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
         ConnectionString connectionString = new ConnectionString(uri);
         MongoClientSettings settings = MongoClientSettings.builder().applyConnectionString(connectionString)
                 .retryWrites(true).build();
