@@ -312,7 +312,7 @@ public class CheckRuleOperation {
      * @return TaskRuleSetVo
      */
     public TaskRuleResultVo queryRuleById(RuleSetModel ruleSetModel) {
-        return mongoTemplate.findOne(Query.query(Criteria.where("_id").is(ruleSetModel.getId())),
+        return mongoTemplate.findOne(Query.query(Criteria.where("_id").is(new ObjectId(ruleSetModel.getId()))),
                 TaskRuleResultVo.class, CollectionTableName.ANTI_TASK_RULE_SET);
     }
 }
