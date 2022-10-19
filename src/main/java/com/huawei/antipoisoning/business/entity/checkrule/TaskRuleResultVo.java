@@ -7,7 +7,6 @@ package com.huawei.antipoisoning.business.entity.checkrule;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.core.mapping.Field;
 
 import java.util.List;
@@ -23,7 +22,7 @@ import java.util.List;
 @NoArgsConstructor
 public class TaskRuleResultVo {
     @Field("_id")
-    private ObjectId id;
+    private String id;
 
     @Field("repo_name_en")
     private String repoNameEn;

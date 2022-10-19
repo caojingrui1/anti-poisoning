@@ -7,6 +7,7 @@ package com.huawei.antipoisoning.business.operation;
 import com.huawei.antipoisoning.business.enmu.CollectionTableName;
 import com.huawei.antipoisoning.business.entity.RepoInfo;
 import org.apache.commons.lang.StringUtils;
+import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -71,7 +72,7 @@ public class RepoOperation {
      * @return Long
      */
     public Long updateRepo(String id, String taskId){
-        Query query = Query.query(Criteria.where("_id").is(id));
+        Query query = Query.query(Criteria.where("_id").is(new ObjectId(id)));
         Update update = new Update();
         if (StringUtils.isNotBlank(taskId)) {
             update.set("poison_task_id", taskId);

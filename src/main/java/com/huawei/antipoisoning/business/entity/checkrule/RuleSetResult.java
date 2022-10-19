@@ -7,7 +7,6 @@ package com.huawei.antipoisoning.business.entity.checkrule;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.mapping.Field;
 
@@ -24,7 +23,7 @@ import java.util.List;
 @NoArgsConstructor
 public class RuleSetResult {
     @Field("_id")
-    private ObjectId id;
+    private String id;
 
     // 所属社区
     @Field("project_name")
