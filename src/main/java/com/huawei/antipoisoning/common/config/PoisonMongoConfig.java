@@ -9,6 +9,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.SimpleMongoClientDatabaseFactory;
 
+import java.net.URLDecoder;
+
 /**
  * mongoDB配置类
  *
@@ -18,11 +20,13 @@ import org.springframework.data.mongodb.core.SimpleMongoClientDatabaseFactory;
 @Configuration
 public class PoisonMongoConfig {
     private final String mongouri =
-            System.getenv("spring.data.mongodb.uri");
+//            System.getenv("spring.data.mongodb.uri");
+            System.getProperty("spring.data.mongodb.uri");
 
     private final String dbName =
-            "anti-poison";
+            "majun-anti-poisoning";
 //            System.getenv("spring.data.mongodb.dbname");
+//            System.getProperty("spring.data.mongodb.dbname");
 
     /**
      * mongodb客户端
@@ -31,7 +35,11 @@ public class PoisonMongoConfig {
      */
     @Bean("poisonMongoClient")
     public MongoClient mongoClient() {
-        ConnectionString connectionString = new ConnectionString(mongouri);
+        String uri = mongouri;
+        uri = uri.replaceAll("%(?![0-9a-fA-F]{2})", "%25");
+        uri = uri.replaceAll("\\+", "%2B");
+        uri = URLDecoder.decode(uri);
+        ConnectionString connectionString = new ConnectionString(uri);
         MongoClientSettings settings = MongoClientSettings.builder().applyConnectionString(connectionString)
                 .retryWrites(true).build();
         return MongoClients.create(settings);
