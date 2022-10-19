@@ -137,7 +137,7 @@ public class CheckRuleOperation {
      */
     public List<RuleSetModel> queryRuleSet(RuleSetModel ruleSetModel) {
         Criteria criteria = new Criteria();
-        if (StringUtils.isNotEmpty(ruleSetModel.getId())) {
+        if (StringUtils.isNotBlank(ruleSetModel.getId())) {
             criteria.and("_id").is(new ObjectId(ruleSetModel.getId()));
         }
         if (StringUtils.isNotBlank(ruleSetModel.getTemplateName())) {
@@ -174,7 +174,7 @@ public class CheckRuleOperation {
      */
     public List<TaskRuleResultVo> getTaskRuleSet(String id, String projectName, String repoName) {
         Criteria criteria = new Criteria();
-        if (StringUtils.isNotEmpty(id)) {
+        if (StringUtils.isNotBlank(id)) {
             criteria.and("anti_check_rules.ruleSetId").in(id);
         }
         if (StringUtils.isNotBlank(projectName)) {

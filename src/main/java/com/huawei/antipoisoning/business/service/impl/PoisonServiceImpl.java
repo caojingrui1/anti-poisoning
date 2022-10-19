@@ -69,7 +69,7 @@ public class PoisonServiceImpl implements PoisonService {
     @Override
     public MultiResponse poisonScan(RepoInfo repoInfo) {
         // 查询仓库语言和规则集
-        List<TaskRuleResultVo> taskRuleSet = checkRuleOperation.getTaskRuleSet(null, repoInfo.getProjectName(), repoInfo.getRepoName());
+        List<TaskRuleResultVo> taskRuleSet = checkRuleOperation.getTaskRuleSet("", repoInfo.getProjectName(), repoInfo.getRepoName());
         List<String> ruleIds = new ArrayList<>();
         if (taskRuleSet.size() == 1) {
             for (CheckRuleSet checkRuleSet : taskRuleSet.get(0).getAntiCheckRules()) {
@@ -97,7 +97,7 @@ public class PoisonServiceImpl implements PoisonService {
         ruleModel.setRuleLanguage("COMMON");
         PageVo commRules = checkRuleOperation.getAllRules(ruleModel, new ArrayList<>());
         List<RuleModel> commList = commRules.getList();
-        List<TaskRuleResultVo> ruleList = checkRuleOperation.getTaskRuleSet(null, repoInfo.getProjectName(), repoInfo.getRepoName());
+        List<TaskRuleResultVo> ruleList = checkRuleOperation.getTaskRuleSet("", repoInfo.getProjectName(), repoInfo.getRepoName());
         List<String> languageList = new ArrayList<>();
         for (TaskRuleResultVo rule : ruleList) {
             List<CheckRuleSet> checkRuleSetList = rule.getAntiCheckRules();
@@ -217,7 +217,7 @@ public class PoisonServiceImpl implements PoisonService {
                 JSON.toJSONString(jsonObject.get("repoInfos")), RepoInfo.class);
         //给所有已启动过的任务匹配一个仓库信息，以便检测中心启动
         for (TaskEntity task : taskEntities) {
-            List<TaskRuleResultVo> taskRuleSet = checkRuleOperation.getTaskRuleSet(null, task.getProjectName(), task.getRepoName());
+            List<TaskRuleResultVo> taskRuleSet = checkRuleOperation.getTaskRuleSet("", task.getProjectName(), task.getRepoName());
             if (taskRuleSet.size() == CommonConstants.CommonNumber.NUMBER_ONE) {
                 task.setTaskRuleSetVo(taskRuleSet.get(0));
                 for (RepoInfo repoInfo : repoInfos){
