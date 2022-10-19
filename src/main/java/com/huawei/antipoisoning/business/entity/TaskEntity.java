@@ -5,7 +5,7 @@
 package com.huawei.antipoisoning.business.entity;
 
 import com.huawei.antipoisoning.business.enmu.CollectionTableName;
-import com.huawei.antipoisoning.business.entity.checkrule.TaskRuleResultVo;
+import com.huawei.antipoisoning.business.entity.checkrule.TaskRuleSetVo;
 import lombok.Data;
 import lombok.ToString;
 import org.springframework.data.annotation.Transient;
@@ -175,7 +175,7 @@ public class TaskEntity {
      * 该任务所用的规则集参数体
      */
     @Transient
-    private TaskRuleResultVo taskRuleSetVo;
+    private TaskRuleSetVo taskRuleSetVo;
 
     /**
      * 仓库id
