@@ -38,6 +38,7 @@ public class PoisonMongoConfig {
     @Bean("poisonMongoClient")
     public MongoClient mongoClient() {
         String uri = mongouri;
+        // 对特殊字符进行转义
         uri = uri.replaceAll("%(?![0-9a-fA-F]{2})", "%25");
         uri = uri.replaceAll("\\+", "%2B");
         try {
