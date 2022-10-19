@@ -135,7 +135,7 @@ public class CheckRuleOperation {
      * @param ruleSetModel 查询参数
      * @return queryRuleSet
      */
-    public List<RuleSetModel> queryRuleSet(RuleSetModel ruleSetModel) {
+    public List<RuleSetResult> queryRuleSet(RuleSetModel ruleSetModel) {
         Criteria criteria = new Criteria();
         if (StringUtils.isNotBlank(ruleSetModel.getId())) {
             criteria.and("_id").is(new ObjectId(ruleSetModel.getId()));
@@ -152,7 +152,7 @@ public class CheckRuleOperation {
         if (StringUtils.isNotBlank(ruleSetModel.getProjectName())) {
             criteria.and("project_name").is(ruleSetModel.getProjectName());
         }
-        return mongoTemplate.find(Query.query(criteria), RuleSetModel.class, CollectionTableName.ANTI_CHECK_RULE_SET);
+        return mongoTemplate.find(Query.query(criteria), RuleSetResult.class, CollectionTableName.ANTI_CHECK_RULE_SET);
     }
 
     /**
@@ -172,7 +172,7 @@ public class CheckRuleOperation {
      * @param repoName    仓库
      * @return RuleModel
      */
-    public List<TaskRuleResultVo> getTaskRuleSet(String id, String projectName, String repoName) {
+    public List<TaskRuleSetVo> getTaskRuleSet(String id, String projectName, String repoName) {
         Criteria criteria = new Criteria();
         if (StringUtils.isNotBlank(id)) {
             criteria.and("anti_check_rules.ruleSetId").in(id);
@@ -183,7 +183,7 @@ public class CheckRuleOperation {
         if (StringUtils.isNotBlank(repoName)) {
             criteria.and("repo_name_en").is(repoName);
         }
-        return mongoTemplate.find(Query.query(criteria), TaskRuleResultVo.class, CollectionTableName.ANTI_TASK_RULE_SET);
+        return mongoTemplate.find(Query.query(criteria), TaskRuleSetVo.class, CollectionTableName.ANTI_TASK_RULE_SET);
     }
 
     /**
