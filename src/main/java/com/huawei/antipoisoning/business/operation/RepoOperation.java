@@ -72,7 +72,7 @@ public class RepoOperation {
      * @return Long
      */
     public Long updateRepo(String id, String taskId){
-        Query query = Query.query(Criteria.where("_id").is(new ObjectId(id)));
+        Query query = Query.query(Criteria.where("_id").is(id));
         Update update = new Update();
         if (StringUtils.isNotBlank(taskId)) {
             update.set("poison_task_id", taskId);
