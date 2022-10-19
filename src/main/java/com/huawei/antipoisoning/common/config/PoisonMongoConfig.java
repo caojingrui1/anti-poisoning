@@ -20,13 +20,12 @@ import java.net.URLDecoder;
 @Configuration
 public class PoisonMongoConfig {
     private final String mongouri =
-//            System.getenv("spring.data.mongodb.uri");
-            System.getProperty("spring.data.mongodb.uri");
+            System.getenv("spring.data.mongodb.uri");
+//            System.getProperty("spring.data.mongodb.uri");
 
     private final String dbName =
             "majun-anti-poisoning";
 //            System.getenv("spring.data.mongodb.dbname");
-//            System.getProperty("spring.data.mongodb.dbname");
 
     /**
      * mongodb客户端
