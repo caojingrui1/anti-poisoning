@@ -21,6 +21,7 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Component;
+import org.springframework.util.ObjectUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -137,7 +138,7 @@ public class CheckRuleOperation {
      */
     public List<RuleSetModel> queryRuleSet(RuleSetModel ruleSetModel) {
         Criteria criteria = new Criteria();
-        if (StringUtils.isNotBlank(ruleSetModel.getId())) {
+        if (!ObjectUtils.isEmpty(ruleSetModel.getId())) {
             criteria.and("_id").is(ruleSetModel.getId());
         }
         if (StringUtils.isNotBlank(ruleSetModel.getTemplateName())) {
@@ -160,7 +161,7 @@ public class CheckRuleOperation {
      *
      * @param id 主键id
      */
-    public void delRuleSet(String id) {
+    public void delRuleSet(ObjectId id) {
         mongoTemplate.remove(Query.query(Criteria.where("_id").is(id)), CollectionTableName.ANTI_CHECK_RULE_SET);
     }
 
@@ -172,9 +173,9 @@ public class CheckRuleOperation {
      * @param repoName    仓库
      * @return RuleModel
      */
-    public List<TaskRuleSetVo> getTaskRuleSet(String id, String projectName, String repoName) {
+    public List<TaskRuleSetVo> getTaskRuleSet(ObjectId id, String projectName, String repoName) {
         Criteria criteria = new Criteria();
-        if (StringUtils.isNotBlank(id)) {
+        if (!ObjectUtils.isEmpty(id)) {
             criteria.and("anti_check_rules.ruleSetId").in(id);
         }
         if (StringUtils.isNotBlank(projectName)) {
@@ -218,7 +219,7 @@ public class CheckRuleOperation {
             query.limit(ruleSetModel.getPageSize());
         }
         int enableCount = 0;
-        if (StringUtils.isNotBlank(ruleSetModel.getId()) && queryRuleSet(ruleSetModel).size() == 1) {
+        if (!ObjectUtils.isEmpty(ruleSetModel.getId()) && queryRuleSet(ruleSetModel).size() == 1) {
             // 对比当前规则是否启用
             List<String> ruleCount = queryRuleSet(ruleSetModel).get(0).getRuleIds();
             for (RuleModel ruleModel : ruleVosCount) {
@@ -264,7 +265,7 @@ public class CheckRuleOperation {
      * @param id      主键id
      * @param ruleIds 规则数据
      */
-    public void updateRuleSetToRuleIds(String id, List<String> ruleIds) {
+    public void updateRuleSetToRuleIds(ObjectId id, List<String> ruleIds) {
         Criteria criteria = Criteria.where("_id").is(id);
         Update update = new Update();
         update.set("rule_ids", ruleIds);
@@ -278,7 +279,7 @@ public class CheckRuleOperation {
      */
     public void updateTaskRule(TaskRuleSetVo taskRuleSetVo) {
         Criteria criteria = new Criteria();
-        if (StringUtils.isNotEmpty(taskRuleSetVo.getId())) {
+        if (!ObjectUtils.isEmpty(taskRuleSetVo.getId())) {
             criteria.and("_id").is(taskRuleSetVo.getId());
         }
         if (StringUtils.isNotBlank(taskRuleSetVo.getProjectName())
@@ -310,8 +311,8 @@ public class CheckRuleOperation {
      * @param ruleSetModel updateRuleSet
      * @return TaskRuleSetVo
      */
-    public TaskRuleResultVo queryRuleById(RuleSetModel ruleSetModel) {
-        return mongoTemplate.findOne(Query.query(Criteria.where("_id").is(new ObjectId(ruleSetModel.getId()))),
-                TaskRuleResultVo.class, CollectionTableName.ANTI_TASK_RULE_SET);
+    public TaskRuleSetVo queryRuleById(RuleSetModel ruleSetModel) {
+        return mongoTemplate.findOne(Query.query(Criteria.where("_id").is(ruleSetModel.getId())),
+                TaskRuleSetVo.class, CollectionTableName.ANTI_TASK_RULE_SET);
     }
 }
