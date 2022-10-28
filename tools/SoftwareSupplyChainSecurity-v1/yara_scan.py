@@ -35,9 +35,13 @@ class YaraScan(object):
         exclude_list = [x.lower() for x in self.config['exclude']]
         for root, _, files in os.walk(self.source_dir):
             all_files = [os.path.join(root, file) for file in files]
-            self.all_files.extend(filter(
-                lambda x: all(exclude not in x.lower() for exclude in exclude_list),
-                all_files))
+            for one_file in all_files:
+                _check_name = os.path.relpath(one_file, self.source_dir).lower()
+                for exclude in exclude_list:
+                    if exclude in _check_name:
+                        print(f"Skip{one_file}. (match {exclude})   ")
+                    else:
+                        self.all_files.append(one_file)
         print("Found files:", len(self.all_files))
 
     def generate_tasks(self):
