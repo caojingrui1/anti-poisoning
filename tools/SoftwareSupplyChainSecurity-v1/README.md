@@ -65,4 +65,5 @@ options:
   --enable-javascript  开启javascript扫描
   --enable-python      开启python扫描
   --enable-ruby        开启ruby扫描
+  --custom-yaml        扫描配置，传递一个yaml文件。此条目会覆盖其他语言级规则
 ```
