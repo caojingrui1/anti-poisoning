@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) Huawei Technologies Co., Ltd. 2012-2020. All rights reserved.
+ */
+
 package com.huawei.antipoisoning.business.enmu;
 
 /**
@@ -18,7 +22,7 @@ public class ConstantsArgs {
     public static final String MAJUN_BETA_URL = "https://majun-beta.osinfra.cn";
 
     /**
-     * majun-beta访问url
+     * mongodb 环境
      */
-    public static final String MAJUN_LOCAL_URL = "http://localhost:8083";
+    public static final String DB_ENV = System.getenv("spring.data.mongodb.env");
 }

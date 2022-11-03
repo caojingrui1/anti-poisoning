@@ -1,5 +1,8 @@
-package com.huawei.antipoisoning.business.controller;
+/*
+ * Copyright (c) Huawei Technologies Co., Ltd. 2012-2020. All rights reserved.
+ */
 
+package com.huawei.antipoisoning.business.controller;
 
 import com.alibaba.fastjson.JSONObject;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -7,7 +10,6 @@ import com.huawei.antipoisoning.business.entity.AntiEntity;
 import com.huawei.antipoisoning.business.entity.pr.PullRequestInfo;
 import com.huawei.antipoisoning.business.entity.RepoInfo;
 import com.huawei.antipoisoning.business.entity.TaskEntity;
-import com.huawei.antipoisoning.business.entity.vo.AntiPoisonModel;
 import com.huawei.antipoisoning.business.service.PoisonService;
 import com.huawei.antipoisoning.common.entity.MultiResponse;
 import org.slf4j.Logger;
@@ -19,11 +21,18 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
 import java.util.Objects;
-import java.util.concurrent.*;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeoutException;
 
 /**
+ * 防投毒controller。
+ *
+ * @since 2022-09-12
  * @author zhangshengjie
  */
 @RestController
@@ -43,6 +52,8 @@ public class PoisonController {
      *
      * @param repoInfo 检查仓库
      * @return MultiResponse
+     * @throws InterruptedException 中断异常
+     * @throws ExecutionException 执行异常
      */
     @RequestMapping(value = "/poisonScan",
             produces = {"application/json"},
@@ -52,14 +63,26 @@ public class PoisonController {
         return queueService(repoInfo);
     }
 
+    /**
+     * 查询任务列表。
+     *
+     * @param repoInfo 参数
+     * @return MultiResponse
+     */
     @RequestMapping(value = "/query-results",
             produces = {"application/json"},
             consumes = {"application/json"},
             method = RequestMethod.POST)
-    public MultiResponse queryResults(@RequestBody RepoInfo repoInfo){
+    public MultiResponse queryResults(@RequestBody RepoInfo repoInfo) {
         return poisonService.queryResults(repoInfo);
     }
 
+    /**
+     * 查询扫描结果详情信息。
+     *
+     * @param antiEntity 参数
+     * @return MultiResponse
+     */
     @RequestMapping(value = "/query-results-detail",
             produces = {"application/json"},
             consumes = {"application/json"},
@@ -95,6 +118,8 @@ public class PoisonController {
      *
      * @param repoInfo 任务实体类
      * @return MultiResponse
+     * @throws InterruptedException 中断异常
+     * @throws ExecutionException 执行异常
      */
     public MultiResponse queueService(RepoInfo repoInfo) throws InterruptedException, ExecutionException {
         if (Objects.isNull(repoInfo) || BLOCKING_QUEUE.remainingCapacity() <= 0) {
@@ -107,14 +132,13 @@ public class PoisonController {
         }
         Future future = THREAD_SCHEDULED_EXECUTOR.submit(() -> {
             RepoInfo take = BLOCKING_QUEUE.take();
-            poisonService.poisonScan(take);
             return poisonService.poisonScan(take);
         });
         ObjectMapper objectMapper = new ObjectMapper();
         MultiResponse response;
         try {
             response = objectMapper.convertValue(future.get(3, TimeUnit.SECONDS), MultiResponse.class);
-        }catch (Exception e){
+        } catch (TimeoutException e) {
             return new MultiResponse().code(200).message("success");
         }
         return response;
@@ -130,7 +154,7 @@ public class PoisonController {
             produces = {"application/json"},
             consumes = {"application/json"},
             method = RequestMethod.POST)
-    public MultiResponse getPrDiff(@RequestBody PullRequestInfo info) throws InterruptedException {
+    public MultiResponse getPrDiff(@RequestBody PullRequestInfo info) {
         return poisonService.getPrDiff(info);
     }
 }

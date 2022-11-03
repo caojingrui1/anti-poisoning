@@ -1,6 +1,10 @@
+/*
+ * Copyright (c) Huawei Technologies Co., Ltd. 2012-2020. All rights reserved.
+ */
+
 package com.huawei.antipoisoning.schedule;
 
-import com.huawei.antipoisoning.business.entity.checkRule.RuleModel;
+import com.huawei.antipoisoning.business.entity.checkrule.RuleModel;
 import com.huawei.antipoisoning.business.operation.CheckRuleOperation;
 import lombok.SneakyThrows;
 import org.apache.poi.ss.usermodel.Row;
@@ -38,8 +42,6 @@ public class SaveCheckRule {
      * 遍历获取表格内容
      */
     @SneakyThrows
-    //    @Scheduled(cron = "0 0/5 * * * ?")
-//    @Scheduled(cron = "0/10 * * * * ?")
     public void getRuleFiles() {
         File file = new File(FILE_PATH);
         Workbook workbook = WorkbookFactory.create(file);
@@ -81,7 +83,6 @@ public class SaveCheckRule {
             }
             // 将规则存入数据库
             checkRuleOperation.createRule(ruleModels);
-            System.out.println(ruleModels);
         }
     }
 }

@@ -35,9 +35,13 @@ class YaraScan(object):
         exclude_list = [x.lower() for x in self.config['exclude']]
         for root, _, files in os.walk(self.source_dir):
             all_files = [os.path.join(root, file) for file in files]
-            self.all_files.extend(filter(
-                lambda x: all(exclude not in x.lower() for exclude in exclude_list),
-                all_files))
+            for one_file in all_files:
+                _check_name = os.path.relpath(one_file, self.source_dir).lower()
+                for exclude in exclude_list:
+                    if exclude in _check_name:
+                        print(f"Skip{one_file}. (match {exclude})   ")
+                    else:
+                        self.all_files.append(one_file)
         print("Found files:", len(self.all_files))
 
     def generate_tasks(self):
@@ -107,10 +111,16 @@ class YaraScan(object):
                         'ruleName': yara_path,
                     }
                     line_number, piece, line_content = self.offset_to_content(data, match_bytes, offset)
+                    # 2.5 针对Java文件，忽略它的javadoc代码
+                    if file_path.endswith('.java'):
+                        if line_content.strip().startswith('*') or line_content.strip().startswith('//'):
+                            continue
                     result['checkResult'] = f'{line_number} : {line_content}'
                     result['keyLogInfo'] = f'{line_number} : {piece}'
                     result['hash'] = md5(line_content.encode()).hexdigest()
-                    self.result.append(result)
+                    # 对于同一个触发点，不需要报告多次，使用hash去重
+                    if not any(x for x in self.result if x['hash'] == result['hash']):
+                        self.result.append(result)
             else:
                 # 3. 如果匹配结果里有 _CORE，就按照 _CORE 的个数拆分为 N 个漏洞
                 for offset, condition, match_bytes in core_match:
@@ -119,6 +129,10 @@ class YaraScan(object):
                         'ruleName': yara_path,
                     }
                     line_number, piece, line_content = self.offset_to_content(data, match_bytes, offset)
+                    # 2.5 针对Java文件，忽略它的javadoc代码
+                    if file_path.endswith('.java'):
+                        if line_content.strip().startswith('*') or line_content.strip().startswith('//'):
+                            continue
                     _with_line_number: list[tuple[int, str, str]] = list()
                     _with_line_number.append((line_number, piece, line_content))
                     for _offset, _, _match_bytes in normal_match:
@@ -131,7 +145,9 @@ class YaraScan(object):
                         [f'{line_number} : {piece}' for line_number, piece, _ in _with_line_number]
                     )
                     result['hash'] = md5(line_content.encode()).hexdigest()
-                    self.result.append(result)
+                    # 对于同一个触发点，不需要报告多次，使用hash去重
+                    if not any(x for x in self.result if x['hash'] == result['hash']):
+                        self.result.append(result)
 
     @staticmethod
     def offset_to_content(data, match_bytes, offset) -> (int, str, str):

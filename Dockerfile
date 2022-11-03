@@ -8,10 +8,9 @@ ENV PROJECT_HOME /usr/local/${PROJECT_NAME}
 
 RUN rm -f $PROJECT_HOME
 RUN mkdir $PROJECT_HOME
-RUN yum update -y && yum install -y python3 python3-pip python3-devel gcc java-1.8.0-openjdk rpm rubygems git maven && \
+RUN yum update -y && yum install -y python3 python3-pip python3-devel gcc java-1.8.0-openjdk rpm rubygems git maven mongo-java-driver curl curl-devel && \
     pip3 install pyyaml wheel yara_python
 VOLUME /tmp
-
 
 # 拉取代码
 RUN git clone -b dev https://gitee.com/openMajun_enterprise/anti-poisoning.git $PROJECT_HOME
@@ -25,4 +24,4 @@ ENV TZ=Asia/Shanghai
 
 WORKDIR $PROJECT_HOME/tools/SoftwareSupplyChainSecurity-v1/
 
-ENTRYPOINT /usr/bin/java -jar -Xms1536m -Xmx1536m $PROJECT_HOME/target/$PROJECT_NAME-0.0.1-SNAPSHOT.jar
+ENTRYPOINT /usr/bin/java -jar -Xms1536m -Xmx1536m $PROJECT_HOME/target/$PROJECT_NAME-0.0.1-SNAPSHOT.jar --logging.file.name=$PROJECT_HOME/tools/SoftwareSupplyChainSecurity-v1/service.out

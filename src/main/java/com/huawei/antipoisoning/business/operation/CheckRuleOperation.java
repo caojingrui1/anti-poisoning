@@ -1,13 +1,19 @@
+/*
+ * Copyright (c) Huawei Technologies Co., Ltd. 2012-2020. All rights reserved.
+ */
+
 package com.huawei.antipoisoning.business.operation;
 
 import com.huawei.antipoisoning.business.enmu.CollectionTableName;
 import com.huawei.antipoisoning.business.entity.TaskEntity;
-import com.huawei.antipoisoning.business.entity.checkRule.RuleModel;
-import com.huawei.antipoisoning.business.entity.checkRule.RuleResultDetailsVo;
-import com.huawei.antipoisoning.business.entity.checkRule.RuleSetModel;
-import com.huawei.antipoisoning.business.entity.checkRule.TaskRuleSetVo;
+import com.huawei.antipoisoning.business.entity.checkrule.*;
 import com.huawei.antipoisoning.business.entity.vo.PageVo;
 import org.apache.commons.lang.StringUtils;
+import org.bson.types.ObjectId;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
 import org.springframework.data.mongodb.core.aggregation.AggregationOperation;
@@ -16,7 +22,6 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -29,10 +34,11 @@ import java.util.regex.Pattern;
  */
 @Component
 public class CheckRuleOperation {
-    @Resource
+    private static final Logger LOGGER = LoggerFactory.getLogger(CheckRuleOperation.class);
+
+    @Autowired
+    @Qualifier("poisonMongoTemplate")
     private MongoTemplate mongoTemplate;
-
-
     /**
      * 根据条件获取规则详情
      *
@@ -68,7 +74,8 @@ public class CheckRuleOperation {
             query.skip((long) (rule.getPageNum() - 1) * rule.getPageSize());
             query.limit(rule.getPageSize());
         }
-        List<RuleModel> codeCheckRuleVos = mongoTemplate.find(query, RuleModel.class, CollectionTableName.ANTI_CHECK_RULE);
+        List<RuleModel> codeCheckRuleVos = mongoTemplate.find(query, RuleModel.class,
+                CollectionTableName.ANTI_CHECK_RULE);
         return new PageVo(count, codeCheckRuleVos);
     }
 
@@ -128,10 +135,11 @@ public class CheckRuleOperation {
      * @param ruleSetModel 查询参数
      * @return queryRuleSet
      */
-    public List<RuleSetModel> queryRuleSet(RuleSetModel ruleSetModel) {
+    public List<RuleSetResult> queryRuleSet(RuleSetModel ruleSetModel) {
         Criteria criteria = new Criteria();
         if (StringUtils.isNotBlank(ruleSetModel.getId())) {
-            criteria.and("_id").is(ruleSetModel.getId());
+//            criteria.and("_id").is(ruleSetModel.getId());
+            criteria.and("_id").is(new ObjectId(ruleSetModel.getId()));
         }
         if (StringUtils.isNotBlank(ruleSetModel.getTemplateName())) {
             criteria.and("template_name").is(ruleSetModel.getTemplateName());
@@ -145,7 +153,7 @@ public class CheckRuleOperation {
         if (StringUtils.isNotBlank(ruleSetModel.getProjectName())) {
             criteria.and("project_name").is(ruleSetModel.getProjectName());
         }
-        return mongoTemplate.find(Query.query(criteria), RuleSetModel.class, CollectionTableName.ANTI_CHECK_RULE_SET);
+        return mongoTemplate.find(Query.query(criteria), RuleSetResult.class, CollectionTableName.ANTI_CHECK_RULE_SET);
     }
 
     /**
@@ -199,7 +207,8 @@ public class CheckRuleOperation {
         }
         if (StringUtils.isNotBlank(ruleSetModel.getRuleName())) {
             Pattern pattern = Pattern
-                    .compile("^.*" + escapeSpecialWord(ruleSetModel.getRuleName()) + ".*$", Pattern.CASE_INSENSITIVE);
+                    .compile("^.*" +
+                            escapeSpecialWord(ruleSetModel.getRuleName()) + ".*$", Pattern.CASE_INSENSITIVE);
             criteria.and("rule_name").regex(pattern);
         }
         Query query = Query.query(criteria);
@@ -210,7 +219,7 @@ public class CheckRuleOperation {
             query.limit(ruleSetModel.getPageSize());
         }
         int enableCount = 0;
-        if (StringUtils.isNotBlank(ruleSetModel.getId()) && queryRuleSet(ruleSetModel).size() == 1) {
+        if (StringUtils.isNotEmpty(ruleSetModel.getId()) && queryRuleSet(ruleSetModel).size() == 1) {
             // 对比当前规则是否启用
             List<String> ruleCount = queryRuleSet(ruleSetModel).get(0).getRuleIds();
             for (RuleModel ruleModel : ruleVosCount) {
@@ -221,7 +230,6 @@ public class CheckRuleOperation {
                     ruleModel.setIsUsed("0");
                 }
             }
-
         }
         List<RuleModel> ruleModelList = mongoTemplate.find(query, RuleModel.class, CollectionTableName.ANTI_CHECK_RULE);
         return new RuleResultDetailsVo(Long.valueOf(ruleVosCount.size()).intValue(), enableCount, ruleModelList);
@@ -271,11 +279,11 @@ public class CheckRuleOperation {
      */
     public void updateTaskRule(TaskRuleSetVo taskRuleSetVo) {
         Criteria criteria = new Criteria();
-        if (StringUtils.isNotBlank(taskRuleSetVo.getId())) {
+        if (StringUtils.isNotEmpty(taskRuleSetVo.getId())) {
             criteria.and("_id").is(taskRuleSetVo.getId());
         }
-        if (StringUtils.isNotBlank(taskRuleSetVo.getProjectName()) &&
-                StringUtils.isNotBlank(taskRuleSetVo.getRepoNameEn())) {
+        if (StringUtils.isNotBlank(taskRuleSetVo.getProjectName())
+                && StringUtils.isNotBlank(taskRuleSetVo.getRepoNameEn())) {
             criteria.and("project_name").is(taskRuleSetVo.getProjectName()).and("repo_name_en")
                     .is(taskRuleSetVo.getRepoNameEn());
         }
@@ -295,7 +303,6 @@ public class CheckRuleOperation {
     public void delTaskRuleSet(TaskEntity taskEntity) {
         mongoTemplate.remove(Query.query(Criteria.where("project_name").is(taskEntity.getProjectName())
                 .and("repo_name_en").is(taskEntity.getRepoName())), CollectionTableName.ANTI_TASK_RULE_SET);
-
     }
 
     /**
@@ -306,7 +313,12 @@ public class CheckRuleOperation {
     public TaskRuleSetVo queryRuleById(TaskRuleSetVo taskRuleSetVo) {
         return mongoTemplate.findOne(Query.query(Criteria.where("_id").is(taskRuleSetVo.getId())),
                 TaskRuleSetVo.class, CollectionTableName.ANTI_TASK_RULE_SET);
+        LOGGER.info("taskRuleSetVo is : {}", taskRuleSetVo);
+        TaskRuleResultVo taskRuleResultVo2 =  mongoTemplate.findOne(
+                Query.query(Criteria.where("_id").is(ruleSetModel.getId())),
+                TaskRuleResultVo.class, CollectionTableName.ANTI_TASK_RULE_SET);
+        LOGGER.info("taskRuleResultVo2 is : {}", taskRuleResultVo2);
+        return mongoTemplate.findOne(Query.query(Criteria.where("_id").is(ruleSetModel.getId())),
+                TaskRuleResultVo.class, CollectionTableName.ANTI_TASK_RULE_SET);
     }
-
-
 }

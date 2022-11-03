@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) Huawei Technologies Co., Ltd. 2012-2020. All rights reserved.
+ */
+
 package com.huawei.antipoisoning.business.entity.vo;
 
 import com.huawei.antipoisoning.business.entity.RepoInfo;
@@ -11,6 +15,7 @@ import java.util.List;
 /**
  * 数据分页实体类
  *
+ * @since 2022-09-03
  * @author zhangshengjie
  */
 @Data

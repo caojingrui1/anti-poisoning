@@ -1,10 +1,15 @@
+/*
+ * Copyright (c) Huawei Technologies Co., Ltd. 2012-2020. All rights reserved.
+ */
+
 package com.huawei.antipoisoning.business.service;
 
-
+import com.alibaba.fastjson.JSONArray;
 import com.huawei.antipoisoning.business.entity.AntiEntity;
+import com.huawei.antipoisoning.business.entity.pr.PRAntiEntity;
+import com.huawei.antipoisoning.business.entity.pr.PullRequestInfo;
 import com.huawei.antipoisoning.common.entity.MultiResponse;
 
-import java.util.List;
 
 /**
  * vms接口服务
@@ -21,11 +26,13 @@ public interface AntiService {
     MultiResponse scanRepo(String uuid);
 
     /**
-     * 查询外部源漏洞
+     * 门禁扫描文件
      *
+     * @param scanId 任务id
+     * @param info pr信息
      * @return MultiResponse<List<VmsExternalCveSourceDTO>>
      */
-    MultiResponse setEnv();
+    MultiResponse scanPRFile(String scanId, PullRequestInfo info);
 
     /**
      * 下载仓库
@@ -34,4 +41,14 @@ public interface AntiService {
      * @return MultiResponse<List<VmsExternalCveSourceDTO>>
      */
     MultiResponse downloadRepo(AntiEntity antiEntity, String id);
+
+    /**
+     * 下载PR增量文件
+     *
+     * @param antiEntity 扫描任务实体
+     * @param info pr信息
+     * @param fileArray 差异文件数
+     * @return MultiResponse<List<VmsExternalCveSourceDTO>>
+     */
+    MultiResponse downloadPRRepoFile(PRAntiEntity antiEntity, PullRequestInfo info, JSONArray fileArray);
 }

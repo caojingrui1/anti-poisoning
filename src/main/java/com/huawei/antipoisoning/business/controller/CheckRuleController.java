@@ -1,8 +1,12 @@
+/*
+ * Copyright (c) Huawei Technologies Co., Ltd. 2012-2020. All rights reserved.
+ */
+
 package com.huawei.antipoisoning.business.controller;
 
-import com.huawei.antipoisoning.business.entity.checkRule.RuleModel;
-import com.huawei.antipoisoning.business.entity.checkRule.RuleSetModel;
-import com.huawei.antipoisoning.business.entity.checkRule.TaskRuleSetVo;
+import com.huawei.antipoisoning.business.entity.checkrule.RuleModel;
+import com.huawei.antipoisoning.business.entity.checkrule.RuleSetModel;
+import com.huawei.antipoisoning.business.entity.checkrule.TaskRuleSetVo;
 import com.huawei.antipoisoning.business.service.CheckRuleService;
 import com.huawei.antipoisoning.common.entity.MultiResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,12 +19,12 @@ import org.springframework.web.bind.annotation.RestController;
 /**
  * 防投毒规则维护
  *
+ * @since 2022-09-11
  * @author cqx
  */
 @RestController
 @RequestMapping(value = "/checkRule")
 public class CheckRuleController {
-
     @Autowired
     private CheckRuleService checkRuleService;
 

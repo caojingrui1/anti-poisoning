@@ -1,6 +1,17 @@
+/*
+ * Copyright (c) Huawei Technologies Co., Ltd. 2012-2020. All rights reserved.
+ */
+
 package com.huawei.antipoisoning.common.entity;
+
 import org.apache.commons.lang.StringUtils;
 
+/**
+ * 接口返回响应类。
+ *
+ * @since 2022-07-30
+ * @author zyx
+ */
 public class MultiResponse {
     /**
      * 编码

@@ -1,7 +1,11 @@
+/*
+ * Copyright (c) Huawei Technologies Co., Ltd. 2012-2020. All rights reserved.
+ */
+
 package com.huawei.antipoisoning.business.entity;
 
 import com.huawei.antipoisoning.business.enmu.CollectionTableName;
-import com.huawei.antipoisoning.business.entity.checkRule.TaskRuleSetVo;
+import com.huawei.antipoisoning.business.entity.checkrule.TaskRuleSetVo;
 import lombok.Data;
 import lombok.ToString;
 import org.springframework.data.annotation.Transient;
@@ -9,6 +13,9 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
 /**
+ * 版本扫描任务实体类。
+ *
+ * @since 2022-09-03
  * @author zhangshengjie
  */
 @Data
@@ -19,6 +26,7 @@ public class TaskEntity {
      * id
      */
     private String id;
+
     /**
      * 任务id
      */

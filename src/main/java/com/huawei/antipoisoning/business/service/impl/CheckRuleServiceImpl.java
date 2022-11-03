@@ -1,13 +1,16 @@
+/*
+ * Copyright (c) Huawei Technologies Co., Ltd. 2012-2020. All rights reserved.
+ */
+
 package com.huawei.antipoisoning.business.service.impl;
 
-import com.huawei.antipoisoning.business.entity.checkRule.RuleModel;
-import com.huawei.antipoisoning.business.entity.checkRule.RuleResultDetailsVo;
-import com.huawei.antipoisoning.business.entity.checkRule.RuleSetModel;
-import com.huawei.antipoisoning.business.entity.checkRule.TaskRuleSetVo;
+import com.huawei.antipoisoning.business.entity.checkrule.*;
 import com.huawei.antipoisoning.business.operation.CheckRuleOperation;
 import com.huawei.antipoisoning.business.service.CheckRuleService;
 import com.huawei.antipoisoning.common.entity.MultiResponse;
 import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -23,6 +26,8 @@ import java.util.stream.Collectors;
  */
 @Service
 public class CheckRuleServiceImpl implements CheckRuleService {
+    private static final Logger LOGGER = LoggerFactory.getLogger(CheckRuleServiceImpl.class);
+
     @Autowired
     private CheckRuleOperation checkRuleOperation;
 
@@ -34,7 +39,8 @@ public class CheckRuleServiceImpl implements CheckRuleService {
      */
     @Override
     public MultiResponse getAllRules(RuleModel ruleModel) {
-        return new MultiResponse().code(200).message("success").result(checkRuleOperation.getAllRules(ruleModel, new ArrayList<>()));
+        return new MultiResponse().code(200).message("success")
+                .result(checkRuleOperation.getAllRules(ruleModel, new ArrayList<>()));
     }
 
     /**
@@ -45,7 +51,7 @@ public class CheckRuleServiceImpl implements CheckRuleService {
      */
     @Override
     public MultiResponse createRuleSet(RuleSetModel ruleSetModel) {
-        if (StringUtils.isNotBlank(ruleSetModel.getId())) {
+        if (StringUtils.isNotEmpty(ruleSetModel.getId())) {
             // 修改规则集
             checkRuleOperation.updateRuleSet(ruleSetModel);
         } else {
@@ -57,7 +63,7 @@ public class CheckRuleServiceImpl implements CheckRuleService {
             RuleSetModel ruleSet = new RuleSetModel();
             ruleSet.setProjectName(ruleSetModel.getProjectName());
             ruleSet.setTemplateName(ruleSetModel.getTemplateName());
-            List<RuleSetModel> models = checkRuleOperation.queryRuleSet(ruleSet);
+            List<RuleSetResult> models = checkRuleOperation.queryRuleSet(ruleSet);
             if (models.size() != 0) {
                 return new MultiResponse().code(400).message("templateName is repeat");
             }
@@ -90,28 +96,30 @@ public class CheckRuleServiceImpl implements CheckRuleService {
         // 查出所有的系统规则集
         RuleSetModel ruleSets = new RuleSetModel();
         ruleSets.setDefaultTemplate(0);
-        List<RuleSetModel> ruleSetModels = checkRuleOperation.queryRuleSet(ruleSets);
+        List<RuleSetResult> ruleSetModels = checkRuleOperation.queryRuleSet(ruleSets);
         // 查询该社区自定义的规则集
         ruleSetModel.setDefaultTemplate(1);
-        List<RuleSetModel> modelList = checkRuleOperation.queryRuleSet(ruleSetModel);
+        List<RuleSetResult> modelList = checkRuleOperation.queryRuleSet(ruleSetModel);
         if (modelList.size() > 0) {
             ruleSetModels.addAll(modelList);
         }
         // 得到每个规则集的规则个数
-        for (RuleSetModel ruleSet : ruleSetModels) {
+        for (RuleSetResult ruleSet : ruleSetModels) {
             if (ruleSet.getRuleIds().size() > 0) {
                 List<RuleModel> ruleByIds = checkRuleOperation.getRuleByIds(ruleSet.getRuleIds());
                 ruleSet.setRuleCount(ruleByIds.size());
                 if (ruleByIds.size() != ruleSet.getRuleIds().size()) {
                     // 更换该规则集的规则id
-                    List<String> ruleIds = ruleByIds.stream().map(RuleModel::getRuleId).distinct().collect(Collectors.toList());
+                    List<String> ruleIds = ruleByIds.stream()
+                            .map(RuleModel::getRuleId).distinct().collect(Collectors.toList());
                     checkRuleOperation.updateRuleSetToRuleIds(ruleSet.getId(), ruleIds);
                 }
             } else {
                 ruleSet.setRuleCount(0);
             }
             // 判断是否在使用中
-            List<TaskRuleSetVo> taskRuleSet = checkRuleOperation.getTaskRuleSet(ruleSet.getId(), "", "");
+            List<TaskRuleSetVo> taskRuleSet =
+                    checkRuleOperation.getTaskRuleSet(ruleSet.getId(), "", "");
             if (taskRuleSet.size() != 0) {
                 ruleSet.setUsed(true);
             }
@@ -138,7 +146,7 @@ public class CheckRuleServiceImpl implements CheckRuleService {
      */
     @Override
     public MultiResponse delRuleSet(RuleSetModel ruleSetModel) {
-        if (StringUtils.isBlank(ruleSetModel.getId())) {
+        if (StringUtils.isNotEmpty(ruleSetModel.getId())) {
             return new MultiResponse().code(400).message("ruleSet is error");
         }
         checkRuleOperation.delRuleSet(ruleSetModel.getId());
@@ -175,6 +183,7 @@ public class CheckRuleServiceImpl implements CheckRuleService {
      */
     @Override
     public MultiResponse getTaskRule(TaskRuleSetVo taskRuleSetVo) {
+        LOGGER.info("The rule id {}", taskRuleSetVo.getId());
         List<TaskRuleSetVo> taskRuleSet = checkRuleOperation.getTaskRuleSet("", taskRuleSetVo.getProjectName(),
                 taskRuleSetVo.getRepoNameEn());
         if (taskRuleSet.size() == 0) {

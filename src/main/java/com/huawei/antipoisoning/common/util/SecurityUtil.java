@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) Huawei Technologies Co., Ltd. 2012-2020. All rights reserved.
+ */
+
 package com.huawei.antipoisoning.common.util;
 
 import org.jasypt.util.text.BasicTextEncryptor;
@@ -18,9 +22,8 @@ public class SecurityUtil {
     public static String decrypt(String data){
         BasicTextEncryptor basicTextEncryptor=new BasicTextEncryptor();
         basicTextEncryptor.setPassword(System.getProperty("jasypt.encryptor.password"));
-        String decryptData=basicTextEncryptor.decrypt(data);
-        return decryptData;
-    };
+        return basicTextEncryptor.decrypt(data);
+    }
 
     /**
      * 加密
@@ -31,7 +34,6 @@ public class SecurityUtil {
     public static String encrypt(String data){
         BasicTextEncryptor basicTextEncryptor=new BasicTextEncryptor();
         basicTextEncryptor.setPassword(System.getProperty("jasypt.encryptor.password"));
-        String encryptData=basicTextEncryptor.encrypt(data);
-        return encryptData;
+        return basicTextEncryptor.encrypt(data);
     }
 }

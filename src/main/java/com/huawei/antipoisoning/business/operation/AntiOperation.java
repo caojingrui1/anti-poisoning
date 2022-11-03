@@ -1,15 +1,21 @@
+/*
+ * Copyright (c) Huawei Technologies Co., Ltd. 2012-2020. All rights reserved.
+ */
+
 package com.huawei.antipoisoning.business.operation;
 
 import com.huawei.antipoisoning.business.enmu.CollectionTableName;
 import com.huawei.antipoisoning.business.entity.AntiEntity;
+import com.huawei.antipoisoning.business.entity.pr.PRAntiEntity;
+import com.huawei.antipoisoning.business.entity.pr.PRTaskEntity;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Component;
 import org.springframework.util.ObjectUtils;
-
-import javax.annotation.Resource;
 
 /**
  * 扫描结果包裹数据存档
@@ -18,7 +24,8 @@ import javax.annotation.Resource;
  */
 @Component
 public class AntiOperation {
-    @Resource
+    @Autowired
+    @Qualifier("poisonMongoTemplate")
     private MongoTemplate mongoTemplate;
 
     /**
@@ -34,11 +41,24 @@ public class AntiOperation {
     }
 
     /**
+     * 保存pr扫描结果
+     *
+     * @param prAntiEntity 扫描数据
+     */
+    public void insertPRScanResult(PRAntiEntity prAntiEntity) {
+        if (ObjectUtils.isEmpty(prAntiEntity)) {
+            return;
+        }
+        mongoTemplate.insert(prAntiEntity, CollectionTableName.SCAN_PR_RESULTS);
+    }
+
+    /**
      * 保存扫描结果
      *
      * @param query 查询参数
+     * @return AntiEntity
      */
-    public AntiEntity queryScanResult(Query query) { //查询入库结果
+    public AntiEntity queryScanResult(Query query) { // 查询入库结果
         return mongoTemplate.findOne(query, AntiEntity.class, CollectionTableName.SCAN_RESULTS);
     }
 
@@ -49,10 +69,9 @@ public class AntiOperation {
      * @@return 结果
      */
     public long updateScanResult(AntiEntity antiEntity) {
-        Query query = Query.query(Criteria.where("scan_id").is(antiEntity.getScanId()));
         Update update = new Update();
         if (antiEntity.getIsScan() != null) {
-            update.set("isScan", antiEntity.getIsScan());
+            update.set("is_scan", antiEntity.getIsScan());
         }
         if (antiEntity.getIsDownloaded() != null) {
             update.set("is_downloaded", antiEntity.getIsDownloaded());
@@ -69,13 +88,46 @@ public class AntiOperation {
         if (antiEntity.getTimeConsuming() != null) {
             update.set("time_consuming", antiEntity.getTimeConsuming());
         }
+        Query query = Query.query(Criteria.where("scan_id").is(antiEntity.getScanId()));
         return mongoTemplate.updateFirst(query, update, CollectionTableName.SCAN_RESULTS).getModifiedCount();
+    }
+
+    /**
+     * scan ID更新门禁扫描结果
+     *
+     * @param antiEntity 参数
+     * @@return 结果
+     */
+    public long updatePRScanResult(PRAntiEntity antiEntity) {
+        Update update = new Update();
+        if (antiEntity.getIsScan() != null) {
+            update.set("is_scan", antiEntity.getIsScan());
+        }
+        if (antiEntity.getIsDownloaded() != null) {
+            update.set("is_downloaded", antiEntity.getIsDownloaded());
+        }
+        if (antiEntity.getResultCount() != null) {
+            update.set("result_count", antiEntity.getResultCount());
+        }
+        if (antiEntity.getIsSuccess() != null) {
+            update.set("is_downloaded", antiEntity.getIsSuccess());
+        }
+        if (antiEntity.getTips() != null) {
+            update.set("tips", antiEntity.getTips());
+        }
+        if (antiEntity.getTimeConsuming() != null) {
+            update.set("time_consuming", antiEntity.getTimeConsuming());
+        }
+        Query query = Query.query(Criteria.where("scan_id").is(antiEntity.getScanId()));
+        return mongoTemplate.updateFirst(query, update, CollectionTableName.SCAN_PR_RESULTS).getModifiedCount();
     }
 
     /**
      * 更新下载结果
      *
      * @param uuid 参数
+     * @param isDownloaded 是否下载成功
+     * @return long
      */
     public long updateDownloadResult(String uuid, boolean isDownloaded) {
         Query query = Query.query(Criteria.where("scan_id").is(uuid));
@@ -85,12 +137,24 @@ public class AntiOperation {
     }
 
     /**
-     * 查询一条结果
+     * 查询一条版本扫描结果
      *
+     * @param uuid 扫描ID
      * @return AntiEntity
      */
     public AntiEntity queryAntiEntity(String uuid) {
         Query query = Query.query(new Criteria("scan_id").is(uuid));
         return mongoTemplate.findOne(query, AntiEntity.class, CollectionTableName.SCAN_RESULTS);
+    }
+
+    /**
+     * 查询一条门禁扫描结果
+     *
+     * @param uuid 扫描ID
+     * @return PRAntiEntity
+     */
+    public PRAntiEntity queryPRAntiEntity(String uuid) {
+        Query query = Query.query(new Criteria("scan_id").is(uuid));
+        return mongoTemplate.findOne(query, PRAntiEntity.class, CollectionTableName.SCAN_PR_RESULTS);
     }
 }

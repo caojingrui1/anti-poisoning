@@ -1,13 +1,16 @@
 /*
- * Copyright (c) Huawei Technologies Co., Ltd. 2012-2019. All rights reserved.
+ * Copyright (c) Huawei Technologies Co., Ltd. 2012-2020. All rights reserved.
  */
 
 package com.huawei.antipoisoning.common.util;
 
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.StringUtils;
 
 import java.io.Serializable;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -49,7 +52,7 @@ public class GiteeApiUtil implements Serializable {
      *
      * @return JSONObject
      */
-   public JSONObject getPrDiffFiles() {
+   public JSONArray getPrDiffFiles() {
        String path = getPr + "/" + params.get("owner") + "/"
                + params.get("repo") + "/pulls/" + params.get("pullNumber") + "/files";
        if (!StringUtils.isEmpty(params.get("accessToken"))) {
@@ -57,7 +60,25 @@ public class GiteeApiUtil implements Serializable {
        }
        HttpUtil httpUtil = new HttpUtil(URL);
        String result = httpUtil.doGet("", path);
-       JSONObject body = JSONObject.parseObject(result);
+       JSONArray body = JSONArray.parseArray(result);
        return body;
    }
+
+    public static void main(String[] args) {
+       Map<String, String> param = new HashMap<>();
+       param.put("owner", "zzyy95_1");
+       param.put("repo", "helper");
+       param.put("pullNumber", "2");
+//       param.put("accessToken", "885b0b978a4edf5f4f9156b6e0d82672");
+       GiteeApiUtil giteeApiUtil = new GiteeApiUtil(param);
+       JSONArray result = giteeApiUtil.getPrDiffFiles();
+       for (Object file : result) {
+           JSONObject json = (JSONObject) file;
+           String url = json.getString("raw_url");
+           String prePath = url.substring(url.indexOf("gitee.com") + 10, url.indexOf("raw/"));
+           String lastPath = url.substring(url.indexOf("raw/") + 4);
+           String filePath = prePath + lastPath.substring(lastPath.indexOf("/") + 1);
+           StringBuffer buffer = new StringBuffer();
+       }
+    }
 }

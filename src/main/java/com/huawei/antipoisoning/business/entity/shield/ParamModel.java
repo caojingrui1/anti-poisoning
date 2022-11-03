@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) Huawei Technologies Co., Ltd. 2012-2020. All rights reserved.
+ */
+
 package com.huawei.antipoisoning.business.entity.shield;
 
 import lombok.Data;
@@ -21,6 +25,7 @@ public class ParamModel {
     private String projectName;
     private String repoName;
     private String branch;
+    private String prNumber;
     private String startTime;
     private String endTime;
     private String fileName;

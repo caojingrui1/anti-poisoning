@@ -1,6 +1,10 @@
+/*
+ * Copyright (c) Huawei Technologies Co., Ltd. 2012-2020. All rights reserved.
+ */
+
 package com.huawei.antipoisoning.business.util;
 
-import com.huawei.antipoisoning.business.entity.checkRule.RuleModel;
+import com.huawei.antipoisoning.business.entity.checkrule.RuleModel;
 import com.mongodb.lang.Nullable;
 import lombok.Cleanup;
 import lombok.SneakyThrows;
@@ -67,7 +71,7 @@ public class YamlUtil {
     public static void yamlFile(List<LinkedHashMap<String, Object>> rulesMap, String tableName) {
         // 生成Filter类
         String path = CONFIG_PATH + tableName + ".yaml";
-        logger.info("filepath is : {}" + getToolPath() + path);
+        logger.info("filepath is : {}", getToolPath() + path);
         FileWriter fileWriter = new FileWriter(new File(getToolPath()
                  + path));
         // 生成yaml类
@@ -201,16 +205,6 @@ public class YamlUtil {
             logger.error("{} key is not found", key);
             return false;
         }
-//        //不是最小节点值，不修改
-//        if (oldVal instanceof Map) {
-//            logger.error("input key is not last node {}", key);
-//            return false;
-//        }
-        //新旧值一样 不修改
-//        if (value.equals(oldVal)) {
-//            logger.info("newVal equals oldVal, newVal: {} , oldVal: {}", value, oldVal);
-//            return false;
-//        }
         Yaml yaml = new Yaml(OPTIONS);
         String path = this.getClass().getClassLoader().getResource(yamlName).getPath();
         try {

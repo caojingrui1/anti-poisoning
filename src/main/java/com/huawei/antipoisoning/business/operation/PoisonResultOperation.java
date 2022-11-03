@@ -1,10 +1,17 @@
+/*
+ * Copyright (c) Huawei Technologies Co., Ltd. 2012-2020. All rights reserved.
+ */
+
 package com.huawei.antipoisoning.business.operation;
 
 import com.huawei.antipoisoning.business.enmu.CollectionTableName;
 import com.huawei.antipoisoning.business.entity.AntiEntity;
 import com.huawei.antipoisoning.business.entity.ResultEntity;
 import com.huawei.antipoisoning.business.entity.TaskEntity;
+import com.huawei.antipoisoning.business.entity.pr.PRResultEntity;
 import org.apache.commons.lang.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -22,7 +29,8 @@ import java.util.List;
  */
 @Component
 public class PoisonResultOperation {
-    @Resource
+    @Autowired
+    @Qualifier("poisonMongoTemplate")
     private MongoTemplate mongoTemplate;
 
     /**
@@ -38,9 +46,24 @@ public class PoisonResultOperation {
     }
 
     /**
+     * 保存门禁扫描详情结果
+     *
+     * @param resultEntity 扫描数据
+     */
+    public void insertPRResultDetails(PRResultEntity resultEntity) {
+        if (ObjectUtils.isEmpty(resultEntity)) {
+            return;
+        }
+        mongoTemplate.insert(resultEntity, CollectionTableName.SCAN_PR_RESULT_DETAILS);
+    }
+
+
+    /**
      * 保存扫描结果
      *
      * @param antiEntity 扫描数据
+     * @param taskId 任务ID
+     * @return long
      */
     public long updateTaskResult(AntiEntity antiEntity, String taskId) {
         if (ObjectUtils.isEmpty(antiEntity)) {
@@ -73,8 +96,9 @@ public class PoisonResultOperation {
      * 保存扫描结果
      *
      * @param query 查询参数
+     * @return AntiEntity
      */
-    public AntiEntity queryScanResult(Query query) { //查询入库结果
+    public AntiEntity queryScanResult(Query query) { // 查询入库结果
         return mongoTemplate.findOne(query, AntiEntity.class, CollectionTableName.SCAN_RESULT_DETAILS);
     }
 
@@ -99,6 +123,7 @@ public class PoisonResultOperation {
     /**
      * 查询一条结果
      *
+     * @param uuid 扫描ID
      * @return AntiEntity
      */
     public List<ResultEntity> queryResultEntity(String uuid) {
@@ -107,9 +132,21 @@ public class PoisonResultOperation {
     }
 
     /**
+     * 查询一条门禁扫描对应详情结果
+     *
+     * @param scanId 扫描ID
+     * @return AntiEntity
+     */
+    public List<PRResultEntity> queryPRResultEntity(String scanId) {
+        Query query = Query.query(new Criteria("scan_id").is(scanId));
+        return mongoTemplate.find(query, PRResultEntity.class, CollectionTableName.SCAN_PR_RESULT_DETAILS);
+    }
+
+    /**
      * 查询taskId结果
      *
-     * @return AntiEntity
+     * @param antiEntity 参数
+     * @return List<TaskEntity>
      */
     public List<TaskEntity> queryTaskId(AntiEntity antiEntity) {
         Criteria criteria = new Criteria();
@@ -129,6 +166,8 @@ public class PoisonResultOperation {
      * 根据hash获取屏蔽数据量
      *
      * @param hash 问题的唯一hash值
+     * @param taskId 任务ID
+     * @return int
      */
     public int getResultDetailByHash(String hash, String taskId) {
         Criteria criteria = Criteria.where("hash").is(hash).and("status").is("2");
@@ -141,6 +180,8 @@ public class PoisonResultOperation {
      * 查询状态为已屏蔽的问题数
      *
      * @param status 屏蔽状态
+     * @param scanId 扫描ID
+     * @return int
      */
     public int getCountByStatus(String status, String scanId) {
         Criteria criteria = Criteria.where("status").is(status).and("scan_id").is(scanId);
