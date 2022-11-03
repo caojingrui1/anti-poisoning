@@ -109,12 +109,12 @@ public class CheckRuleController {
     /**
      * 查询检测中心任务的规则列表
      *
-     * @param taskRuleSetVo 查询参数
+     * @param ruleSetModel 查询参数
      * @return queryRuleSet
      */
     @PostMapping(value = "poison/queryRuleById")
-    public MultiResponse queryRuleById(@RequestBody TaskRuleSetVo taskRuleSetVo) {
-        return checkRuleService.queryTaskById(taskRuleSetVo);
+    public MultiResponse queryRuleById(@RequestBody RuleSetModel ruleSetModel) {
+        return checkRuleService.queryTaskById(ruleSetModel);
     }
 
     /**
