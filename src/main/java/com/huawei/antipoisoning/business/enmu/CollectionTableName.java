@@ -64,4 +64,9 @@ public class CollectionTableName {
      * 屏蔽问题详情
      */
     public static final String SHIELD_RESULT_DETAIL = "shield_result_detail";
+
+    /**
+     * 门禁屏蔽问题详情
+     */
+    public static final String SHIELD_PR_RESULT_DETAIL = "shield_pr_result_detail";
 }

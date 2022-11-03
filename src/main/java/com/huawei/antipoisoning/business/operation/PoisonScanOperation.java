@@ -46,6 +46,20 @@ public class PoisonScanOperation {
         return new PageVo(count, summaryVos);
     }
 
+    public PageVo queryPRResults(RepoInfo repoInfo) {
+        Criteria criteria = getCommonCriteria(repoInfo);
+        Query commonQuery = Query.query(criteria);
+        long count = mongoTemplate.count(commonQuery, AntiEntity.class,
+                CollectionTableName.SCAN_RESULTS);
+        commonQuery.with(Sort.by(Sort.Direction.DESC, "repo_name"));
+        if (repoInfo.getPageSize() != null && repoInfo.getCurrentPage() != null) {
+            commonQuery.skip((repoInfo.getCurrentPage() - 1) * repoInfo.getPageSize()).limit(repoInfo.getPageSize());
+        }
+        List<AntiEntity> summaryVos= mongoTemplate.find(commonQuery, AntiEntity.class, CollectionTableName.SCAN_PR_RESULTS);
+
+        return new PageVo(count, summaryVos);
+    }
+
     /**
      * 获取公共查询条件
      *

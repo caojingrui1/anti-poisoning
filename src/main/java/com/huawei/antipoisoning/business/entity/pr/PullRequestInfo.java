@@ -14,6 +14,10 @@ import lombok.Data;
  */
 @Data
 public class PullRequestInfo {
+    private String projectName;
+    private String repoName;
+    private String pullNumber;
+    private String accessToken;
     private String branch;
     private String target;
     private String pullInfo;
@@ -21,5 +25,8 @@ public class PullRequestInfo {
     private String password;
     private String version;
     private String gitUrl;
+    private String mergeUrl;
     private String workspace;
+    private String executorName;
+    private String executorId;
 }

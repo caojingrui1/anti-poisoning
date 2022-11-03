@@ -7,6 +7,8 @@ package com.huawei.antipoisoning.business.operation;
 import com.huawei.antipoisoning.business.enmu.CollectionTableName;
 import com.huawei.antipoisoning.business.entity.AntiEntity;
 import com.huawei.antipoisoning.business.entity.TaskEntity;
+import com.huawei.antipoisoning.business.entity.pr.PRAntiEntity;
+import com.huawei.antipoisoning.business.entity.pr.PRTaskEntity;
 import com.huawei.antipoisoning.business.entity.vo.PageVo;
 import com.mongodb.client.result.UpdateResult;
 import org.apache.commons.lang.StringUtils;
@@ -61,6 +63,35 @@ public class PoisonTaskOperation {
     }
 
     /**
+     * 保存门禁扫描结果
+     *
+     * @param antiEntity 扫描数据
+     * @param newtaskEntity 新参数
+     */
+    public void insertPRTaskResult(PRAntiEntity antiEntity, PRTaskEntity newtaskEntity) {
+        if (ObjectUtils.isEmpty(antiEntity)) {
+            return;
+        }
+        PRTaskEntity taskEntity = new PRTaskEntity();
+        taskEntity.setTaskId(newtaskEntity.getTaskId());
+        taskEntity.setScanId(antiEntity.getScanId());
+        taskEntity.setBranch(antiEntity.getBranch());
+        taskEntity.setRepoUrl(antiEntity.getRepoUrl());
+        taskEntity.setRepoName(antiEntity.getRepoName());
+        taskEntity.setCreateTime(antiEntity.getCreateTime());
+        taskEntity.setLanguage(antiEntity.getLanguage());
+        taskEntity.setIsScan(antiEntity.getIsScan());
+        taskEntity.setPrNumber(antiEntity.getPrNumber());
+        taskEntity.setPrUrl(antiEntity.getPrUrl());
+        taskEntity.setProjectName(antiEntity.getProjectName());
+        taskEntity.setRulesName(antiEntity.getRulesName());
+        taskEntity.setExecutorId(antiEntity.getExecutorId());
+        taskEntity.setExecutorName(antiEntity.getExecutorName());
+        taskEntity.setExecutionStatus(newtaskEntity.getExecutionStatus());
+        mongoTemplate.insert(taskEntity, CollectionTableName.POISON_PR_TASK);
+    }
+
+    /**
      * 保存扫描结果
      *
      * @param antiEntity 扫描数据
@@ -111,11 +142,58 @@ public class PoisonTaskOperation {
     /**
      * 下载完更新扫描结果
      *
+     * @param taskEntity 参数
+     * @@return 结果
+     */
+    public Long updatePRTaskDownloadTime(PRTaskEntity taskEntity) {
+        Update update = new Update();
+        if (taskEntity.getDownloadConsuming() != null) {
+            update.set("download_consuming", taskEntity.getDownloadConsuming());
+        }
+        Query query = Query.query(Criteria.where("task_id").is(taskEntity.getTaskId()));
+        return mongoTemplate.updateFirst(query, update, CollectionTableName.POISON_PR_TASK).getModifiedCount();
+    }
+
+    /**
+     * 下载完更新扫描结果
+     *
      * @param antiEntity 参数
      * @param taskEntity 参数
      * @@return 结果
      */
     public Long updateTaskDownload(AntiEntity antiEntity, TaskEntity taskEntity) {
+        Update update = new Update();
+        if (antiEntity.getScanId() != null) {
+            update.set("scan_id", antiEntity.getScanId());
+        }
+        if (antiEntity.getLanguage() != null){
+            update.set("language", antiEntity.getLanguage());
+        }
+        if (antiEntity.getCreateTime() != null) {
+            update.set("create_time", antiEntity.getCreateTime());
+        }
+        if (taskEntity.getExecutionStatus() != null) {
+            update.set("execution_status", taskEntity.getExecutionStatus());
+        }
+        if (taskEntity.getTaskId() != null) {
+            update.set("task_id", taskEntity.getTaskId());
+        }
+        //初始化总耗时
+        if (taskEntity.getTimeConsuming() != null) {
+            update.set("time_consuming", "");
+        }
+        Query query = Query.query(Criteria.where("task_id").is(taskEntity.getTaskId()));
+        return mongoTemplate.updateFirst(query, update, CollectionTableName.POISON_VERSION_TASK).getModifiedCount();
+    }
+
+    /**
+     * PR增量文件下载完更新扫描结果
+     *
+     * @param antiEntity 参数
+     * @param taskEntity 参数
+     * @@return 结果
+     */
+    public Long updatePRTaskDownload(AntiEntity antiEntity, TaskEntity taskEntity) {
         Update update = new Update();
         if (antiEntity.getScanId() != null) {
             update.set("scan_id", antiEntity.getScanId());
@@ -187,7 +265,53 @@ public class PoisonTaskOperation {
     }
 
     /**
-     * 查询一条结果
+     * ID更新门禁扫描结果
+     *
+     * @param antiEntity 参数
+     * @param taskEntity 参数
+     * @@return 结果
+     */
+    public Long updatePRTask(PRAntiEntity antiEntity, PRTaskEntity taskEntity) {
+        Update update = new Update();
+        if (taskEntity.getExecuteStartTime() != null) {
+            update.set("execute_start_time", taskEntity.getExecuteStartTime());
+        }
+        if (taskEntity.getExecuteEndTime() != null) {
+            update.set("execute_end_time", taskEntity.getExecuteEndTime());
+        }
+        if (taskEntity.getTaskConsuming() != null) {
+            update.set("task_consuming", taskEntity.getTaskConsuming());
+        }
+        if (taskEntity.getTimeConsuming() != null) {
+            update.set("time_consuming", taskEntity.getTimeConsuming());
+        }
+        if (antiEntity.getIsSuccess() != null) {
+            update.set("is_success", antiEntity.getIsSuccess());
+        }
+        if (antiEntity.getResultCount() != null) {
+            update.set("result_count", antiEntity.getResultCount());
+        }
+        if (antiEntity.getTips() != null) {
+            update.set("tips", antiEntity.getTips());
+        }
+        if (taskEntity.getLogs() != null) {
+            update.set("logs", taskEntity.getLogs());
+        }
+        if (taskEntity.getExecutionStatus() != null) {
+            update.set("execution_status", taskEntity.getExecutionStatus());
+        }
+        if (antiEntity.getSolveCount() != null) {
+            update.set("solve_Count", antiEntity.getSolveCount());
+        }
+        if (antiEntity.getIssueCount() != null) {
+            update.set("issue_count", antiEntity.getIssueCount());
+        }
+        Query query = Query.query(Criteria.where("scan_id").is(taskEntity.getScanId()));
+        return mongoTemplate.updateFirst(query, update, CollectionTableName.POISON_PR_TASK).getModifiedCount();
+    }
+
+    /**
+     * 查询一条版本扫描任务结果
      *
      * @param uuid 扫描ID
      * @return AntiEntity
@@ -195,6 +319,17 @@ public class PoisonTaskOperation {
     public TaskEntity queryTaskEntity(String uuid) {
         Query query = Query.query(new Criteria("scan_id").is(uuid));
         return mongoTemplate.findOne(query, TaskEntity.class, CollectionTableName.POISON_VERSION_TASK);
+    }
+
+    /**
+     * 查询一条门禁扫描任务结果
+     *
+     * @param scanId 扫描ID
+     * @return AntiEntity
+     */
+    public PRTaskEntity queryPRTaskEntity(String scanId) {
+        Query query = Query.query(new Criteria("scan_id").is(scanId));
+        return mongoTemplate.findOne(query, PRTaskEntity.class, CollectionTableName.POISON_PR_TASK);
     }
 
     /**
@@ -265,5 +400,25 @@ public class PoisonTaskOperation {
             update.set("language", language);
         }
         return mongoTemplate.updateMulti(query, update, CollectionTableName.POISON_VERSION_TASK);
+    }
+
+    /**
+     * 修改同社区统仓的语言
+     *
+     * @param prTaskEntity 扫描数据
+     * @param language 语言
+     * @return UpdateResult
+     */
+    public UpdateResult updatePRTaskLanguage(PRTaskEntity prTaskEntity, String language) {
+        if (ObjectUtils.isEmpty(prTaskEntity)) {
+            return null;
+        }
+        Query query = Query.query(Criteria.where("project_name").is(prTaskEntity.getProjectName())
+                .and("repo_name").is(prTaskEntity.getRepoName()));
+        Update update = new Update();
+        if (StringUtils.isNotBlank(language)) {
+            update.set("language", language);
+        }
+        return mongoTemplate.updateMulti(query, update, CollectionTableName.POISON_PR_TASK);
     }
 }

@@ -64,6 +64,18 @@ public class PRTaskEntity {
     private String repoUrl;
 
     /**
+     * PR链接
+     */
+    @Field("pr_url")
+    private String prUrl;
+
+    /**
+     * PR编号
+     */
+    @Field("pr_number")
+    private String prNumber;
+
+    /**
      * 开始时间
      */
     @Field("execute_start_time")
@@ -200,4 +212,6 @@ public class PRTaskEntity {
 
     @Transient
     private Integer pageSize;
+
+    private Integer total;
 }

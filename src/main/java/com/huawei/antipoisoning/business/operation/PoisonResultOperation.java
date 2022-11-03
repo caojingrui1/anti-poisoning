@@ -8,6 +8,7 @@ import com.huawei.antipoisoning.business.enmu.CollectionTableName;
 import com.huawei.antipoisoning.business.entity.AntiEntity;
 import com.huawei.antipoisoning.business.entity.ResultEntity;
 import com.huawei.antipoisoning.business.entity.TaskEntity;
+import com.huawei.antipoisoning.business.entity.pr.PRResultEntity;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -43,6 +44,19 @@ public class PoisonResultOperation {
         }
         mongoTemplate.insert(resultEntity, CollectionTableName.SCAN_RESULT_DETAILS);
     }
+
+    /**
+     * 保存门禁扫描详情结果
+     *
+     * @param resultEntity 扫描数据
+     */
+    public void insertPRResultDetails(PRResultEntity resultEntity) {
+        if (ObjectUtils.isEmpty(resultEntity)) {
+            return;
+        }
+        mongoTemplate.insert(resultEntity, CollectionTableName.SCAN_PR_RESULT_DETAILS);
+    }
+
 
     /**
      * 保存扫描结果
@@ -115,6 +129,17 @@ public class PoisonResultOperation {
     public List<ResultEntity> queryResultEntity(String uuid) {
         Query query = Query.query(new Criteria("scan_id").is(uuid));
         return mongoTemplate.find(query, ResultEntity.class, CollectionTableName.SCAN_RESULT_DETAILS);
+    }
+
+    /**
+     * 查询一条门禁扫描对应详情结果
+     *
+     * @param scanId 扫描ID
+     * @return AntiEntity
+     */
+    public List<PRResultEntity> queryPRResultEntity(String scanId) {
+        Query query = Query.query(new Criteria("scan_id").is(scanId));
+        return mongoTemplate.find(query, PRResultEntity.class, CollectionTableName.SCAN_PR_RESULT_DETAILS);
     }
 
     /**
