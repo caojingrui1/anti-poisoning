@@ -254,7 +254,7 @@ public class ScanResultDetailOperation {
         if (StringUtils.isNotBlank(resultModel.getStartTime()) && StringUtils.isNotBlank(resultModel.getEndTime())) {
             criteria.and("create_time").gte(resultModel.getStartTime()).lte(resultModel.getEndTime());
         }
-        Sort.Order order = Sort.Order.desc("create_time");
+        Sort.Order order = Sort.Order.asc("create_time");
         List<AggregationOperation> operations = new ArrayList<>();
         operations.add(Aggregation.project("project_name", "repo_name", "branch", "pr_number",
                 "result_count", "issue_count", "solve_Count", "time_consuming", "repo_url", "execute_start_time",
