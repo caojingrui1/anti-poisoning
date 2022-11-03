@@ -156,12 +156,12 @@ public class CheckRuleServiceImpl implements CheckRuleService {
     /**
      * 查找任务规则
      *
-     * @param taskRuleSetVo 查找id
+     * @param ruleSetModel 查找id
      */
     @Override
-    public MultiResponse queryTaskById(TaskRuleSetVo taskRuleSetVo) {
+    public MultiResponse queryTaskById(RuleSetModel ruleSetModel) {
         return new MultiResponse().code(200).
-                result(checkRuleOperation.queryRuleById(taskRuleSetVo));
+                result(checkRuleOperation.queryRuleById(ruleSetModel));
     }
 
     /**
