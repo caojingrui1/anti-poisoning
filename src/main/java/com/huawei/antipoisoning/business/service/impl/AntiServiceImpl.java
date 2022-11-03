@@ -468,7 +468,7 @@ public class AntiServiceImpl implements AntiService {
         // 设置下载所需的用户权限
         buffer.append(info.getUser()).append(":").append(info.getPassword()).append(" -o ");
         // 设置文件下载存放路径
-        buffer.append(DOWN_PATH).append(info.getWorkspace()).append("modify_dirs/")
+        buffer.append(DOWN_PATH).append(info.getWorkspace()).append("/modify_dirs/")
                 .append(filePath).append(" >/dev/null 2>&1");
         buffer.append(" --create-dir ").append(url);
         return buffer;
