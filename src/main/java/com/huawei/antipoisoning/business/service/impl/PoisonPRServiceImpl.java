@@ -205,27 +205,6 @@ public class PoisonPRServiceImpl implements PoisonPRService {
      */
     @Override
     public MultiResponse getPrDiff(PullRequestInfo info) {
-//        JGitUtil jGitUtil = new JGitUtil(info.getPullInfo(), info.getUser(), info.getPassword(),
-//                info.getBranch(), info.getVersion(), info.getWorkspace());
-//        jGitUtil.pullPr(info.getGitUrl());
-//        StringBuffer sb = jGitUtil.cmdOfPullRequest(info.getWorkspace(), info.getTarget());
-//        List<String> strList = new ArrayList<String>();
-//        try {
-//            LOGGER.info("get diff tree start!");
-//            Process process = Runtime.getRuntime().exec(new String[]{"/bin/sh", "-c", sb.toString()},null,null);
-//            InputStreamReader ir = new InputStreamReader(process.getInputStream());
-//            LineNumberReader input = new LineNumberReader(ir);
-//            String line;
-//            process.waitFor();
-//            while ((line = input.readLine()) != null){
-//                strList.add(line);
-//                LOGGER.info(line);
-//            }
-//            LOGGER.info("get diff tree end!");
-//        } catch (IOException | InterruptedException e) {
-//            LOGGER.error("errInfo is {}", e.getMessage());
-//        }
-
         return MultiResponse.success(200, "success");
     }
 

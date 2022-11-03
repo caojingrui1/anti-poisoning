@@ -138,8 +138,8 @@ public class CheckRuleOperation {
     public List<RuleSetResult> queryRuleSet(RuleSetModel ruleSetModel) {
         Criteria criteria = new Criteria();
         if (StringUtils.isNotBlank(ruleSetModel.getId())) {
-//            criteria.and("_id").is(ruleSetModel.getId());
-            criteria.and("_id").is(new ObjectId(ruleSetModel.getId()));
+            criteria.and("_id").is(ruleSetModel.getId());
+//            criteria.and("_id").is(new ObjectId(ruleSetModel.getId()));
         }
         if (StringUtils.isNotBlank(ruleSetModel.getTemplateName())) {
             criteria.and("template_name").is(ruleSetModel.getTemplateName());
