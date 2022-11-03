@@ -60,12 +60,7 @@ public interface CheckRuleService {
      */
     MultiResponse delRuleSet(RuleSetModel ruleSetModel);
 
-    /**
-     * 查找任务规则
-     *
-     * @param ruleSetModel 查找id
-     */
-    MultiResponse queryTaskById(RuleSetModel ruleSetModel);
+    MultiResponse queryTaskById(TaskRuleSetVo taskRuleSetVo);
 
     /**
      * 更改任务规则
