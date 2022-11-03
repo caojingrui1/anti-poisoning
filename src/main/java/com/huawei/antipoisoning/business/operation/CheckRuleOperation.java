@@ -308,12 +308,13 @@ public class CheckRuleOperation {
     /**
      * 查找自定义规则集
      *
-     * @param taskRuleSetVo updateRuleSet
+     * @param ruleSetModel updateRuleSet
+     * @return TaskRuleSetVo
      */
-    public TaskRuleSetVo queryRuleById(TaskRuleSetVo taskRuleSetVo) {
-        return mongoTemplate.findOne(Query.query(Criteria.where("_id").is(taskRuleSetVo.getId())),
-                TaskRuleSetVo.class, CollectionTableName.ANTI_TASK_RULE_SET);
-        LOGGER.info("taskRuleSetVo is : {}", taskRuleSetVo);
+    public TaskRuleResultVo queryRuleById(RuleSetModel ruleSetModel) {
+        TaskRuleResultVo taskRuleResultVo1 =  mongoTemplate.findOne(Query.query(Criteria.where("_id").is(new ObjectId(ruleSetModel.getId()))),
+                TaskRuleResultVo.class, CollectionTableName.ANTI_TASK_RULE_SET);
+        LOGGER.info("taskRuleResultVo1 is : {}", taskRuleResultVo1);
         TaskRuleResultVo taskRuleResultVo2 =  mongoTemplate.findOne(
                 Query.query(Criteria.where("_id").is(ruleSetModel.getId())),
                 TaskRuleResultVo.class, CollectionTableName.ANTI_TASK_RULE_SET);
