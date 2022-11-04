@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RequestBody;
 
 /**
- * 漏洞控制类
+ * 下载仓库、扫描
  *
  * @since: 2022/5/31 15:55
  */
