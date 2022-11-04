@@ -150,7 +150,7 @@ public class PoisonTaskOperation {
         if (taskEntity.getDownloadConsuming() != null) {
             update.set("download_consuming", taskEntity.getDownloadConsuming());
         }
-        Query query = Query.query(Criteria.where("task_id").is(taskEntity.getTaskId()));
+        Query query = Query.query(Criteria.where("scan_id").is(taskEntity.getScanId()));
         return mongoTemplate.updateFirst(query, update, CollectionTableName.POISON_PR_TASK).getModifiedCount();
     }
 
