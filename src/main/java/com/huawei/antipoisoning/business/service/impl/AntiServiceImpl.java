@@ -6,6 +6,7 @@ package com.huawei.antipoisoning.business.service.impl;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.huawei.antipoisoning.business.enmu.CollectionTableName;
 import com.huawei.antipoisoning.business.enmu.ConstantsArgs;
 import com.huawei.antipoisoning.business.entity.AntiEntity;
 import com.huawei.antipoisoning.business.entity.ResultEntity;
@@ -29,6 +30,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 
 import javax.xml.crypto.Data;
@@ -367,7 +370,7 @@ public class AntiServiceImpl implements AntiService {
         String createTime = DATE_FORMAT.format(System.currentTimeMillis());
         antiEntity.setCreateTime(createTime);
         // 生成任务id
-        PRTaskEntity prTaskEntity = prTaskIdGenerate(antiEntity, antiEntity.getScanId());
+        PRTaskEntity prTaskEntity = prTaskIdGenerate(antiEntity);
         antiOperation.insertPRScanResult(antiEntity);
         long startTime = System.currentTimeMillis();
         int getPullCode = 0;
@@ -504,17 +507,15 @@ public class AntiServiceImpl implements AntiService {
      * 门禁扫描任务ID生成。
      *
      * @param prAntiEntity 任务对象
-     * @param scanId 扫描id
      * @return TaskEntity
      */
-    public PRTaskEntity prTaskIdGenerate(PRAntiEntity prAntiEntity, String scanId) {
+    public PRTaskEntity prTaskIdGenerate(PRAntiEntity prAntiEntity) {
         String taskId = prAntiEntity.getProjectName() + "-" +
                 prAntiEntity.getRepoName() + "-" + prAntiEntity.getBranch();
         PRTaskEntity newTaskEntity = new PRTaskEntity();
         newTaskEntity.setTaskId(taskId);
-        newTaskEntity.setTaskId(scanId);
         newTaskEntity.setExecutionStatus(1);
         poisonTaskOperation.insertPRTaskResult(prAntiEntity, newTaskEntity);
-        return newTaskEntity;
+        return poisonTaskOperation.queryPRTaskEntity(prAntiEntity.getScanId());
     }
 }
