@@ -254,7 +254,7 @@ public class ScanResultDetailOperation {
         if (StringUtils.isNotBlank(resultModel.getStartTime()) && StringUtils.isNotBlank(resultModel.getEndTime())) {
             criteria.and("create_time").gte(resultModel.getStartTime()).lte(resultModel.getEndTime());
         }
-        Sort.Order order = Sort.Order.asc("create_time");
+        Sort.Order order = Sort.Order.desc("create_time");
         List<AggregationOperation> operations = new ArrayList<>();
         operations.add(Aggregation.project("project_name", "repo_name", "branch", "pr_number",
                 "result_count", "issue_count", "solve_Count", "time_consuming", "repo_url", "execute_start_time",
@@ -263,6 +263,7 @@ public class ScanResultDetailOperation {
                 "download_consuming", "task_consuming", "task_id", "scan_id", "total")
         );
         operations.add(Aggregation.match(criteria));
+        operations.add(Aggregation.sort(Sort.by(order)));
         operations.add(Aggregation.group("project_name", "repo_name", "branch", "pr_number")
                 .count().as("total")
                 .first("task_id").as("task_id")
@@ -291,7 +292,6 @@ public class ScanResultDetailOperation {
                 .first("task_consuming").as("task_consuming")
                 .first("is_scan").as("is_scan")
         );
-        operations.add(Aggregation.sort(Sort.by(order)));
         if (resultModel.getPageNum() != null && resultModel.getPageSize() != null) {
             operations.add(Aggregation.skip((resultModel.getPageNum() - 1) * resultModel.getPageSize()));
             operations.add(Aggregation.limit(resultModel.getPageSize()));
