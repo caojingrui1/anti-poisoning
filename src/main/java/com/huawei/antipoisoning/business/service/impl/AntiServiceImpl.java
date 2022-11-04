@@ -274,7 +274,7 @@ public class AntiServiceImpl implements AntiService {
                     prAntiEntity.setTips("");
                     // 更新扫描结果
                     antiOperation.updatePRScanResult(prAntiEntity);
-                    // 更新版本级结果
+                    // 更新门禁级结果
                     poisonTaskOperation.updatePRTask(prAntiEntity, prTaskEntity);
                     return MultiResponse.success(200, "success", results);
                 } else // 这里可以重试下载 后期优化
@@ -367,7 +367,7 @@ public class AntiServiceImpl implements AntiService {
         String createTime = DATE_FORMAT.format(System.currentTimeMillis());
         antiEntity.setCreateTime(createTime);
         // 生成任务id
-        PRTaskEntity prTaskEntity = prTaskIdGenerate(antiEntity);
+        PRTaskEntity prTaskEntity = prTaskIdGenerate(antiEntity, antiEntity.getScanId());
         antiOperation.insertPRScanResult(antiEntity);
         long startTime = System.currentTimeMillis();
         int getPullCode = 0;
@@ -504,13 +504,15 @@ public class AntiServiceImpl implements AntiService {
      * 门禁扫描任务ID生成。
      *
      * @param prAntiEntity 任务对象
+     * @param scanId 扫描id
      * @return TaskEntity
      */
-    public PRTaskEntity prTaskIdGenerate(PRAntiEntity prAntiEntity) {
+    public PRTaskEntity prTaskIdGenerate(PRAntiEntity prAntiEntity, String scanId) {
         String taskId = prAntiEntity.getProjectName() + "-" +
                 prAntiEntity.getRepoName() + "-" + prAntiEntity.getBranch();
         PRTaskEntity newTaskEntity = new PRTaskEntity();
         newTaskEntity.setTaskId(taskId);
+        newTaskEntity.setTaskId(scanId);
         newTaskEntity.setExecutionStatus(1);
         poisonTaskOperation.insertPRTaskResult(prAntiEntity, newTaskEntity);
         return newTaskEntity;
