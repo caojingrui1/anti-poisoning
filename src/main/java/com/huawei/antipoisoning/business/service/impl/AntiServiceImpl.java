@@ -371,7 +371,7 @@ public class AntiServiceImpl implements AntiService {
         long startTime = System.currentTimeMillis();
         int getPullCode = 0;
         if (fileArray.size() < 100) {
-            curlFile(fileArray, info);
+            getPullCode = curlFile(fileArray, info);
         } else {
             getPullCode = cloneRepository(info);
         }
@@ -401,24 +401,24 @@ public class AntiServiceImpl implements AntiService {
      */
     public int curlFile(JSONArray fileArray, PullRequestInfo info) {
         final int[] pullCode = {0};
+        LOGGER.info("get diff tree start!");
         fileArray.stream().forEach(file->{
             JSONObject json = (JSONObject) file;
             String url = json.getString("raw_url");
             StringBuffer sb = cmdOfCurl(info, url);
             try {
-                LOGGER.info("get diff tree start!");
                 Process process = Runtime.getRuntime().exec(
                         new String[]{"/bin/sh", "-c", sb.toString()},null,null);
                 InputStreamReader ir = new InputStreamReader(process.getInputStream());
                 LineNumberReader input = new LineNumberReader(ir);
                 String line;
                 process.waitFor();
-                LOGGER.info("get diff tree end!");
             } catch (IOException | InterruptedException e) {
                 pullCode[0] = 1;
                 LOGGER.error("errInfo is {}", e.getMessage());
             }
         });
+        LOGGER.info("get diff tree end!");
         return pullCode[0];
     }
 
