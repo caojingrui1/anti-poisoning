@@ -14,7 +14,6 @@ import com.huawei.antipoisoning.business.entity.checkrule.RuleResultDetailsVo;
 import com.huawei.antipoisoning.business.entity.checkrule.TaskRuleResultVo;
 import com.huawei.antipoisoning.business.entity.vo.PageVo;
 import org.apache.commons.lang.StringUtils;
-import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

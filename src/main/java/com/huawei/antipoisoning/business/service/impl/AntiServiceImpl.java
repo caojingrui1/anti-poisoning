@@ -149,8 +149,7 @@ public class AntiServiceImpl implements AntiService {
                     // 更新版本级结果
                     poisonTaskOperation.updateTask(antiEntity, taskEntity);
                     return MultiResponse.success(ConstantsArgs.CODE_SUCCESS, "success", results);
-                } else // 这里可以重试下载 后期优化
-                {
+                } else {
                     // 扫描是否成功
                     antiEntity.setIsSuccess(false);
                     antiEntity.setIsPass(false);
@@ -298,8 +297,7 @@ public class AntiServiceImpl implements AntiService {
                     // 更新门禁级结果
                     poisonTaskOperation.updatePRTask(prAntiEntity, prTaskEntity);
                     return MultiResponse.success(ConstantsArgs.CODE_SUCCESS, "success", results);
-                } else // 这里可以重试下载 后期优化
-                {
+                } else {
                     // 扫描是否成功
                     prAntiEntity.setIsSuccess(false);
                     prAntiEntity.setIsPass(false);
@@ -546,7 +544,7 @@ public class AntiServiceImpl implements AntiService {
      */
     public String[] versionScan(String repoName, String branch, String ruleName, String scanId) {
         String[] versionScan = new String[]{"/bin/sh", "-c",
-                "python3 " + YamlUtil.getToolPath() + SCANTOOLPATH +
+                    "python3 " + YamlUtil.getToolPath() + SCANTOOLPATH +
                         // 仓库下载后存放地址
                         " " + YamlUtil.getToolPath() + REPOPATH +
                         repoName + "-" + branch + " " +
