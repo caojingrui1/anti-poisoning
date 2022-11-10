@@ -7,7 +7,6 @@ package com.huawei.antipoisoning.business.operation;
 import com.huawei.antipoisoning.business.enmu.CollectionTableName;
 import com.huawei.antipoisoning.business.entity.AntiEntity;
 import com.huawei.antipoisoning.business.entity.pr.PRAntiEntity;
-import com.huawei.antipoisoning.business.entity.pr.PRTaskEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -66,7 +65,7 @@ public class AntiOperation {
      * ID更新扫描结果
      *
      * @param antiEntity 参数
-     * @@return 结果
+     * @return long 结果
      */
     public long updateScanResult(AntiEntity antiEntity) {
         Update update = new Update();

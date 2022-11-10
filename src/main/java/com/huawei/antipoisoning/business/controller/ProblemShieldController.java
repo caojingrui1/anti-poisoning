@@ -50,7 +50,7 @@ public class ProblemShieldController {
      */
     @GetMapping("/apply-audit-pr-number")
     public MultiResponse applyAndAuditPRNumber(@RequestParam("userId") String userId,
-                                             @RequestParam("scanId") String scanId) {
+            @RequestParam("scanId") String scanId) {
         return problemShieldService.applyAndAuditPRNumber(userId, scanId);
     }
 
@@ -186,7 +186,7 @@ public class ProblemShieldController {
      */
     @PostMapping("/poison-pr-apply")
     public MultiResponse poisonPRApply(@RequestParam String userId,
-                                     @RequestParam String login, @RequestBody ParamModel paramModel) {
+            @RequestParam String login, @RequestBody ParamModel paramModel) {
         return problemShieldService.poisonPRApply(userId, login, paramModel);
     }
 

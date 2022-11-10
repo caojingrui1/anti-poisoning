@@ -19,7 +19,6 @@ import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Component;
 import org.springframework.util.ObjectUtils;
 
-import javax.annotation.Resource;
 import java.util.List;
 
 /**
@@ -172,8 +171,14 @@ public class PoisonResultOperation {
     public int getResultDetailByHash(String hash, String taskId) {
         Criteria criteria = Criteria.where("hash").is(hash).and("status").is("2");
         criteria.and("task_id").is(taskId);
-        return mongoTemplate.find(Query.query(criteria), ResultEntity.class,
+        int size = 0;
+        size = mongoTemplate.find(Query.query(criteria), ResultEntity.class,
                 CollectionTableName.SCAN_RESULT_DETAILS).size();
+        if (size == 0) {
+            size = mongoTemplate.find(Query.query(criteria), PRResultEntity.class,
+                    CollectionTableName.SCAN_PR_RESULT_DETAILS).size();
+        }
+        return size;
     }
 
     /**

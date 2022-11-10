@@ -183,12 +183,11 @@ public class CheckRuleServiceImpl implements CheckRuleService {
      */
     @Override
     public MultiResponse getTaskRule(TaskRuleSetVo taskRuleSetVo) {
-        LOGGER.info("The rule id {}", taskRuleSetVo.getId());
         List<TaskRuleSetVo> taskRuleSet = checkRuleOperation.getTaskRuleSet("", taskRuleSetVo.getProjectName(),
                 taskRuleSetVo.getRepoNameEn());
         if (taskRuleSet.size() == 0) {
             return new MultiResponse().code(400).message("data is null");
         }
-        return new MultiResponse().code(200).message("succedss").result(taskRuleSet);
+        return new MultiResponse().code(200).message("success").result(taskRuleSet);
     }
 }

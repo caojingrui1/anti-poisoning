@@ -242,6 +242,9 @@ public class PoisonTaskOperation {
         if (antiEntity.getIsSuccess() != null) {
             update.set("is_success", antiEntity.getIsSuccess());
         }
+        if (antiEntity.getIsPass() != null) {
+            update.set("is_pass", antiEntity.getIsPass());
+        }
         if (antiEntity.getResultCount() != null) {
             update.set("result_count", antiEntity.getResultCount());
         }
@@ -287,6 +290,9 @@ public class PoisonTaskOperation {
         }
         if (antiEntity.getIsSuccess() != null) {
             update.set("is_success", antiEntity.getIsSuccess());
+        }
+        if (antiEntity.getIsPass() != null) {
+            update.set("is_pass", antiEntity.getIsPass());
         }
         if (antiEntity.getResultCount() != null) {
             update.set("result_count", antiEntity.getResultCount());
