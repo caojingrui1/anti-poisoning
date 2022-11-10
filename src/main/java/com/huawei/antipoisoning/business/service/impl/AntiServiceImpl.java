@@ -96,10 +96,9 @@ public class AntiServiceImpl implements AntiService {
                 if (antiEntity.getIsDownloaded()) {
                     String[] arguments = versionScan(antiEntity.getRepoName(), antiEntity.getBranch(),
                             antiEntity.getRulesName(), uuid);
-                    SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss:SSS");
                     // 设置任务开始时间
                     long startTime = System.currentTimeMillis();
-                    String taskStartTime = df.format(startTime);
+                    String taskStartTime = DATE_FORMAT.format(startTime);
                     taskEntity.setExecuteStartTime(taskStartTime);
                     // 工具执行
                     String sb = AntiMainUtil.execute(arguments);
@@ -108,7 +107,7 @@ public class AntiServiceImpl implements AntiService {
                     taskEntity.setLogs(AntiMainUtil.getTxtContent(url, uuid));
                     // 设置任务结束时间
                     long endTime = System.currentTimeMillis();
-                    String taskEndTime = df.format(endTime);
+                    String taskEndTime = DATE_FORMAT.format(endTime);
                     taskEntity.setExecuteEndTime(taskEndTime);
                     String taskConsuming = (endTime - startTime) / 1000 + "s";
                     taskEntity.setTaskConsuming(taskConsuming);
@@ -149,7 +148,7 @@ public class AntiServiceImpl implements AntiService {
                     antiOperation.updateScanResult(antiEntity);
                     // 更新版本级结果
                     poisonTaskOperation.updateTask(antiEntity, taskEntity);
-                    return MultiResponse.success(200, "success", results);
+                    return MultiResponse.success(ConstantsArgs.CODE_SUCCESS, "success", results);
                 } else // 这里可以重试下载 后期优化
                 {
                     // 扫描是否成功
@@ -160,7 +159,7 @@ public class AntiServiceImpl implements AntiService {
                     taskEntity.setExecutionStatus(3);
                     antiOperation.updateScanResult(antiEntity);
                     poisonTaskOperation.updateTask(antiEntity, taskEntity);
-                    return MultiResponse.error(400, "repoNotDownloaded error");
+                    return MultiResponse.error(ConstantsArgs.CODE_FAILED, "repoNotDownloaded error");
                 }
             } catch (IOException e) {
                 antiEntity.setIsSuccess(false);
@@ -170,10 +169,10 @@ public class AntiServiceImpl implements AntiService {
                 antiOperation.updateScanResult(antiEntity);
                 poisonTaskOperation.updateTask(antiEntity, taskEntity);
                 LOGGER.error(e.getMessage());
-                return MultiResponse.error(400, "scan error : " + e.getCause());
+                return MultiResponse.error(ConstantsArgs.CODE_FAILED, "scan error : " + e.getCause());
             }
         } else {
-            return MultiResponse.error(400, "scan error , task not exist!");
+            return MultiResponse.error(ConstantsArgs.CODE_FAILED, "scan error , task not exist!");
         }
     }
 
@@ -298,7 +297,7 @@ public class AntiServiceImpl implements AntiService {
                     antiOperation.updatePRScanResult(prAntiEntity);
                     // 更新门禁级结果
                     poisonTaskOperation.updatePRTask(prAntiEntity, prTaskEntity);
-                    return MultiResponse.success(200, "success", results);
+                    return MultiResponse.success(ConstantsArgs.CODE_SUCCESS, "success", results);
                 } else // 这里可以重试下载 后期优化
                 {
                     // 扫描是否成功
@@ -309,7 +308,7 @@ public class AntiServiceImpl implements AntiService {
                     prTaskEntity.setExecutionStatus(3);
                     antiOperation.updatePRScanResult(prAntiEntity);
                     poisonTaskOperation.updatePRTask(prAntiEntity, prTaskEntity);
-                    return MultiResponse.error(400, "repoNotDownloaded error");
+                    return MultiResponse.error(ConstantsArgs.CODE_FAILED, "repoNotDownloaded error");
                 }
             } catch (IOException e) {
                 prAntiEntity.setIsSuccess(false);
@@ -319,10 +318,10 @@ public class AntiServiceImpl implements AntiService {
                 antiOperation.updatePRScanResult(prAntiEntity);
                 poisonTaskOperation.updatePRTask(prAntiEntity, prTaskEntity);
                 LOGGER.error(e.getMessage());
-                return MultiResponse.error(400, "scan error : " + e.getCause());
+                return MultiResponse.error(ConstantsArgs.CODE_FAILED, "scan error : " + e.getCause());
             }
         } else {
-            return MultiResponse.error(400, "scan error , task not exist!");
+            return MultiResponse.error(ConstantsArgs.CODE_FAILED, "scan error , task not exist!");
         }
     }
 
@@ -335,8 +334,7 @@ public class AntiServiceImpl implements AntiService {
      */
     @Override
     public MultiResponse downloadRepo(AntiEntity antiEntity, String id) {
-        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss:SSS");
-        String createTime = df.format(System.currentTimeMillis());
+        String createTime = DATE_FORMAT.format(System.currentTimeMillis());
         antiEntity.setCreateTime(createTime);
         // 生成任务id
         TaskEntity taskEntity = taskIdGenerate(antiEntity);
@@ -366,12 +364,12 @@ public class AntiServiceImpl implements AntiService {
             LOGGER.info("checkout success code : {}", getPullCode);
             antiEntity.setIsDownloaded(true);
             antiOperation.updateScanResult(antiEntity);
-            return MultiResponse.success(200, "success");
+            return MultiResponse.success(ConstantsArgs.CODE_SUCCESS, "success");
         } else {
             LOGGER.info("checkout error code : {}", getPullCode);
             antiEntity.setIsDownloaded(false);
             antiOperation.updateScanResult(antiEntity);
-            return MultiResponse.error(400, "downloadRepo error");
+            return MultiResponse.error(ConstantsArgs.CODE_FAILED, "downloadRepo error");
         }
     }
 
@@ -405,12 +403,12 @@ public class AntiServiceImpl implements AntiService {
             LOGGER.info("checkout success code : {}", getPullCode);
             antiEntity.setIsDownloaded(true);
             antiOperation.updatePRScanResult(antiEntity);
-            return MultiResponse.success(200, "success");
+            return MultiResponse.success(ConstantsArgs.CODE_SUCCESS, "success");
         } else {
             LOGGER.info("checkout error code : {}", getPullCode);
             antiEntity.setIsDownloaded(false);
             antiOperation.updatePRScanResult(antiEntity);
-            return MultiResponse.error(400, "downloadPRRepoFile error");
+            return MultiResponse.error(ConstantsArgs.CODE_FAILED, "downloadPRRepoFile error");
         }
     }
 

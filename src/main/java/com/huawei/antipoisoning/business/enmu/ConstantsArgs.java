@@ -30,4 +30,14 @@ public class ConstantsArgs {
      * mongodb 环境
      */
     public static final String DB_ENV = System.getenv("spring.data.mongodb.env");
+
+    /**
+     * 成功码。
+     */
+    public static int CODE_SUCCESS = 200;
+
+    /**
+     * 错误码。
+     */
+    public static int CODE_FAILED = 400;
 }

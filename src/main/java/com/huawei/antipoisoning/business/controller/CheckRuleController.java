@@ -4,6 +4,7 @@
 
 package com.huawei.antipoisoning.business.controller;
 
+import com.huawei.antipoisoning.business.enmu.ConstantsArgs;
 import com.huawei.antipoisoning.business.entity.checkrule.RuleModel;
 import com.huawei.antipoisoning.business.entity.checkrule.RuleSetModel;
 import com.huawei.antipoisoning.business.entity.checkrule.TaskRuleSetVo;
@@ -126,7 +127,7 @@ public class CheckRuleController {
     @PostMapping(value = "/update/taskRule")
     public MultiResponse updateTaskRule(@RequestBody TaskRuleSetVo taskRuleSetVo) {
         checkRuleService.updateTaskRule(taskRuleSetVo);
-        return new MultiResponse().code(200).message("success");
+        return new MultiResponse().code(ConstantsArgs.CODE_SUCCESS).message("success");
     }
 
     /**
