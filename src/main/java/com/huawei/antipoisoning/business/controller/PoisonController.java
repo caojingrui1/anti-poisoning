@@ -140,7 +140,7 @@ public class PoisonController {
         try {
             response = objectMapper.convertValue(future.get(3, TimeUnit.SECONDS), MultiResponse.class);
         } catch (TimeoutException e) {
-            return new MultiResponse().code(ConstantsArgs.CODE_FAILED).message("failed");
+            return new MultiResponse().code(ConstantsArgs.CODE_SUCCESS).message("create version task success!");
         }
         return response;
     }

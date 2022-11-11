@@ -16,10 +16,10 @@ public interface PoisonPRService {
     /**
      * 启动扫扫描任务
      *
-     * @param info 仓库主键id
+     * @param pullRequestInfo pr详情信息
      * @return poisonScan
      */
-    MultiResponse poisonPRScan(PRInfo info);
+    MultiResponse poisonPRScan(PullRequestInfo pullRequestInfo);
 
     /**
      * 查询版本扫描任务列表信息。

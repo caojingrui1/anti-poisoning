@@ -40,7 +40,7 @@ import java.util.concurrent.TimeoutException;
 @RequestMapping(value = "/poison-pr")
 public class PoisonPRController {
     private static final Logger LOGGER = LoggerFactory.getLogger(PoisonPRController.class);
-    private static final LinkedBlockingQueue<PRInfo> BLOCKING_QUEUE = new LinkedBlockingQueue<>(200);
+    private static final LinkedBlockingQueue<PullRequestInfo> BLOCKING_QUEUE = new LinkedBlockingQueue<>(200);
     private static final ThreadPoolExecutor THREAD_SCHEDULED_EXECUTOR =
             new ThreadPoolExecutor(10, 200, 0,
                     TimeUnit.SECONDS, new LinkedBlockingQueue<>(200));
@@ -114,16 +114,17 @@ public class PoisonPRController {
      * @throws ExecutionException 执行异常
      */
     public MultiResponse queuePRService(PRInfo prRepoInfo) throws InterruptedException, ExecutionException {
-        if (Objects.isNull(prRepoInfo) || BLOCKING_QUEUE.remainingCapacity() <= 0) {
+        PullRequestInfo pullRequestInfo = poisonService.getPRInfo(prRepoInfo);
+        if (Objects.isNull(pullRequestInfo) || BLOCKING_QUEUE.remainingCapacity() <= 0) {
             LOGGER.error("Blocking queue is full.");
         }
         try {
-            BLOCKING_QUEUE.put(prRepoInfo);
+            BLOCKING_QUEUE.put(pullRequestInfo);
         } catch (InterruptedException e) {
             LOGGER.error("{} Blocking queue put string failed.", e.getMessage());
         }
         Future future = THREAD_SCHEDULED_EXECUTOR.submit(() -> {
-            PRInfo take = BLOCKING_QUEUE.take();
+            PullRequestInfo take = BLOCKING_QUEUE.take();
             return poisonService.poisonPRScan(take);
         });
         ObjectMapper objectMapper = new ObjectMapper();
@@ -131,7 +132,8 @@ public class PoisonPRController {
         try {
             response = objectMapper.convertValue(future.get(3, TimeUnit.SECONDS), MultiResponse.class);
         } catch (TimeoutException e) {
-            return new MultiResponse().code(ConstantsArgs.CODE_FAILED).message("create task failed!");
+            return new MultiResponse().code(ConstantsArgs.CODE_SUCCESS)
+                    .message("create task success!").result(pullRequestInfo.getScanId());
         }
         return response;
     }

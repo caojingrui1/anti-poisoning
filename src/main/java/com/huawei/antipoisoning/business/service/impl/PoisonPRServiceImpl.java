@@ -73,14 +73,14 @@ public class PoisonPRServiceImpl implements PoisonPRService {
     /**
      * 启动扫扫描任务
      *
-     * @param info 仓库主键id
+     * @param pullRequestInfo pr详情信息
      * @return poisonScan
      */
     @Override
-    public MultiResponse poisonPRScan(PRInfo info) {
-        PullRequestInfo pullRequestInfo = getPRInfo(info);
+    public MultiResponse poisonPRScan(PullRequestInfo pullRequestInfo) {
         // 查询仓库语言和规则集
-        List<TaskRuleSetVo> taskRuleSet = checkRuleOperation.getTaskRuleSet("", pullRequestInfo.getProjectName(), pullRequestInfo.getRepoName());
+        List<TaskRuleSetVo> taskRuleSet = checkRuleOperation.getTaskRuleSet("",
+                pullRequestInfo.getProjectName(), pullRequestInfo.getRepoName());
         List<String> ruleIds = new ArrayList<>();
         if (taskRuleSet.size() == 1) {
             for (CheckRuleSet checkRuleSet : taskRuleSet.get(0).getAntiCheckRules()) {
@@ -121,11 +121,9 @@ public class PoisonPRServiceImpl implements PoisonPRService {
         String tableName = pullRequestInfo.getProjectName() + "-" +
                 pullRequestInfo.getRepoName() + "-" + pullRequestInfo.getBranch();
         if (YamlUtil.getRulesMap(ruleModelList, tableName)) {
-            //1.生成scanId
-            String scanId = ScanIdGenerate(pullRequestInfo.getProjectName(), pullRequestInfo.getRepoName(), pullRequestInfo.getBranch());
-            //请求下载PR代码地址参数
+            // 请求下载PR代码地址参数
             PRAntiEntity prAntiEntity = new PRAntiEntity();
-            prAntiEntity.setScanId(scanId);
+            prAntiEntity.setScanId(pullRequestInfo.getScanId());
             prAntiEntity.setProjectName(pullRequestInfo.getProjectName());
             prAntiEntity.setRepoName(pullRequestInfo.getRepoName());
             prAntiEntity.setBranch(pullRequestInfo.getBranch());
@@ -141,20 +139,20 @@ public class PoisonPRServiceImpl implements PoisonPRService {
                     stringBuffer.append(" ");
                 }
             }
-            //同步同社区同仓库的语言配置
+            // 同步同社区同仓库的语言配置
             prAntiEntity.setLanguage(stringBuffer.toString());
             prAntiEntity.setIsScan(true);
             prAntiEntity.setProjectName(pullRequestInfo.getProjectName());
             prAntiEntity.setRulesName(tableName + ".yaml");
             // 下载目标仓库代码,下载目标PR增量代码
-            JSONArray fileArray = getPRDiffFile(info);
+            JSONArray fileArray = getPRDiffFile(pullRequestInfo);
             antiService.downloadPRRepoFile(prAntiEntity, pullRequestInfo, fileArray);
             // 防投毒扫描
-            antiService.scanPRFile(scanId, pullRequestInfo);
-            return new MultiResponse().code(200).result(INC_URL + scanId +
+            antiService.scanPRFile(pullRequestInfo.getScanId(), pullRequestInfo);
+            return new MultiResponse().code(ConstantsArgs.CODE_SUCCESS).result(INC_URL + pullRequestInfo.getScanId() +
                     "/" + prAntiEntity.getProjectName() + "/" + prAntiEntity.getRepoName());
         } else {
-            return new MultiResponse().code(400).message("create rule yaml is error");
+            return new MultiResponse().code(ConstantsArgs.CODE_FAILED).message("create rule yaml is error");
         }
     }
 
@@ -190,7 +188,7 @@ public class PoisonPRServiceImpl implements PoisonPRService {
      * @param branch    分支名称
      * @return String 随机码
      */
-    public String ScanIdGenerate(String community, String repoName, String branch) {
+    public String scanIdGenerate(String community, String repoName, String branch) {
         long time = System.currentTimeMillis();
         return community + "-" + repoName + "-" + branch + "-" + time;
     }
@@ -276,6 +274,9 @@ public class PoisonPRServiceImpl implements PoisonPRService {
             info.setExecutorId(headUser.get("id").toString()); // pr请求发起者ID
             info.setUser(gitUser);
             info.setPassword(gitPass);
+            String scanId = scanIdGenerate(info.getProjectName(),
+                    info.getRepoName(), info.getBranch());
+            info.setScanId(scanId);
             return info;
         }
     }
@@ -286,7 +287,7 @@ public class PoisonPRServiceImpl implements PoisonPRService {
      * @param prInfo pr信息
      * @return JSONArray
      */
-    public JSONArray getPRDiffFile(PRInfo prInfo) {
+    public JSONArray getPRDiffFile(PullRequestInfo prInfo) {
         Map<String, String> params = new HashMap<>();
         params.put("owner", prInfo.getProjectName());
         params.put("repo", prInfo.getRepoName());

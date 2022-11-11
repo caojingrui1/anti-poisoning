@@ -29,4 +29,5 @@ public class PullRequestInfo {
     private String workspace;
     private String executorName;
     private String executorId;
+    private String scanId;
 }
