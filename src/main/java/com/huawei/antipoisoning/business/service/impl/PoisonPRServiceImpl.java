@@ -74,10 +74,11 @@ public class PoisonPRServiceImpl implements PoisonPRService {
      * 启动扫扫描任务
      *
      * @param pullRequestInfo pr详情信息
+     * @param info pr信息
      * @return poisonScan
      */
     @Override
-    public MultiResponse poisonPRScan(PullRequestInfo pullRequestInfo) {
+    public MultiResponse poisonPRScan(PullRequestInfo pullRequestInfo, PRInfo info) {
         // 查询仓库语言和规则集
         List<TaskRuleSetVo> taskRuleSet = checkRuleOperation.getTaskRuleSet("",
                 pullRequestInfo.getProjectName(), pullRequestInfo.getRepoName());
@@ -145,7 +146,7 @@ public class PoisonPRServiceImpl implements PoisonPRService {
             prAntiEntity.setProjectName(pullRequestInfo.getProjectName());
             prAntiEntity.setRulesName(tableName + ".yaml");
             // 下载目标仓库代码,下载目标PR增量代码
-            JSONArray fileArray = getPRDiffFile(pullRequestInfo);
+            JSONArray fileArray = getPRDiffFile(info);
             antiService.downloadPRRepoFile(prAntiEntity, pullRequestInfo, fileArray);
             // 防投毒扫描
             antiService.scanPRFile(pullRequestInfo.getScanId(), pullRequestInfo);
@@ -287,7 +288,7 @@ public class PoisonPRServiceImpl implements PoisonPRService {
      * @param prInfo pr信息
      * @return JSONArray
      */
-    public JSONArray getPRDiffFile(PullRequestInfo prInfo) {
+    public JSONArray getPRDiffFile(PRInfo prInfo) {
         Map<String, String> params = new HashMap<>();
         params.put("owner", prInfo.getProjectName());
         params.put("repo", prInfo.getRepoName());
