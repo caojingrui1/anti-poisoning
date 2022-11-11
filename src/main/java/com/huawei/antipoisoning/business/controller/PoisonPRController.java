@@ -125,7 +125,7 @@ public class PoisonPRController {
         }
         Future future = THREAD_SCHEDULED_EXECUTOR.submit(() -> {
             PullRequestInfo take = BLOCKING_QUEUE.take();
-            return poisonService.poisonPRScan(take);
+            return poisonService.poisonPRScan(take, prRepoInfo);
         });
         ObjectMapper objectMapper = new ObjectMapper();
         MultiResponse response;
