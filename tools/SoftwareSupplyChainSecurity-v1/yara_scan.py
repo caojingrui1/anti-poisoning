@@ -177,7 +177,7 @@ class YaraJob(object):
         return hash((self.file_path, self.yara_path))
 
 
-@functools.cache
+@functools.lru_cache(maxsize=None)
 def _get_yara_rule(yara_path: str) -> Optional[yara.Rules]:
     print("Load yara:", yara_path)
     # 优先加载 .cp 文件，其次加载文本规则

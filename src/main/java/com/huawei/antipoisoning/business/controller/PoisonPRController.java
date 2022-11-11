@@ -4,9 +4,8 @@
 
 package com.huawei.antipoisoning.business.controller;
 
-import com.alibaba.fastjson.JSONObject;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.huawei.antipoisoning.business.entity.AntiEntity;
+import com.huawei.antipoisoning.business.enmu.ConstantsArgs;
 import com.huawei.antipoisoning.business.entity.RepoInfo;
 import com.huawei.antipoisoning.business.entity.TaskEntity;
 import com.huawei.antipoisoning.business.entity.pr.PRAntiEntity;
@@ -17,10 +16,19 @@ import com.huawei.antipoisoning.common.entity.MultiResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.PostMapping;
 
 import java.util.Objects;
-import java.util.concurrent.*;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.Future;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeoutException;
 
 /**
  * 防投毒controller。
@@ -36,6 +44,8 @@ public class PoisonPRController {
     private static final ThreadPoolExecutor THREAD_SCHEDULED_EXECUTOR =
             new ThreadPoolExecutor(10, 200, 0,
                     TimeUnit.SECONDS, new LinkedBlockingQueue<>(200));
+    private static int CODE_SUCCESS = 200;
+    private static int CODE_FAILED = 400;
 
     @Autowired(required = false)
     private PoisonPRService poisonService;
@@ -110,7 +120,7 @@ public class PoisonPRController {
         try {
             BLOCKING_QUEUE.put(prRepoInfo);
         } catch (InterruptedException e) {
-            LOGGER.error("{} Blocking queue put string failed." + e.getMessage());
+            LOGGER.error("{} Blocking queue put string failed.", e.getMessage());
         }
         Future future = THREAD_SCHEDULED_EXECUTOR.submit(() -> {
             PRInfo take = BLOCKING_QUEUE.take();
@@ -121,7 +131,7 @@ public class PoisonPRController {
         try {
             response = objectMapper.convertValue(future.get(3, TimeUnit.SECONDS), MultiResponse.class);
         } catch (TimeoutException e) {
-            return new MultiResponse().code(200).message("success");
+            return new MultiResponse().code(ConstantsArgs.CODE_FAILED).message("create task failed!");
         }
         return response;
     }

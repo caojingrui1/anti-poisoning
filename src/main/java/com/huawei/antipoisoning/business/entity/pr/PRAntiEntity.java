@@ -45,6 +45,12 @@ public class PRAntiEntity {
     private Boolean isSuccess;
 
     /**
+     * 扫描是否通过状态
+     */
+    @Field("is_pass")
+    private Boolean isPass;
+
+    /**
      * 提示信息
      */
     @Field("tips")

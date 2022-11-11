@@ -22,7 +22,22 @@ public class ConstantsArgs {
     public static final String MAJUN_BETA_URL = "https://majun-beta.osinfra.cn";
 
     /**
+     * 防投毒门禁详情访问地址。
+     */
+    public static final String MAJUN_POISON_INC = "/increment/antipoisoning/poisoningresult/";
+
+    /**
      * mongodb 环境
      */
     public static final String DB_ENV = System.getenv("spring.data.mongodb.env");
+
+    /**
+     * 成功码。
+     */
+    public static int CODE_SUCCESS = 200;
+
+    /**
+     * 错误码。
+     */
+    public static int CODE_FAILED = 400;
 }

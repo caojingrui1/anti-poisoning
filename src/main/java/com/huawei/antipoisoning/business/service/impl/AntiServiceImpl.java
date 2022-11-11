@@ -6,7 +6,6 @@ package com.huawei.antipoisoning.business.service.impl;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import com.huawei.antipoisoning.business.enmu.CollectionTableName;
 import com.huawei.antipoisoning.business.enmu.ConstantsArgs;
 import com.huawei.antipoisoning.business.entity.AntiEntity;
 import com.huawei.antipoisoning.business.entity.ResultEntity;
@@ -19,7 +18,6 @@ import com.huawei.antipoisoning.business.operation.AntiOperation;
 import com.huawei.antipoisoning.business.operation.PoisonResultOperation;
 import com.huawei.antipoisoning.business.operation.PoisonTaskOperation;
 import com.huawei.antipoisoning.business.service.AntiService;
-import com.huawei.antipoisoning.business.util.FileUtil;
 import com.huawei.antipoisoning.business.util.YamlUtil;
 import com.huawei.antipoisoning.common.entity.MultiResponse;
 import com.huawei.antipoisoning.common.util.AntiMainUtil;
@@ -30,11 +28,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.mongodb.core.query.Criteria;
-import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 
-import javax.xml.crypto.Data;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -69,7 +64,7 @@ public class AntiServiceImpl implements AntiService {
 
     private static final String DOWN_PATH = "prDownload/";
 
-    private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss:SSS");
+    private SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss:SSS");
 
     @Value("${git.username}")
     private String gitUser;
@@ -100,21 +95,11 @@ public class AntiServiceImpl implements AntiService {
         if (null != antiEntity) {
             try {
                 if (antiEntity.getIsDownloaded()) {
-                    String[] arguments = new String[]{"/bin/sh", "-c",
-                            "python3 " + YamlUtil.getToolPath() + SCANTOOLPATH +
-                                    // 仓库下载后存放地址
-                                    " " + YamlUtil.getToolPath() + REPOPATH +
-                                    antiEntity.getRepoName() + "-" + antiEntity.getBranch() + " " +
-                                    // 扫描完成后结果存放地址
-                                    YamlUtil.getToolPath() + SCANRESULTPATH + antiEntity.getRepoName() + ".json " +
-                                    // 支持多语言规则扫描
-                                    "--custom-yaml " + YamlUtil.getToolPath() + CONFIG_PATH +
-                                    antiEntity.getRulesName() + " > " + YamlUtil.getToolPath() + SCANTOOLFILE +
-                                    "poison_logs" + File.separator + uuid + ".txt"};
-                    SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss:SSS");
+                    String[] arguments = versionScan(antiEntity.getRepoName(), antiEntity.getBranch(),
+                            antiEntity.getRulesName(), uuid);
                     // 设置任务开始时间
                     long startTime = System.currentTimeMillis();
-                    String taskStartTime = df.format(startTime);
+                    String taskStartTime = DATE_FORMAT.format(startTime);
                     taskEntity.setExecuteStartTime(taskStartTime);
                     // 工具执行
                     String sb = AntiMainUtil.execute(arguments);
@@ -123,7 +108,7 @@ public class AntiServiceImpl implements AntiService {
                     taskEntity.setLogs(AntiMainUtil.getTxtContent(url, uuid));
                     // 设置任务结束时间
                     long endTime = System.currentTimeMillis();
-                    String taskEndTime = df.format(endTime);
+                    String taskEndTime = DATE_FORMAT.format(endTime);
                     taskEntity.setExecuteEndTime(taskEndTime);
                     String taskConsuming = (endTime - startTime) / 1000 + "s";
                     taskEntity.setTaskConsuming(taskConsuming);
@@ -142,25 +127,20 @@ public class AntiServiceImpl implements AntiService {
                     List<ResultEntity> results = JSONArray.parseArray(result, ResultEntity.class);
                     // 扫描结果详情
                     for (ResultEntity resultEntity : results) {
-                        int count = poisonResultOperation.getResultDetailByHash(resultEntity.getHash(),
-                                taskEntity.getTaskId());
-                        String status = count > 0 ? "2" : "0";
-                        resultEntity.setProjectName(antiEntity.getProjectName());
-                        resultEntity.setRepoName(antiEntity.getRepoName());
-                        resultEntity.setBranch(antiEntity.getBranch());
-                        resultEntity.setStatus(status);
-                        resultEntity.setScanId(uuid);
-                        resultEntity.setTaskId(taskEntity.getTaskId());
-                        poisonResultOperation.insertResultDetails(resultEntity);
+                        insertVersionScanDetail(resultEntity, antiEntity, taskEntity, uuid);
                     }
                     // 扫描是否成功
                     antiEntity.setIsSuccess(true);
+                    antiEntity.setIsPass(true);
                     // 结果计数
                     antiEntity.setResultCount(results.size());
                     if (results.size() > 0) {
-                      int solveCount = poisonResultOperation.getCountByStatus("2", results.get(0).getScanId());
-                      antiEntity.setSolveCount(solveCount);
-                      antiEntity.setIssueCount(results.size() - solveCount);
+                        int solveCount = poisonResultOperation.getCountByStatus("2", results.get(0).getScanId());
+                        antiEntity.setSolveCount(solveCount);
+                        antiEntity.setIssueCount(results.size() - solveCount);
+                        if ((results.size() - solveCount) > 0) { // 未解决问题数大于0，扫描不通过
+                            antiEntity.setIsPass(false);
+                        }
                     }
                     // 执行成功  0：未执行、1：执行中、2：执行成功、3：执行失败
                     taskEntity.setExecutionStatus(2);
@@ -169,30 +149,64 @@ public class AntiServiceImpl implements AntiService {
                     antiOperation.updateScanResult(antiEntity);
                     // 更新版本级结果
                     poisonTaskOperation.updateTask(antiEntity, taskEntity);
-                    return MultiResponse.success(200, "success", results);
-                } else // 这里可以重试下载 后期优化
-                {
+                    return MultiResponse.success(ConstantsArgs.CODE_SUCCESS, "success", results);
+                } else {
                     // 扫描是否成功
                     antiEntity.setIsSuccess(false);
+                    antiEntity.setIsPass(false);
                     // 原因
                     antiEntity.setTips("repo not Downloaded.");
                     taskEntity.setExecutionStatus(3);
                     antiOperation.updateScanResult(antiEntity);
                     poisonTaskOperation.updateTask(antiEntity, taskEntity);
-                    return MultiResponse.error(400, "repoNotDownloaded error");
+                    return MultiResponse.error(ConstantsArgs.CODE_FAILED, "repoNotDownloaded error");
                 }
             } catch (IOException e) {
                 antiEntity.setIsSuccess(false);
+                antiEntity.setIsPass(false);
                 antiEntity.setTips(e.toString());
                 taskEntity.setExecutionStatus(3);
                 antiOperation.updateScanResult(antiEntity);
                 poisonTaskOperation.updateTask(antiEntity, taskEntity);
                 LOGGER.error(e.getMessage());
-                return MultiResponse.error(400, "scan error : " + e.getCause());
+                return MultiResponse.error(ConstantsArgs.CODE_FAILED, "scan error : " + e.getCause());
             }
         } else {
-            return MultiResponse.error(400, "scan error , task not exist!");
+            return MultiResponse.error(ConstantsArgs.CODE_FAILED, "scan error , task not exist!");
         }
+    }
+
+    /**
+     * 保存版本级扫描详情数据。
+     *
+     * @param resultEntity 扫描详情
+     * @param antiEntity 扫描信息
+     * @param taskEntity 任务信息
+     * @param uuid 扫描ID
+     */
+    public void insertVersionScanDetail(ResultEntity resultEntity, AntiEntity antiEntity,
+                                        TaskEntity taskEntity, String uuid) {
+        String status = countResultByHash(resultEntity, taskEntity);
+        resultEntity.setProjectName(antiEntity.getProjectName());
+        resultEntity.setRepoName(antiEntity.getRepoName());
+        resultEntity.setBranch(antiEntity.getBranch());
+        resultEntity.setStatus(status);
+        resultEntity.setScanId(uuid);
+        resultEntity.setTaskId(taskEntity.getTaskId());
+        poisonResultOperation.insertResultDetails(resultEntity);
+    }
+
+    /**
+     * 统计同一hash值的数据已被屏蔽条数，返回状态信息。
+     *
+     * @param resultEntity 详情数据信息
+     * @param taskEntity 任务信息
+     * @return int
+     */
+    public String countResultByHash(ResultEntity resultEntity, TaskEntity taskEntity) {
+        int count = poisonResultOperation.getResultDetailByHash(resultEntity.getHash(),
+                taskEntity.getTaskId());
+        return  count > 0 ? "2" : "0";
     }
 
     /**
@@ -265,12 +279,16 @@ public class AntiServiceImpl implements AntiService {
                     }
                     // 扫描是否成功
                     prAntiEntity.setIsSuccess(true);
+                    prAntiEntity.setIsPass(true);
                     // 结果计数
                     prAntiEntity.setResultCount(results.size());
                     if (results.size() > 0) {
                         int solveCount = poisonResultOperation.getCountByStatus("2", results.get(0).getScanId());
                         prAntiEntity.setSolveCount(solveCount);
                         prAntiEntity.setIssueCount(results.size() - solveCount);
+                        if ((results.size() - solveCount) > 0) { // 未解决问题数大于0，扫描不通过
+                            prAntiEntity.setIsPass(false);
+                        }
                     }
                     // 执行成功  0：未执行、1：执行中、2：执行成功、3：执行失败
                     prTaskEntity.setExecutionStatus(2);
@@ -279,32 +297,30 @@ public class AntiServiceImpl implements AntiService {
                     antiOperation.updatePRScanResult(prAntiEntity);
                     // 更新门禁级结果
                     poisonTaskOperation.updatePRTask(prAntiEntity, prTaskEntity);
-                    return MultiResponse.success(200, "success", results);
-                } else // 这里可以重试下载 后期优化
-                {
+                    return MultiResponse.success(ConstantsArgs.CODE_SUCCESS, "success", results);
+                } else {
                     // 扫描是否成功
                     prAntiEntity.setIsSuccess(false);
+                    prAntiEntity.setIsPass(false);
                     // 原因
                     prAntiEntity.setTips("repo not Downloaded.");
                     prTaskEntity.setExecutionStatus(3);
                     antiOperation.updatePRScanResult(prAntiEntity);
                     poisonTaskOperation.updatePRTask(prAntiEntity, prTaskEntity);
-                    return MultiResponse.error(400, "repoNotDownloaded error");
+                    return MultiResponse.error(ConstantsArgs.CODE_FAILED, "repoNotDownloaded error");
                 }
             } catch (IOException e) {
                 prAntiEntity.setIsSuccess(false);
+                prAntiEntity.setIsPass(false);
                 prAntiEntity.setTips(e.toString());
                 prTaskEntity.setExecutionStatus(3);
                 antiOperation.updatePRScanResult(prAntiEntity);
                 poisonTaskOperation.updatePRTask(prAntiEntity, prTaskEntity);
                 LOGGER.error(e.getMessage());
-                return MultiResponse.error(400, "scan error : " + e.getCause());
+                return MultiResponse.error(ConstantsArgs.CODE_FAILED, "scan error : " + e.getCause());
             }
-//            finally { // 扫描完成后删除代码
-//                FileUtil.deleteDirectory(PR_REPOPATH + info.getWorkspace() + File.separator + "modify_dirs");
-//            }
         } else {
-            return MultiResponse.error(400, "scan error , task not exist!");
+            return MultiResponse.error(ConstantsArgs.CODE_FAILED, "scan error , task not exist!");
         }
     }
 
@@ -317,8 +333,7 @@ public class AntiServiceImpl implements AntiService {
      */
     @Override
     public MultiResponse downloadRepo(AntiEntity antiEntity, String id) {
-        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss:SSS");
-        String createTime = df.format(System.currentTimeMillis());
+        String createTime = DATE_FORMAT.format(System.currentTimeMillis());
         antiEntity.setCreateTime(createTime);
         // 生成任务id
         TaskEntity taskEntity = taskIdGenerate(antiEntity);
@@ -348,12 +363,12 @@ public class AntiServiceImpl implements AntiService {
             LOGGER.info("checkout success code : {}", getPullCode);
             antiEntity.setIsDownloaded(true);
             antiOperation.updateScanResult(antiEntity);
-            return MultiResponse.success(200, "success");
+            return MultiResponse.success(ConstantsArgs.CODE_SUCCESS, "success");
         } else {
             LOGGER.info("checkout error code : {}", getPullCode);
             antiEntity.setIsDownloaded(false);
             antiOperation.updateScanResult(antiEntity);
-            return MultiResponse.error(400, "downloadRepo error");
+            return MultiResponse.error(ConstantsArgs.CODE_FAILED, "downloadRepo error");
         }
     }
 
@@ -387,12 +402,12 @@ public class AntiServiceImpl implements AntiService {
             LOGGER.info("checkout success code : {}", getPullCode);
             antiEntity.setIsDownloaded(true);
             antiOperation.updatePRScanResult(antiEntity);
-            return MultiResponse.success(200, "success");
+            return MultiResponse.success(ConstantsArgs.CODE_SUCCESS, "success");
         } else {
             LOGGER.info("checkout error code : {}", getPullCode);
             antiEntity.setIsDownloaded(false);
             antiOperation.updatePRScanResult(antiEntity);
-            return MultiResponse.error(400, "downloadPRRepoFile error");
+            return MultiResponse.error(ConstantsArgs.CODE_FAILED, "downloadPRRepoFile error");
         }
     }
 
@@ -517,5 +532,29 @@ public class AntiServiceImpl implements AntiService {
         newTaskEntity.setExecutionStatus(1);
         poisonTaskOperation.insertPRTaskResult(prAntiEntity, newTaskEntity);
         return poisonTaskOperation.queryPRTaskEntity(prAntiEntity.getScanId());
+    }
+
+    /**
+     * 封装版本扫描指令。
+     *
+     * @param repoName 仓库名称
+     * @param branch 仓库分支
+     * @param ruleName 规则名称
+     * @param scanId 扫描ID
+     * @return String[]
+     */
+    public String[] versionScan(String repoName, String branch, String ruleName, String scanId) {
+        String[] versionScan = new String[]{"/bin/sh", "-c",
+                    "python3 " + YamlUtil.getToolPath() + SCANTOOLPATH +
+                        // 仓库下载后存放地址
+                        " " + YamlUtil.getToolPath() + REPOPATH +
+                        repoName + "-" + branch + " " +
+                        // 扫描完成后结果存放地址
+                        YamlUtil.getToolPath() + SCANRESULTPATH + repoName + ".json " +
+                        // 支持多语言规则扫描
+                        "--custom-yaml " + YamlUtil.getToolPath() + CONFIG_PATH +
+                        ruleName + " > " + YamlUtil.getToolPath() + SCANTOOLFILE +
+                        "poison_logs" + File.separator + scanId + ".txt"};
+        return versionScan;
     }
 }

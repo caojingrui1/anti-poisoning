@@ -6,6 +6,7 @@ package com.huawei.antipoisoning.business.controller;
 
 import com.alibaba.fastjson.JSONObject;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.huawei.antipoisoning.business.enmu.ConstantsArgs;
 import com.huawei.antipoisoning.business.entity.AntiEntity;
 import com.huawei.antipoisoning.business.entity.pr.PullRequestInfo;
 import com.huawei.antipoisoning.business.entity.RepoInfo;
@@ -128,7 +129,7 @@ public class PoisonController {
         try {
             BLOCKING_QUEUE.put(repoInfo);
         } catch (InterruptedException e) {
-            LOGGER.error("{} Blocking queue put string failed." + e.getMessage());
+            LOGGER.error("{} Blocking queue put string failed.", e.getMessage());
         }
         Future future = THREAD_SCHEDULED_EXECUTOR.submit(() -> {
             RepoInfo take = BLOCKING_QUEUE.take();
@@ -139,7 +140,7 @@ public class PoisonController {
         try {
             response = objectMapper.convertValue(future.get(3, TimeUnit.SECONDS), MultiResponse.class);
         } catch (TimeoutException e) {
-            return new MultiResponse().code(200).message("success");
+            return new MultiResponse().code(ConstantsArgs.CODE_FAILED).message("failed");
         }
         return response;
     }

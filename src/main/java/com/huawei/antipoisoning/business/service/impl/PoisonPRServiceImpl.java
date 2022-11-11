@@ -7,10 +7,18 @@ package com.huawei.antipoisoning.business.service.impl;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.huawei.antipoisoning.business.enmu.CommonConstants;
+import com.huawei.antipoisoning.business.enmu.ConstantsArgs;
 import com.huawei.antipoisoning.business.entity.RepoInfo;
 import com.huawei.antipoisoning.business.entity.TaskEntity;
-import com.huawei.antipoisoning.business.entity.checkrule.*;
-import com.huawei.antipoisoning.business.entity.pr.*;
+import com.huawei.antipoisoning.business.entity.checkrule.CheckRuleSet;
+import com.huawei.antipoisoning.business.entity.checkrule.RuleSetModel;
+import com.huawei.antipoisoning.business.entity.checkrule.TaskRuleSetVo;
+import com.huawei.antipoisoning.business.entity.checkrule.RuleSetResult;
+import com.huawei.antipoisoning.business.entity.checkrule.RuleModel;
+import com.huawei.antipoisoning.business.entity.pr.PRInfo;
+import com.huawei.antipoisoning.business.entity.pr.PullRequestInfo;
+import com.huawei.antipoisoning.business.entity.pr.PRAntiEntity;
+import com.huawei.antipoisoning.business.entity.pr.PRResultEntity;
 import com.huawei.antipoisoning.business.entity.vo.PageVo;
 import com.huawei.antipoisoning.business.operation.CheckRuleOperation;
 import com.huawei.antipoisoning.business.operation.PoisonResultOperation;
@@ -24,13 +32,22 @@ import com.huawei.antipoisoning.common.util.GiteeApiUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.Map;
+import java.util.HashMap;
+
 
 @Service
 public class PoisonPRServiceImpl implements PoisonPRService {
     private static final Logger LOGGER = LoggerFactory.getLogger(PoisonPRServiceImpl.class);
+
+    private static final String INC_URL = ("prod".equals(ConstantsArgs.DB_ENV)
+            ? ConstantsArgs.MAJUN_URL  : ConstantsArgs.MAJUN_BETA_URL) + ConstantsArgs.MAJUN_POISON_INC;
 
     @Autowired
     private AntiService antiService;
@@ -46,6 +63,12 @@ public class PoisonPRServiceImpl implements PoisonPRService {
 
     @Autowired
     private PoisonTaskOperation poisonTaskOperation;
+
+    @Value("${git.username}")
+    private String gitUser;
+
+    @Value("${git.password}")
+    private String gitPass;
 
     /**
      * 启动扫扫描任务
@@ -128,10 +151,11 @@ public class PoisonPRServiceImpl implements PoisonPRService {
             antiService.downloadPRRepoFile(prAntiEntity, pullRequestInfo, fileArray);
             // 防投毒扫描
             antiService.scanPRFile(scanId, pullRequestInfo);
+            return new MultiResponse().code(200).result(INC_URL + scanId +
+                    "/" + prAntiEntity.getProjectName() + "/" + prAntiEntity.getRepoName());
         } else {
             return new MultiResponse().code(400).message("create rule yaml is error");
         }
-        return new MultiResponse().code(200).result("poisonScan start");
     }
 
     /**
@@ -250,8 +274,8 @@ public class PoisonPRServiceImpl implements PoisonPRService {
                     headRepos.get("path").toString() + "-" + head.get("ref").toString());
             info.setExecutorName(headUser.get("name").toString()); // pr请求发起者
             info.setExecutorId(headUser.get("id").toString()); // pr请求发起者ID
-            info.setUser("openlibing@163.com");
-            info.setPassword("Jszb2022h1");
+            info.setUser(gitUser);
+            info.setPassword(gitPass);
             return info;
         }
     }
