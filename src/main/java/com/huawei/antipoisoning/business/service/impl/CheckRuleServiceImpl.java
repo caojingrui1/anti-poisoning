@@ -15,10 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -40,7 +37,7 @@ public class CheckRuleServiceImpl implements CheckRuleService {
     @Override
     public MultiResponse getAllRules(RuleModel ruleModel) {
         return new MultiResponse().code(200).message("success")
-                .result(checkRuleOperation.getAllRules(ruleModel, new ArrayList<>()));
+                .result(checkRuleOperation.getAllRules(ruleModel, new LinkedHashSet<>()));
     }
 
     /**
