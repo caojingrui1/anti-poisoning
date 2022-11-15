@@ -36,6 +36,7 @@ import java.io.LineNumberReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class PoisonServiceImpl implements PoisonService {
@@ -102,8 +103,9 @@ public class PoisonServiceImpl implements PoisonService {
             }
         }
         ruleModelList.addAll(commList);
+        List<RuleModel> rulesMap = ruleModelList.stream().distinct().collect(Collectors.toList());
         String tableName = repoInfo.getProjectName() + "-" + repoInfo.getRepoName() + "-" + repoInfo.getRepoBranchName();
-        if (YamlUtil.getRulesMap(ruleModelList, tableName)) {
+        if (YamlUtil.getRulesMap(rulesMap, tableName)) {
             //1.生成scanId
             String scanId = ScanIdGenerate(repoInfo.getProjectName(), repoInfo.getRepoName(), repoInfo.getRepoBranchName());
             //请求下载目标仓地址参数

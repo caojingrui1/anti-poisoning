@@ -36,6 +36,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 
 @Service
@@ -115,9 +116,10 @@ public class PoisonPRServiceImpl implements PoisonPRService {
             }
         }
         ruleModelList.addAll(commList);
+        List<RuleModel> rulesMap = ruleModelList.stream().distinct().collect(Collectors.toList());
         String tableName = pullRequestInfo.getProjectName() + "-" +
                 pullRequestInfo.getRepoName() + "-" + pullRequestInfo.getBranch();
-        if (YamlUtil.getRulesMap(ruleModelList, tableName)) {
+        if (YamlUtil.getRulesMap(rulesMap, tableName)) {
             // 请求下载PR代码地址参数
             PRAntiEntity prAntiEntity = new PRAntiEntity();
             prAntiEntity.setScanId(pullRequestInfo.getScanId());

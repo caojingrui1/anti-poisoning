@@ -145,7 +145,6 @@ public class CheckRuleOperation {
         Criteria criteria = new Criteria();
         if (StringUtils.isNotBlank(ruleSetModel.getId())) {
             criteria.and("_id").is(ruleSetModel.getId());
-//            criteria.and("_id").is(new ObjectId(ruleSetModel.getId()));
         }
         if (StringUtils.isNotBlank(ruleSetModel.getTemplateName())) {
             criteria.and("template_name").is(ruleSetModel.getTemplateName());
@@ -168,7 +167,9 @@ public class CheckRuleOperation {
      * @param id 主键id
      */
     public void delRuleSet(String id) {
-        mongoTemplate.remove(Query.query(Criteria.where("_id").is(id)), CollectionTableName.ANTI_CHECK_RULE_SET);
+        RuleSetModel ruleSetModel = new RuleSetModel();
+        ruleSetModel.setId(id);
+        mongoTemplate.remove(Query.query(Criteria.where("_id").is(ruleSetModel.getId())), CollectionTableName.ANTI_CHECK_RULE_SET);
     }
 
     /**

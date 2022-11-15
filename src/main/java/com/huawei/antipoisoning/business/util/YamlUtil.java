@@ -76,10 +76,8 @@ public class YamlUtil {
         LinkedHashMap<String, Object> yamlMap = new LinkedHashMap<>();
         List<LinkedHashMap<String, Object>> rulesMaps = new ArrayList<>();
         LinkedHashMap<String, Object> rulesMapYaml = new LinkedHashMap<>();
-        Set<LinkedHashMap<String, Object>> rulesSet = new LinkedHashSet<>();
-        rulesSet.addAll(rulesMap);
         rulesMapYaml.put("name", "Custom Yara Scan");
-        rulesMapYaml.put("rules", rulesSet);
+        rulesMapYaml.put("rules", rulesMap);
         rulesMaps.add(rulesMapYaml);
         yamlMap.put("scan_tasks", rulesMaps);
         // 拼接屏蔽文件
