@@ -35,11 +35,7 @@ import java.io.InputStreamReader;
 import java.io.LineNumberReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Collections;
+import java.util.*;
 
 @Service
 public class PoisonServiceImpl implements PoisonService {
@@ -70,13 +66,13 @@ public class PoisonServiceImpl implements PoisonService {
     public MultiResponse poisonScan(RepoInfo repoInfo) {
         // 查询仓库语言和规则集
         List<TaskRuleSetVo> taskRuleSet = checkRuleOperation.getTaskRuleSet("", repoInfo.getProjectName(), repoInfo.getRepoName());
-        List<String> ruleIds = new ArrayList<>();
+        Set<String> ruleIds = new LinkedHashSet<>();
         if (taskRuleSet.size() == 1) {
             for (CheckRuleSet checkRuleSet : taskRuleSet.get(0).getAntiCheckRules()) {
                 RuleSetModel ruleSetModel = new RuleSetModel();
                 ruleSetModel.setId(checkRuleSet.getRuleSetId());
                 List<RuleSetResult> ruleSetModels = checkRuleOperation.queryRuleSet(ruleSetModel);
-                if (ruleSetModels.size() == 1 && (!("通用检查规则集").equals(ruleSetModels.get(0).getTemplateName()))) {
+                if (ruleSetModels.size() > 0) {
                     ruleIds.addAll(ruleSetModels.get(0).getRuleIds());
                 } else {
                     return new MultiResponse().code(400).message("ruleSet is error");
@@ -95,7 +91,7 @@ public class PoisonServiceImpl implements PoisonService {
         // 加入通用规则
         RuleModel ruleModel = new RuleModel();
         ruleModel.setRuleLanguage("COMMON");
-        PageVo commRules = checkRuleOperation.getAllRules(ruleModel, new ArrayList<>());
+        PageVo commRules = checkRuleOperation.getAllRules(ruleModel, new LinkedHashSet<>());
         List<RuleModel> commList = commRules.getList();
         List<TaskRuleSetVo> ruleList = checkRuleOperation.getTaskRuleSet("", repoInfo.getProjectName(), repoInfo.getRepoName());
         List<String> languageList = new ArrayList<>();

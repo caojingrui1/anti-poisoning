@@ -16,11 +16,7 @@ import org.yaml.snakeyaml.Yaml;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * 生成yaml相关工具类
@@ -80,8 +76,10 @@ public class YamlUtil {
         LinkedHashMap<String, Object> yamlMap = new LinkedHashMap<>();
         List<LinkedHashMap<String, Object>> rulesMaps = new ArrayList<>();
         LinkedHashMap<String, Object> rulesMapYaml = new LinkedHashMap<>();
+        Set<LinkedHashMap<String, Object>> rulesSet = new LinkedHashSet<>();
+        rulesSet.addAll(rulesMap);
         rulesMapYaml.put("name", "Custom Yara Scan");
-        rulesMapYaml.put("rules", rulesMap);
+        rulesMapYaml.put("rules", rulesSet);
         rulesMaps.add(rulesMapYaml);
         yamlMap.put("scan_tasks", rulesMaps);
         // 拼接屏蔽文件

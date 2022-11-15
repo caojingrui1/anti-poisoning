@@ -29,6 +29,7 @@ import org.springframework.stereotype.Component;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import java.util.regex.Pattern;
 
 /**
@@ -51,7 +52,7 @@ public class CheckRuleOperation {
      * @param ruleIds 规则id数组
      * @return getAllRules
      */
-    public PageVo getAllRules(RuleModel rule, List<String> ruleIds) {
+    public PageVo getAllRules(RuleModel rule, Set<String> ruleIds) {
         Criteria criteria = new Criteria();
         if (ruleIds.size() > 0) {
             criteria.and("rule_id").in(ruleIds);
