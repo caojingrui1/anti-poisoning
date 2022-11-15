@@ -169,7 +169,11 @@ public class CheckRuleOperation {
     public void delRuleSet(String id) {
         RuleSetResult ruleSetModel = new RuleSetResult();
         ruleSetModel.setId(id);
-        mongoTemplate.remove(Query.query(Criteria.where("_id").is(ruleSetModel.getId())), CollectionTableName.ANTI_CHECK_RULE_SET);
+        RuleSetResult ruleSetResult = mongoTemplate.findOne(Query.query(Criteria.where("_id").is(ruleSetModel.getId())),
+                RuleSetResult.class, CollectionTableName.ANTI_CHECK_RULE_SET);
+        LOGGER.info("The rule is : {}", ruleSetResult);
+        mongoTemplate.remove(ruleSetResult,
+                CollectionTableName.ANTI_CHECK_RULE_SET);
     }
 
     /**

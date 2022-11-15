@@ -368,7 +368,8 @@ public class PoisonTaskOperation {
         if (StringUtils.isNotBlank(taskEntity.getBranch())) {
             criteria.and("branch").is(taskEntity.getBranch());
         }
-        if (taskEntity.getExecutionStatus() != null) {
+        if (taskEntity.getExecutionStatus() != null
+                && StringUtils.isNotEmpty(String.valueOf(taskEntity.getExecutionStatus()))) {
             criteria.and("execution_status").is(taskEntity.getExecutionStatus());
         }
         Query query = Query.query(criteria);
