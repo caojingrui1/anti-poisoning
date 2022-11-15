@@ -167,6 +167,7 @@ public class CheckRuleOperation {
      * @param id 主键id
      */
     public void delRuleSet(String id) {
+        LOGGER.info("delete rule set");
         RuleSetResult ruleSetModel = new RuleSetResult();
         ruleSetModel.setId(id);
         RuleSetResult ruleSetResult = mongoTemplate.findOne(Query.query(Criteria.where("_id").is(ruleSetModel.getId())),
