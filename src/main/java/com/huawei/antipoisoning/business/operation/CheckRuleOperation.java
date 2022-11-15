@@ -167,7 +167,7 @@ public class CheckRuleOperation {
      * @param id 主键id
      */
     public void delRuleSet(String id) {
-        RuleSetModel ruleSetModel = new RuleSetModel();
+        RuleSetResult ruleSetModel = new RuleSetResult();
         ruleSetModel.setId(id);
         mongoTemplate.remove(Query.query(Criteria.where("_id").is(ruleSetModel.getId())), CollectionTableName.ANTI_CHECK_RULE_SET);
     }
