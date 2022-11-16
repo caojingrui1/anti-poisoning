@@ -80,6 +80,12 @@ public class AntiEntity {
     private String repoUrl;
 
     /**
+     * 仓库id
+     */
+    @Field("branch_repository_id")
+    private String branchRepositoryId;
+
+    /**
      * 问题数
      */
     @Field("result_count")

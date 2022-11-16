@@ -114,6 +114,7 @@ public class PoisonServiceImpl implements PoisonService {
             antiEntity.setBranch(repoInfo.getRepoBranchName());
             antiEntity.setRepoUrl(repoInfo.getRepoUrl());
             antiEntity.setRepoName(repoInfo.getRepoName());
+            antiEntity.setBranchRepositoryId(repoInfo.getId());
             StringBuffer stringBuffer = new StringBuffer();
             for (int i = 0; i < languageList.size(); i++) {
                 stringBuffer.append(languageList.get(i));

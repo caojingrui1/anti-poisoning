@@ -357,6 +357,7 @@ public class AntiServiceImpl implements AntiService {
         long endTime = System.currentTimeMillis();
         String downloadConsuming = (endTime - startTime) / 1000 + "s";
         taskEntity.setDownloadConsuming(downloadConsuming);
+        taskEntity.setBranchRepositoryId(antiEntity.getBranchRepositoryId());
         poisonTaskOperation.updateTaskDownloadTime(taskEntity);
         if (getPullCode == 0) {
             LOGGER.info("checkout success code : {}", getPullCode);
