@@ -258,6 +258,9 @@ public class PoisonTaskOperation {
         if (antiEntity.getTips() != null) {
             update.set("tips", antiEntity.getTips());
         }
+        if (antiEntity.getBranchRepositoryId() != null) {
+            update.set("branch_repository_id", antiEntity.getBranchRepositoryId());
+        }
         if (taskEntity.getLogs() != null) {
             update.set("logs", taskEntity.getLogs());
         }
