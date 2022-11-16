@@ -377,7 +377,6 @@ public class PoisonTaskOperation {
             criteria.and("execution_status").is(taskEntity.getExecutionStatus());
         }
         Query query = Query.query(criteria);
-        LOGGER.info("query sql is : {}", query.toString());
         // 总数量
         query.with(Sort.by(Sort.Direction.DESC, "_id"));
         long count = mongoTemplate.count(query, TaskEntity.class, CollectionTableName.POISON_VERSION_TASK);
