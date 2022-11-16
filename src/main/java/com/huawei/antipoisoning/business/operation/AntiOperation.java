@@ -6,6 +6,7 @@ package com.huawei.antipoisoning.business.operation;
 
 import com.huawei.antipoisoning.business.enmu.CollectionTableName;
 import com.huawei.antipoisoning.business.entity.AntiEntity;
+import com.huawei.antipoisoning.business.entity.pr.PRAntiEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -39,6 +40,18 @@ public class AntiOperation {
     }
 
     /**
+     * 保存pr扫描结果
+     *
+     * @param prAntiEntity 扫描数据
+     */
+    public void insertPRScanResult(PRAntiEntity prAntiEntity) {
+        if (ObjectUtils.isEmpty(prAntiEntity)) {
+            return;
+        }
+        mongoTemplate.insert(prAntiEntity, CollectionTableName.SCAN_PR_RESULTS);
+    }
+
+    /**
      * 保存扫描结果
      *
      * @param query 查询参数
@@ -52,12 +65,12 @@ public class AntiOperation {
      * ID更新扫描结果
      *
      * @param antiEntity 参数
-     * @@return 结果
+     * @return long 结果
      */
     public long updateScanResult(AntiEntity antiEntity) {
         Update update = new Update();
         if (antiEntity.getIsScan() != null) {
-            update.set("isScan", antiEntity.getIsScan());
+            update.set("is_scan", antiEntity.getIsScan());
         }
         if (antiEntity.getIsDownloaded() != null) {
             update.set("is_downloaded", antiEntity.getIsDownloaded());
@@ -79,6 +92,36 @@ public class AntiOperation {
     }
 
     /**
+     * scan ID更新门禁扫描结果
+     *
+     * @param antiEntity 参数
+     * @@return 结果
+     */
+    public long updatePRScanResult(PRAntiEntity antiEntity) {
+        Update update = new Update();
+        if (antiEntity.getIsScan() != null) {
+            update.set("is_scan", antiEntity.getIsScan());
+        }
+        if (antiEntity.getIsDownloaded() != null) {
+            update.set("is_downloaded", antiEntity.getIsDownloaded());
+        }
+        if (antiEntity.getResultCount() != null) {
+            update.set("result_count", antiEntity.getResultCount());
+        }
+        if (antiEntity.getIsSuccess() != null) {
+            update.set("is_downloaded", antiEntity.getIsSuccess());
+        }
+        if (antiEntity.getTips() != null) {
+            update.set("tips", antiEntity.getTips());
+        }
+        if (antiEntity.getTimeConsuming() != null) {
+            update.set("time_consuming", antiEntity.getTimeConsuming());
+        }
+        Query query = Query.query(Criteria.where("scan_id").is(antiEntity.getScanId()));
+        return mongoTemplate.updateFirst(query, update, CollectionTableName.SCAN_PR_RESULTS).getModifiedCount();
+    }
+
+    /**
      * 更新下载结果
      *
      * @param uuid 参数
@@ -93,7 +136,7 @@ public class AntiOperation {
     }
 
     /**
-     * 查询一条结果
+     * 查询一条版本扫描结果
      *
      * @param uuid 扫描ID
      * @return AntiEntity
@@ -101,5 +144,16 @@ public class AntiOperation {
     public AntiEntity queryAntiEntity(String uuid) {
         Query query = Query.query(new Criteria("scan_id").is(uuid));
         return mongoTemplate.findOne(query, AntiEntity.class, CollectionTableName.SCAN_RESULTS);
+    }
+
+    /**
+     * 查询一条门禁扫描结果
+     *
+     * @param uuid 扫描ID
+     * @return PRAntiEntity
+     */
+    public PRAntiEntity queryPRAntiEntity(String uuid) {
+        Query query = Query.query(new Criteria("scan_id").is(uuid));
+        return mongoTemplate.findOne(query, PRAntiEntity.class, CollectionTableName.SCAN_PR_RESULTS);
     }
 }

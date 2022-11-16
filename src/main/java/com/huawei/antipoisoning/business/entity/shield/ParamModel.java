@@ -25,6 +25,7 @@ public class ParamModel {
     private String projectName;
     private String repoName;
     private String branch;
+    private String prNumber;
     private String startTime;
     private String endTime;
     private String fileName;

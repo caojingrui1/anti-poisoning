@@ -16,7 +16,6 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.Resource;
 import java.util.List;
 
 /**
@@ -31,7 +30,12 @@ public class PoisonScanOperation {
     @Qualifier("poisonMongoTemplate")
     private MongoTemplate mongoTemplate;
 
-
+    /**
+     * 查询版本扫描任务。
+     *
+     * @param repoInfo 查询参数
+     * @return PageVo
+     */
     public PageVo queryResults(RepoInfo repoInfo) {
         Criteria criteria = getCommonCriteria(repoInfo);
         Query commonQuery = Query.query(criteria);
@@ -42,6 +46,26 @@ public class PoisonScanOperation {
             commonQuery.skip((repoInfo.getCurrentPage() - 1) * repoInfo.getPageSize()).limit(repoInfo.getPageSize());
         }
         List<AntiEntity> summaryVos= mongoTemplate.find(commonQuery, AntiEntity.class, CollectionTableName.SCAN_RESULTS);
+
+        return new PageVo(count, summaryVos);
+    }
+
+    /**
+     * 查询门禁扫描任务。
+     *
+     * @param repoInfo 查询参数
+     * @return PageVo
+     */
+    public PageVo queryPRResults(RepoInfo repoInfo) {
+        Criteria criteria = getCommonCriteria(repoInfo);
+        Query commonQuery = Query.query(criteria);
+        long count = mongoTemplate.count(commonQuery, AntiEntity.class,
+                CollectionTableName.SCAN_RESULTS);
+        commonQuery.with(Sort.by(Sort.Direction.DESC, "repo_name"));
+        if (repoInfo.getPageSize() != null && repoInfo.getCurrentPage() != null) {
+            commonQuery.skip((repoInfo.getCurrentPage() - 1) * repoInfo.getPageSize()).limit(repoInfo.getPageSize());
+        }
+        List<AntiEntity> summaryVos= mongoTemplate.find(commonQuery, AntiEntity.class, CollectionTableName.SCAN_PR_RESULTS);
 
         return new PageVo(count, summaryVos);
     }

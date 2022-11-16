@@ -4,30 +4,30 @@
 
 package com.huawei.antipoisoning.business.controller;
 
-import com.alibaba.fastjson.JSONObject;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.huawei.antipoisoning.business.enmu.ConstantsArgs;
-import com.huawei.antipoisoning.business.entity.AntiEntity;
-import com.huawei.antipoisoning.business.entity.pr.PullRequestInfo;
 import com.huawei.antipoisoning.business.entity.RepoInfo;
 import com.huawei.antipoisoning.business.entity.TaskEntity;
-import com.huawei.antipoisoning.business.service.PoisonService;
+import com.huawei.antipoisoning.business.entity.pr.PRAntiEntity;
+import com.huawei.antipoisoning.business.entity.pr.PRInfo;
+import com.huawei.antipoisoning.business.entity.pr.PullRequestInfo;
+import com.huawei.antipoisoning.business.service.PoisonPRService;
 import com.huawei.antipoisoning.common.entity.MultiResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.PostMapping;
 
 import java.util.Objects;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeoutException;
 
 /**
@@ -37,31 +37,33 @@ import java.util.concurrent.TimeoutException;
  * @author zhangshengjie
  */
 @RestController
-@RequestMapping(value = "/releasepoison")
-public class PoisonController {
-    private static final Logger LOGGER = LoggerFactory.getLogger(PoisonController.class);
-    private static final LinkedBlockingQueue<RepoInfo> BLOCKING_QUEUE = new LinkedBlockingQueue<>(200);
+@RequestMapping(value = "/poison-pr")
+public class PoisonPRController {
+    private static final Logger LOGGER = LoggerFactory.getLogger(PoisonPRController.class);
+    private static final LinkedBlockingQueue<PullRequestInfo> BLOCKING_QUEUE = new LinkedBlockingQueue<>(200);
     private static final ThreadPoolExecutor THREAD_SCHEDULED_EXECUTOR =
             new ThreadPoolExecutor(10, 200, 0,
                     TimeUnit.SECONDS, new LinkedBlockingQueue<>(200));
+    private static int CODE_SUCCESS = 200;
+    private static int CODE_FAILED = 400;
 
     @Autowired(required = false)
-    private PoisonService poisonService;
+    private PoisonPRService poisonService;
 
     /**
-     * 启动扫描任务
+     * 启动PR门禁扫描任务
      *
-     * @param repoInfo 检查仓库
+     * @param info 检查PR分支信息
      * @return MultiResponse
      * @throws InterruptedException 中断异常
      * @throws ExecutionException 执行异常
      */
-    @RequestMapping(value = "/poisonScan",
+    @RequestMapping(value = "/sca-pr",
             produces = {"application/json"},
             consumes = {"application/json"},
             method = RequestMethod.POST)
-    public MultiResponse poisonScan(@RequestBody RepoInfo repoInfo) throws InterruptedException, ExecutionException {
-        return queueService(repoInfo);
+    public MultiResponse poisonPRScan(@RequestBody PRInfo info) throws InterruptedException, ExecutionException {
+        return queuePRService(info);
     }
 
     /**
@@ -70,37 +72,26 @@ public class PoisonController {
      * @param repoInfo 参数
      * @return MultiResponse
      */
-    @RequestMapping(value = "/query-results",
+    @RequestMapping(value = "/query-pr-results",
             produces = {"application/json"},
             consumes = {"application/json"},
             method = RequestMethod.POST)
-    public MultiResponse queryResults(@RequestBody RepoInfo repoInfo) {
+    public MultiResponse queryPRResults(@RequestBody RepoInfo repoInfo) {
         return poisonService.queryResults(repoInfo);
     }
 
     /**
      * 查询扫描结果详情信息。
      *
-     * @param antiEntity 参数
+     * @param prAntiEntity 参数
      * @return MultiResponse
      */
-    @RequestMapping(value = "/query-results-detail",
+    @RequestMapping(value = "/query-pr-results-detail",
             produces = {"application/json"},
             consumes = {"application/json"},
             method = RequestMethod.POST)
-    public MultiResponse queryResultsDetail(@RequestBody AntiEntity antiEntity) {
-        return poisonService.queryResultsDetail(antiEntity);
-    }
-
-    /**
-     * 获取检测中心（主界面）
-     *
-     * @param jsonObject 查询参数
-     * @return queryRuleSet
-     */
-    @PostMapping(value = "poison/query/task")
-    public MultiResponse queryTaskInfo(@RequestBody JSONObject jsonObject) {
-        return poisonService.queryTaskInfo(jsonObject);
+    public MultiResponse queryPRResultsDetail(@RequestBody PRAntiEntity prAntiEntity) {
+        return poisonService.queryPRResultsDetail(prAntiEntity);
     }
 
     /**
@@ -115,38 +106,40 @@ public class PoisonController {
     }
 
     /**
-     * 队列
+     * 门禁扫描队列
      *
-     * @param repoInfo 任务实体类
+     * @param prRepoInfo 任务实体类
      * @return MultiResponse
      * @throws InterruptedException 中断异常
      * @throws ExecutionException 执行异常
      */
-    public MultiResponse queueService(RepoInfo repoInfo) throws InterruptedException, ExecutionException {
-        if (Objects.isNull(repoInfo) || BLOCKING_QUEUE.remainingCapacity() <= 0) {
+    public MultiResponse queuePRService(PRInfo prRepoInfo) throws InterruptedException, ExecutionException {
+        PullRequestInfo pullRequestInfo = poisonService.getPRInfo(prRepoInfo);
+        if (Objects.isNull(pullRequestInfo) || BLOCKING_QUEUE.remainingCapacity() <= 0) {
             LOGGER.error("Blocking queue is full.");
         }
         try {
-            BLOCKING_QUEUE.put(repoInfo);
+            BLOCKING_QUEUE.put(pullRequestInfo);
         } catch (InterruptedException e) {
             LOGGER.error("{} Blocking queue put string failed.", e.getMessage());
         }
         Future future = THREAD_SCHEDULED_EXECUTOR.submit(() -> {
-            RepoInfo take = BLOCKING_QUEUE.take();
-            return poisonService.poisonScan(take);
+            PullRequestInfo take = BLOCKING_QUEUE.take();
+            return poisonService.poisonPRScan(take, prRepoInfo);
         });
         ObjectMapper objectMapper = new ObjectMapper();
         MultiResponse response;
         try {
             response = objectMapper.convertValue(future.get(3, TimeUnit.SECONDS), MultiResponse.class);
         } catch (TimeoutException e) {
-            return new MultiResponse().code(ConstantsArgs.CODE_SUCCESS).message("create version task success!");
+            return new MultiResponse().code(ConstantsArgs.CODE_SUCCESS)
+                    .message("create task success!").result(pullRequestInfo.getScanId());
         }
         return response;
     }
 
     /**
-     * 启动扫描任务
+     * 获取PR增量文件信息
      *
      * @param info pullRequest 信息
      * @return MultiResponse
@@ -155,8 +148,9 @@ public class PoisonController {
             produces = {"application/json"},
             consumes = {"application/json"},
             method = RequestMethod.POST)
-    public MultiResponse getPrDiff(@RequestBody PullRequestInfo info) {
-        return poisonService.getPrDiff(info);
+    public MultiResponse getPrDiff(@RequestBody PRInfo info) {
+        PullRequestInfo pullRequestInfo = poisonService.getPRInfo(info);
+        return poisonService.getPrDiff(pullRequestInfo);
     }
 }
 

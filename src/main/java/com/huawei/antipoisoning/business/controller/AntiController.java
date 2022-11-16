@@ -4,6 +4,7 @@
 
 package com.huawei.antipoisoning.business.controller;
 
+import com.huawei.antipoisoning.business.enmu.ConstantsArgs;
 import com.huawei.antipoisoning.business.entity.AntiEntity;
 import com.huawei.antipoisoning.business.service.AntiService;
 import com.huawei.antipoisoning.common.entity.MultiResponse;
@@ -47,13 +48,13 @@ public class AntiController {
     @RequestMapping(value = "/downloadRepo", method = RequestMethod.POST)
     public MultiResponse downloadRepo(@RequestBody AntiEntity antiEntity, String id) {
         if (StringUtils.isEmpty(antiEntity.getScanId())) {
-            return MultiResponse.error(400, "error: no scanId detected!");
+            return MultiResponse.error(ConstantsArgs.CODE_FAILED, "error: no scanId detected!");
         }
         if (StringUtils.isEmpty(antiEntity.getRepoUrl())) {
-            return MultiResponse.error(400, "error: no repoUrl detected!");
+            return MultiResponse.error(ConstantsArgs.CODE_FAILED, "error: no repoUrl detected!");
         }
         if (StringUtils.isEmpty(antiEntity.getLanguage())) {
-            return MultiResponse.error(400, "error: no language detected!");
+            return MultiResponse.error(ConstantsArgs.CODE_FAILED, "error: no language detected!");
         }
         return antiService.downloadRepo(antiEntity, id);
     }

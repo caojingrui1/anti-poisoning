@@ -64,6 +64,18 @@ public class PRTaskEntity {
     private String repoUrl;
 
     /**
+     * PR链接
+     */
+    @Field("pr_url")
+    private String prUrl;
+
+    /**
+     * PR编号
+     */
+    @Field("pr_number")
+    private String prNumber;
+
+    /**
      * 开始时间
      */
     @Field("execute_start_time")
@@ -104,6 +116,12 @@ public class PRTaskEntity {
      */
     @Field("is_success")
     private Boolean isSuccess;
+
+    /**
+     * 扫描是否通过状态
+     */
+    @Field("is_pass")
+    private Boolean isPass;
 
     /**
      * 提示信息
@@ -200,4 +218,6 @@ public class PRTaskEntity {
 
     @Transient
     private Integer pageSize;
+
+    private Integer total;
 }

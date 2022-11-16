@@ -61,5 +61,4 @@ public class PoisonMongoConfig {
     public MongoTemplate mongoTemplate() {
         return new MongoTemplate(new SimpleMongoClientDatabaseFactory(mongoClient(), dbName));
     }
-
 }

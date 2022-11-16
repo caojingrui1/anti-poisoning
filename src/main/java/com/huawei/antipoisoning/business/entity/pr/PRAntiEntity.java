@@ -2,8 +2,9 @@
  * Copyright (c) Huawei Technologies Co., Ltd. 2012-2020. All rights reserved.
  */
 
-package com.huawei.antipoisoning.business.entity;
+package com.huawei.antipoisoning.business.entity.pr;
 
+import com.huawei.antipoisoning.business.entity.ResultEntity;
 import lombok.Data;
 import lombok.ToString;
 import org.springframework.data.mongodb.core.mapping.Field;
@@ -11,14 +12,14 @@ import org.springframework.data.mongodb.core.mapping.Field;
 import java.util.List;
 
 /**
- * vms:外部漏洞源-漏洞修复版本
+ * PR扫描结果实体类
  *
- * @author zhangshengjie
- * @since: 2022-05-20 11:35
+ * @author zyx
+ * @since: 2022-10-20 11:35
  */
 @Data
 @ToString
-public class AntiEntity {
+public class PRAntiEntity {
     /**
      * 扫描任务唯一代码
      */
@@ -72,6 +73,18 @@ public class AntiEntity {
      */
     @Field("branch")
     private String branch;
+
+    /**
+     * PR链接
+     */
+    @Field("pr_url")
+    private String prUrl;
+
+    /**
+     * PR编号
+     */
+    @Field("pr_number")
+    private String prNumber;
 
     /**
      * 地址

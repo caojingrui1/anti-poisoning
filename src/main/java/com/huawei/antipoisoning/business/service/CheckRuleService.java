@@ -67,6 +67,7 @@ public interface CheckRuleService {
      */
     MultiResponse queryTaskById(RuleSetModel ruleSetModel);
 
+
     /**
      * 更改任务规则
      *

@@ -42,6 +42,19 @@ public class ProblemShieldController {
     }
 
     /**
+     * 获取我的申请/待我审批门禁问题数量
+     *
+     * @param userId 用户id
+     * @param scanId 扫描id
+     * @return MultiResponse
+     */
+    @GetMapping("/apply-audit-pr-number")
+    public MultiResponse applyAndAuditPRNumber(@RequestParam("userId") String userId,
+            @RequestParam("scanId") String scanId) {
+        return problemShieldService.applyAndAuditPRNumber(userId, scanId);
+    }
+
+    /**
      * 审核通过问题撤销
      *
      * @param paramModel 待撤销问题列表
@@ -50,6 +63,17 @@ public class ProblemShieldController {
     @PostMapping("/auditPassRevoke")
     public MultiResponse auditPassRevoke(@RequestBody ParamModel paramModel) {
         return problemShieldService.auditPassRevoke(paramModel);
+    }
+
+    /**
+     * 门禁审核通过问题撤销
+     *
+     * @param paramModel 待撤销问题列表
+     * @return MultiResponse
+     */
+    @PostMapping("/audit-pr-revoke")
+    public MultiResponse auditPassPRRevoke(@RequestBody ParamModel paramModel) {
+        return problemShieldService.auditPassPRRevoke(paramModel);
     }
 
     /**
@@ -67,6 +91,20 @@ public class ProblemShieldController {
     }
 
     /**
+     * 查询防投毒问题详情
+     *
+     * @param scanId     唯一id
+     * @param userId     用户id
+     * @param paramModel 查询参数体
+     * @return MultiResponse
+     */
+    @PostMapping("/get-pr-result-details")
+    public MultiResponse getPRResultDetail(@RequestParam String scanId, @RequestParam String userId,
+                                         @RequestBody ParamModel paramModel) {
+        return problemShieldService.getPRResultDetail(scanId, userId, paramModel);
+    }
+
+    /**
      * 差选scanDetail左侧的筛选列
      *
      * @param userId     用户id
@@ -75,7 +113,20 @@ public class ProblemShieldController {
      */
     @PostMapping("/getScanReport")
     public MultiResponse getScanReport(@RequestParam String userId, @RequestBody ParamModel paramModel) {
-        return problemShieldService.getScanReport(userId, paramModel);
+        return problemShieldService.getScanReport(userId, null, paramModel);
+    }
+
+
+    /**
+     * 查询门禁scanDetail左侧的筛选列
+     *
+     * @param userId     用户id
+     * @param paramModel 参数体
+     * @return MultiResponse
+     */
+    @PostMapping("/get-scan-pr-report")
+    public MultiResponse getScanPRReport(@RequestParam String userId, @RequestBody ParamModel paramModel) {
+        return problemShieldService.getScanReport(userId, "pr", paramModel);
     }
 
     /**
@@ -87,6 +138,28 @@ public class ProblemShieldController {
     @PostMapping("/getScanResult")
     public MultiResponse getScanResult(@RequestBody ParamModel paramModel) {
         return problemShieldService.getScanResult(paramModel);
+    }
+
+    /**
+     * 查询防投毒门禁扫描情况
+     *
+     * @param paramModel 参数体
+     * @return MultiResponse
+     */
+    @PostMapping("/get-scan-pr-result")
+    public MultiResponse getScanPRResult(@RequestBody ParamModel paramModel) {
+        return problemShieldService.getScanPRResult(paramModel);
+    }
+
+    /**
+     * 查询防投毒门禁扫描情况(根据社区PR分组）
+     *
+     * @param paramModel 参数体
+     * @return MultiResponse
+     */
+    @PostMapping("/get-scan-pr-result-group")
+    public MultiResponse getScanPRResultGroup(@RequestBody ParamModel paramModel) {
+        return problemShieldService.getScanPRResultGroup(paramModel);
     }
 
     /**
@@ -104,6 +177,20 @@ public class ProblemShieldController {
     }
 
     /**
+     * 防投毒门禁问题屏蔽申请
+     *
+     * @param userId     码云id
+     * @param login      码云唯一标识
+     * @param paramModel 屏蔽参数体
+     * @return MultiResponse
+     */
+    @PostMapping("/poison-pr-apply")
+    public MultiResponse poisonPRApply(@RequestParam String userId,
+            @RequestParam String login, @RequestBody ParamModel paramModel) {
+        return problemShieldService.poisonPRApply(userId, login, paramModel);
+    }
+
+    /**
      * 待审核问题的审批
      *
      * @param paramModel 审批参数体
@@ -112,6 +199,17 @@ public class ProblemShieldController {
     @PostMapping("/problemAudit")
     public MultiResponse problemAudit(@RequestBody ParamModel paramModel) {
         return problemShieldService.problemAudit(paramModel);
+    }
+
+    /**
+     * 待审核门禁问题的审批
+     *
+     * @param paramModel 审批参数体
+     * @return MultiResponse
+     */
+    @PostMapping("/problem-pr-audit")
+    public MultiResponse problemPRAudit(@RequestBody ParamModel paramModel) {
+        return problemShieldService.problemPRAudit(paramModel);
     }
 
     /**
@@ -126,6 +224,17 @@ public class ProblemShieldController {
     }
 
     /**
+     * 撤销门禁审核申请数据
+     *
+     * @param paramModel 撤销审核申请数据参数
+     * @return MultiResponse
+     */
+    @PostMapping("/problem-pr-revoke")
+    public MultiResponse problemPRRevoke(@RequestBody ParamModel paramModel) {
+        return problemShieldService.problemPRRevoke(paramModel);
+    }
+
+    /**
      * 待审核问题转审
      *
      * @param paramModel 请求参数体
@@ -137,6 +246,17 @@ public class ProblemShieldController {
     }
 
     /**
+     * 门禁待审核问题转审
+     *
+     * @param paramModel 请求参数体
+     * @return MultiResponse
+     */
+    @PostMapping("/shield-pr-referral")
+    public MultiResponse shieldPRReferral(@RequestBody ParamModel paramModel) {
+        return problemShieldService.shieldPRReferral(paramModel);
+    }
+
+    /**
      * 提供下拉列表
      *
      * @return MultiResponse
@@ -144,5 +264,15 @@ public class ProblemShieldController {
     @RequestMapping("/getPoisoningSelect")
     public MultiResponse getPoisoningSelect() {
         return problemShieldService.getPoisoningSelect();
+    }
+
+    /**
+     * 提供门禁扫描下拉列表
+     *
+     * @return MultiResponse
+     */
+    @RequestMapping("/get-pr-poisoning-select")
+    public MultiResponse getPRPoisoningSelect() {
+        return problemShieldService.getPRPoisoningSelect();
     }
 }

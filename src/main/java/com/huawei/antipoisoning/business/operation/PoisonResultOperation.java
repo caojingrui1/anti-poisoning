@@ -8,6 +8,7 @@ import com.huawei.antipoisoning.business.enmu.CollectionTableName;
 import com.huawei.antipoisoning.business.entity.AntiEntity;
 import com.huawei.antipoisoning.business.entity.ResultEntity;
 import com.huawei.antipoisoning.business.entity.TaskEntity;
+import com.huawei.antipoisoning.business.entity.pr.PRResultEntity;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -18,7 +19,6 @@ import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Component;
 import org.springframework.util.ObjectUtils;
 
-import javax.annotation.Resource;
 import java.util.List;
 
 /**
@@ -43,6 +43,19 @@ public class PoisonResultOperation {
         }
         mongoTemplate.insert(resultEntity, CollectionTableName.SCAN_RESULT_DETAILS);
     }
+
+    /**
+     * 保存门禁扫描详情结果
+     *
+     * @param resultEntity 扫描数据
+     */
+    public void insertPRResultDetails(PRResultEntity resultEntity) {
+        if (ObjectUtils.isEmpty(resultEntity)) {
+            return;
+        }
+        mongoTemplate.insert(resultEntity, CollectionTableName.SCAN_PR_RESULT_DETAILS);
+    }
+
 
     /**
      * 保存扫描结果
@@ -118,6 +131,17 @@ public class PoisonResultOperation {
     }
 
     /**
+     * 查询一条门禁扫描对应详情结果
+     *
+     * @param scanId 扫描ID
+     * @return AntiEntity
+     */
+    public List<PRResultEntity> queryPRResultEntity(String scanId) {
+        Query query = Query.query(new Criteria("scan_id").is(scanId));
+        return mongoTemplate.find(query, PRResultEntity.class, CollectionTableName.SCAN_PR_RESULT_DETAILS);
+    }
+
+    /**
      * 查询taskId结果
      *
      * @param antiEntity 参数
@@ -147,8 +171,14 @@ public class PoisonResultOperation {
     public int getResultDetailByHash(String hash, String taskId) {
         Criteria criteria = Criteria.where("hash").is(hash).and("status").is("2");
         criteria.and("task_id").is(taskId);
-        return mongoTemplate.find(Query.query(criteria), ResultEntity.class,
+        int size = 0;
+        size = mongoTemplate.find(Query.query(criteria), ResultEntity.class,
                 CollectionTableName.SCAN_RESULT_DETAILS).size();
+        if (size == 0) {
+            size = mongoTemplate.find(Query.query(criteria), PRResultEntity.class,
+                    CollectionTableName.SCAN_PR_RESULT_DETAILS).size();
+        }
+        return size;
     }
 
     /**
