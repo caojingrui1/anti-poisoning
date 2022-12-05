@@ -40,7 +40,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * vms接口服务实现类
+ * 下载仓库、扫描
  *
  * @since: 2022/5/30 16:22
  */
@@ -85,6 +85,7 @@ public class AntiServiceImpl implements AntiService {
     /**
      * 执行版本级防投毒扫描
      *
+     * @param uuid 任务id
      * @return MultiResponse
      */
     @Override
