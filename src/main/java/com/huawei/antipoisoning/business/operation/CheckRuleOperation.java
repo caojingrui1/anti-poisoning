@@ -8,13 +8,10 @@ import com.huawei.antipoisoning.business.enmu.CollectionTableName;
 import com.huawei.antipoisoning.business.entity.TaskEntity;
 import com.huawei.antipoisoning.business.entity.checkrule.RuleModel;
 import com.huawei.antipoisoning.business.entity.checkrule.RuleSetModel;
-import com.huawei.antipoisoning.business.entity.checkrule.RuleSetResult;
 import com.huawei.antipoisoning.business.entity.checkrule.TaskRuleSetVo;
 import com.huawei.antipoisoning.business.entity.checkrule.RuleResultDetailsVo;
-import com.huawei.antipoisoning.business.entity.checkrule.TaskRuleResultVo;
 import com.huawei.antipoisoning.business.entity.vo.PageVo;
 import org.apache.commons.lang.StringUtils;
-import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -145,7 +142,7 @@ public class CheckRuleOperation {
     public List<RuleSetModel> queryRuleSet(RuleSetModel ruleSetModel) {
         Criteria criteria = new Criteria();
         if (StringUtils.isNotBlank(ruleSetModel.getId())) {
-            criteria.and("_id").is(new ObjectId(ruleSetModel.getId()));
+            criteria.and("_id").is(ruleSetModel.getId());
         }
         if (StringUtils.isNotBlank(ruleSetModel.getTemplateName())) {
             criteria.and("template_name").is(ruleSetModel.getTemplateName());
