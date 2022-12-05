@@ -142,7 +142,7 @@ public class CheckRuleOperation {
      * @param ruleSetModel 查询参数
      * @return queryRuleSet
      */
-    public List<RuleSetResult> queryRuleSet(RuleSetModel ruleSetModel) {
+    public List<RuleSetModel> queryRuleSet(RuleSetModel ruleSetModel) {
         Criteria criteria = new Criteria();
         if (StringUtils.isNotBlank(ruleSetModel.getId())) {
             criteria.and("_id").is(new ObjectId(ruleSetModel.getId()));
@@ -159,7 +159,7 @@ public class CheckRuleOperation {
         if (StringUtils.isNotBlank(ruleSetModel.getProjectName())) {
             criteria.and("project_name").is(ruleSetModel.getProjectName());
         }
-        return mongoTemplate.find(Query.query(criteria), RuleSetResult.class, CollectionTableName.ANTI_CHECK_RULE_SET);
+        return mongoTemplate.find(Query.query(criteria), RuleSetModel.class, CollectionTableName.ANTI_CHECK_RULE_SET);
     }
 
     /**
