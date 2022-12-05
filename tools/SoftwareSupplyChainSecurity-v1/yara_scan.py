@@ -71,7 +71,7 @@ class YaraScan(object):
                             self.job_set.add((all_file, yara_path))
                 else:
                     for all_file in self.all_files:
-                        if all_file == file_type:
+                        if os.path.basename(all_file) == file_type:
                             self.job_set.add((all_file, yara_path))
 
     def run_jobs(self):
