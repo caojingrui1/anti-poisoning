@@ -12,7 +12,7 @@ import com.huawei.antipoisoning.common.entity.MultiResponse;
 
 
 /**
- * vms接口服务
+ * 下载仓库、扫描
  *
  * @since: 2022/5/30 16:22
  */
@@ -21,7 +21,7 @@ public interface AntiService {
      * 扫描仓库
      *
      * @param uuid 任务id
-     * @return MultiResponse<List<VmsExternalCveSourceDTO>>
+     * @return MultiResponse
      */
     MultiResponse scanRepo(String uuid);
 
@@ -38,7 +38,8 @@ public interface AntiService {
      * 下载仓库
      *
      * @param antiEntity 扫描任务实体
-     * @return MultiResponse<List<VmsExternalCveSourceDTO>>
+     * @param id 仓库id
+     * @return MultiResponse
      */
     MultiResponse downloadRepo(AntiEntity antiEntity, String id);
 

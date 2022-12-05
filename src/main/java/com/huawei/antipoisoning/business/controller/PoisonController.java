@@ -123,7 +123,7 @@ public class PoisonController {
      * @throws ExecutionException 执行异常
      */
     public MultiResponse queueService(RepoInfo repoInfo) throws InterruptedException, ExecutionException {
-        if (Objects.isNull(repoInfo) || BLOCKING_QUEUE.remainingCapacity() <= 0) {
+        if (Objects.isNull(repoInfo) || BLOCKING_QUEUE.remainingCapacity() <= 0) { // 无数据/剩余容量<=0
             LOGGER.error("Blocking queue is full.");
         }
         try {
