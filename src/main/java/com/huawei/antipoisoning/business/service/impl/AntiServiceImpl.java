@@ -18,6 +18,7 @@ import com.huawei.antipoisoning.business.operation.AntiOperation;
 import com.huawei.antipoisoning.business.operation.PoisonResultOperation;
 import com.huawei.antipoisoning.business.operation.PoisonTaskOperation;
 import com.huawei.antipoisoning.business.service.AntiService;
+import com.huawei.antipoisoning.business.util.FileUtil;
 import com.huawei.antipoisoning.business.util.YamlUtil;
 import com.huawei.antipoisoning.common.entity.MultiResponse;
 import com.huawei.antipoisoning.common.util.AntiMainUtil;
@@ -170,6 +171,10 @@ public class AntiServiceImpl implements AntiService {
                 poisonTaskOperation.updateTask(antiEntity, taskEntity);
                 LOGGER.error(e.getMessage());
                 return MultiResponse.error(ConstantsArgs.CODE_FAILED, "scan error : " + e.getCause());
+            } finally {
+                // 删除下载的代码仓
+                FileUtil.deleteDirectory(YamlUtil.getToolPath() + REPOPATH + File.separator + antiEntity.getRepoName() +
+                        "-" + antiEntity.getBranch());
             }
         } else {
             return MultiResponse.error(ConstantsArgs.CODE_FAILED, "scan error , task not exist!");
@@ -318,6 +323,8 @@ public class AntiServiceImpl implements AntiService {
                 poisonTaskOperation.updatePRTask(prAntiEntity, prTaskEntity);
                 LOGGER.error(e.getMessage());
                 return MultiResponse.error(ConstantsArgs.CODE_FAILED, "scan error : " + e.getCause());
+            } finally {
+                FileUtil.deleteDirectory(DOWN_PATH + File.separator + info.getWorkspace());
             }
         } else {
             return MultiResponse.error(ConstantsArgs.CODE_FAILED, "scan error , task not exist!");
