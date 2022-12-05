@@ -4,6 +4,10 @@
 
 package com.huawei.antipoisoning.business.util;
 
+import com.huawei.antipoisoning.business.service.impl.AntiServiceImpl;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.File;
 
 /**
@@ -13,6 +17,8 @@ import java.io.File;
  * @author zyx
  */
 public class FileUtil {
+    private static final Logger LOGGER = LoggerFactory.getLogger(FileUtil.class);
+
     /**
      * 删除目录及目录下的文件
      * @param dir：要删除的目录的文件路径
@@ -25,7 +31,7 @@ public class FileUtil {
         File dirFile = new File(dir);
         // 如果dir对应的文件不存在，或者不是一个目录，则退出
         if ((!dirFile.exists()) || (!dirFile.isDirectory())) {
-            System.out.println("删除目录失败：" + dir + "不存在！");
+            LOGGER.error("删除目录失败：{} 不存在！", dir);
             return false;
         }
         boolean flag = true;
@@ -46,12 +52,11 @@ public class FileUtil {
             }
         }
         if (!flag) {
-            System.out.println("删除目录失败！");
+            LOGGER.error("删除目录失败！");
             return false;
         }
         // 删除当前目录
         if (dirFile.delete()) {
-            System.out.println("删除目录" + dir + "成功！");
             return true;
         } else {
             return false;
@@ -68,14 +73,13 @@ public class FileUtil {
         // 如果文件路径所对应的文件存在，并且是一个文件，则直接删除
         if (file.exists() && file.isFile()) {
             if (file.delete()) {
-                System.out.println("删除单个文件" + fileName + "成功！");
                 return true;
             } else {
-                System.out.println("删除单个文件" + fileName + "失败！");
+                LOGGER.error("删除单个文件：{} 失败！", fileName);
                 return false;
             }
         } else {
-            System.out.println("删除单个文件失败：" + fileName + "不存在！");
+            LOGGER.error("删除单个文件失败：{} 不存在！", fileName);
             return false;
         }
     }

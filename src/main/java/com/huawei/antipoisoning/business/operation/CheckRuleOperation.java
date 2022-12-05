@@ -169,12 +169,10 @@ public class CheckRuleOperation {
      */
     public void delRuleSet(String id) {
         LOGGER.info("delete rule set");
-        RuleSetResult ruleSetModel = new RuleSetResult();
-        ruleSetModel.setId(id);
-        RuleSetResult ruleSetResult = mongoTemplate.findOne(Query.query(Criteria.where("_id").is(ruleSetModel.getId())),
-                RuleSetResult.class, CollectionTableName.ANTI_CHECK_RULE_SET);
-        LOGGER.info("The rule is : {}", ruleSetResult);
-        mongoTemplate.remove(ruleSetResult,
+        RuleSetModel ruleSetModel = mongoTemplate.findOne(Query.query(Criteria.where("_id").is(id)),
+                RuleSetModel.class, CollectionTableName.ANTI_CHECK_RULE_SET);
+        LOGGER.info("The rule is : {}", ruleSetModel);
+        mongoTemplate.remove(ruleSetModel,
                 CollectionTableName.ANTI_CHECK_RULE_SET);
     }
 
@@ -324,20 +322,8 @@ public class CheckRuleOperation {
      * @param ruleSetModel updateRuleSet
      * @return TaskRuleSetVo
      */
-    public TaskRuleResultVo queryRuleById(RuleSetModel ruleSetModel) {
-        TaskRuleSetVo taskRuleSetVo =  mongoTemplate.findOne(Query.query(Criteria.where("_id").is(new ObjectId(ruleSetModel.getId()))),
-                TaskRuleSetVo.class, CollectionTableName.ANTI_TASK_RULE_SET);
-        LOGGER.info("taskRuleSetVo1 is : {}", taskRuleSetVo);
-        TaskRuleSetVo taskRuleSetVo2 =  mongoTemplate.findOne(Query.query(Criteria.where("_id").is(ruleSetModel.getId())),
-                TaskRuleSetVo.class, CollectionTableName.ANTI_TASK_RULE_SET);
-        LOGGER.info("taskRuleSetVo2 is : {}", taskRuleSetVo2);
-        TaskRuleResultVo taskRuleResultVo1 =  mongoTemplate.findOne(Query.query(Criteria.where("_id").is(new ObjectId(ruleSetModel.getId()))),
-                TaskRuleResultVo.class, CollectionTableName.ANTI_TASK_RULE_SET);
-        LOGGER.info("taskRuleResultVo1 is : {}", taskRuleResultVo1);
-        TaskRuleResultVo taskRuleResultVo2 =  mongoTemplate.findOne(Query.query(Criteria.where("_id").is(ruleSetModel.getId())),
-                TaskRuleResultVo.class, CollectionTableName.ANTI_TASK_RULE_SET);
-        LOGGER.info("taskRuleResultVo2 is : {}", taskRuleResultVo2);
+    public TaskRuleSetVo queryRuleById(RuleSetModel ruleSetModel) {
         return mongoTemplate.findOne(Query.query(Criteria.where("_id").is(ruleSetModel.getId())),
-                TaskRuleResultVo.class, CollectionTableName.ANTI_TASK_RULE_SET);
+                TaskRuleSetVo.class, CollectionTableName.ANTI_TASK_RULE_SET);
     }
 }
