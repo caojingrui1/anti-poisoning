@@ -166,14 +166,8 @@ public class CheckRuleOperation {
      * @param id 主键id
      */
     public MultiResponse delRuleSet(String id) {
-        LOGGER.info("delete rule set");
-        RuleSetModel ruleSetModel = mongoTemplate.findOne(Query.query(Criteria.where("_id").is(id)),
-                RuleSetModel.class, CollectionTableName.ANTI_CHECK_RULE_SET);
-        if (ruleSetModel == null) {
-            LOGGER.info("ruleSetId is not exist");
-            return  new MultiResponse().code(400).message("ruleSetId is not exist");
-        }
-        LOGGER.info("The rule is : {}", ruleSetModel);
+        RuleSetModel ruleSetModel = new RuleSetModel();
+        ruleSetModel.setId(id);
         mongoTemplate.remove(ruleSetModel, CollectionTableName.ANTI_CHECK_RULE_SET);
         return  new MultiResponse().code(200).message("success");
     }
