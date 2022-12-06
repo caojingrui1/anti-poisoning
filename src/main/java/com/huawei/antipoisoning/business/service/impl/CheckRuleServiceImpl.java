@@ -146,8 +146,7 @@ public class CheckRuleServiceImpl implements CheckRuleService {
         if (StringUtils.isEmpty(ruleSetModel.getId())) {
             return new MultiResponse().code(400).message("ruleSet is error");
         }
-        checkRuleOperation.delRuleSet(ruleSetModel.getId());
-        return new MultiResponse().code(200).message("success");
+        return checkRuleOperation.delRuleSet(ruleSetModel.getId());
     }
 
     /**
