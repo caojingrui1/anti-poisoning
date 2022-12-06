@@ -143,7 +143,7 @@ public class CheckRuleServiceImpl implements CheckRuleService {
      */
     @Override
     public MultiResponse delRuleSet(RuleSetModel ruleSetModel) {
-        if (StringUtils.isNotEmpty(ruleSetModel.getId())) {
+        if (StringUtils.isEmpty(ruleSetModel.getId())) {
             return new MultiResponse().code(400).message("ruleSet is error");
         }
         checkRuleOperation.delRuleSet(ruleSetModel.getId());
