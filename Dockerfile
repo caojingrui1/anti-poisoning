@@ -13,7 +13,7 @@ RUN yum update -y && yum install -y python3 python3-pip python3-devel gcc java-1
 VOLUME /tmp
 
 # 拉取代码
-RUN git clone -b dev https://gitee.com/openMajun_enterprise/anti-poisoning.git $PROJECT_HOME
+RUN git clone -b dev http://source.openeuler.sh/openMajun/anti-poisoning.git $PROJECT_HOME
 WORKDIR $PROJECT_HOME/
 RUN mvn clean install -s setting-new.xml
 
