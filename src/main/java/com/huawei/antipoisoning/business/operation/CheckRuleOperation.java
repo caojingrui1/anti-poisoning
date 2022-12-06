@@ -8,11 +8,10 @@ import com.huawei.antipoisoning.business.enmu.CollectionTableName;
 import com.huawei.antipoisoning.business.entity.TaskEntity;
 import com.huawei.antipoisoning.business.entity.checkrule.RuleModel;
 import com.huawei.antipoisoning.business.entity.checkrule.RuleSetModel;
-import com.huawei.antipoisoning.business.entity.checkrule.RuleSetResult;
 import com.huawei.antipoisoning.business.entity.checkrule.TaskRuleSetVo;
 import com.huawei.antipoisoning.business.entity.checkrule.RuleResultDetailsVo;
-import com.huawei.antipoisoning.business.entity.checkrule.TaskRuleResultVo;
 import com.huawei.antipoisoning.business.entity.vo.PageVo;
+import com.huawei.antipoisoning.common.entity.MultiResponse;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -141,7 +140,7 @@ public class CheckRuleOperation {
      * @param ruleSetModel 查询参数
      * @return queryRuleSet
      */
-    public List<RuleSetResult> queryRuleSet(RuleSetModel ruleSetModel) {
+    public List<RuleSetModel> queryRuleSet(RuleSetModel ruleSetModel) {
         Criteria criteria = new Criteria();
         if (StringUtils.isNotBlank(ruleSetModel.getId())) {
             criteria.and("_id").is(ruleSetModel.getId());
@@ -158,7 +157,7 @@ public class CheckRuleOperation {
         if (StringUtils.isNotBlank(ruleSetModel.getProjectName())) {
             criteria.and("project_name").is(ruleSetModel.getProjectName());
         }
-        return mongoTemplate.find(Query.query(criteria), RuleSetResult.class, CollectionTableName.ANTI_CHECK_RULE_SET);
+        return mongoTemplate.find(Query.query(criteria), RuleSetModel.class, CollectionTableName.ANTI_CHECK_RULE_SET);
     }
 
     /**
@@ -166,15 +165,11 @@ public class CheckRuleOperation {
      *
      * @param id 主键id
      */
-    public void delRuleSet(String id) {
-        LOGGER.info("delete rule set");
-        RuleSetResult ruleSetModel = new RuleSetResult();
+    public MultiResponse delRuleSet(String id) {
+        RuleSetModel ruleSetModel = new RuleSetModel();
         ruleSetModel.setId(id);
-        RuleSetResult ruleSetResult = mongoTemplate.findOne(Query.query(Criteria.where("_id").is(ruleSetModel.getId())),
-                RuleSetResult.class, CollectionTableName.ANTI_CHECK_RULE_SET);
-        LOGGER.info("The rule is : {}", ruleSetResult);
-        mongoTemplate.remove(ruleSetResult,
-                CollectionTableName.ANTI_CHECK_RULE_SET);
+        mongoTemplate.remove(ruleSetModel, CollectionTableName.ANTI_CHECK_RULE_SET);
+        return  new MultiResponse().code(200).message("success");
     }
 
     /**
@@ -323,8 +318,8 @@ public class CheckRuleOperation {
      * @param ruleSetModel updateRuleSet
      * @return TaskRuleSetVo
      */
-    public TaskRuleResultVo queryRuleById(RuleSetModel ruleSetModel) {
+    public TaskRuleSetVo queryRuleById(RuleSetModel ruleSetModel) {
         return mongoTemplate.findOne(Query.query(Criteria.where("_id").is(ruleSetModel.getId())),
-                TaskRuleResultVo.class, CollectionTableName.ANTI_TASK_RULE_SET);
+                TaskRuleSetVo.class, CollectionTableName.ANTI_TASK_RULE_SET);
     }
 }

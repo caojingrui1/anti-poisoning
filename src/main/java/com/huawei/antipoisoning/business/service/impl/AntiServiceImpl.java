@@ -18,6 +18,7 @@ import com.huawei.antipoisoning.business.operation.AntiOperation;
 import com.huawei.antipoisoning.business.operation.PoisonResultOperation;
 import com.huawei.antipoisoning.business.operation.PoisonTaskOperation;
 import com.huawei.antipoisoning.business.service.AntiService;
+import com.huawei.antipoisoning.business.util.FileUtil;
 import com.huawei.antipoisoning.business.util.YamlUtil;
 import com.huawei.antipoisoning.common.entity.MultiResponse;
 import com.huawei.antipoisoning.common.util.AntiMainUtil;
@@ -39,7 +40,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * vms接口服务实现类
+ * 下载仓库、扫描
  *
  * @since: 2022/5/30 16:22
  */
@@ -84,6 +85,7 @@ public class AntiServiceImpl implements AntiService {
     /**
      * 执行版本级防投毒扫描
      *
+     * @param uuid 任务id
      * @return MultiResponse
      */
     @Override
@@ -169,6 +171,10 @@ public class AntiServiceImpl implements AntiService {
                 poisonTaskOperation.updateTask(antiEntity, taskEntity);
                 LOGGER.error(e.getMessage());
                 return MultiResponse.error(ConstantsArgs.CODE_FAILED, "scan error : " + e.getCause());
+            } finally {
+                // 删除下载的代码仓
+                FileUtil.deleteDirectory(YamlUtil.getToolPath() + REPOPATH + File.separator + antiEntity.getRepoName() +
+                        "-" + antiEntity.getBranch());
             }
         } else {
             return MultiResponse.error(ConstantsArgs.CODE_FAILED, "scan error , task not exist!");
@@ -317,6 +323,8 @@ public class AntiServiceImpl implements AntiService {
                 poisonTaskOperation.updatePRTask(prAntiEntity, prTaskEntity);
                 LOGGER.error(e.getMessage());
                 return MultiResponse.error(ConstantsArgs.CODE_FAILED, "scan error : " + e.getCause());
+            } finally {
+                FileUtil.deleteDirectory(DOWN_PATH + File.separator + info.getWorkspace());
             }
         } else {
             return MultiResponse.error(ConstantsArgs.CODE_FAILED, "scan error , task not exist!");
@@ -357,6 +365,7 @@ public class AntiServiceImpl implements AntiService {
         long endTime = System.currentTimeMillis();
         String downloadConsuming = (endTime - startTime) / 1000 + "s";
         taskEntity.setDownloadConsuming(downloadConsuming);
+        taskEntity.setBranchRepositoryId(antiEntity.getBranchRepositoryId());
         poisonTaskOperation.updateTaskDownloadTime(taskEntity);
         if (getPullCode == 0) {
             LOGGER.info("checkout success code : {}", getPullCode);

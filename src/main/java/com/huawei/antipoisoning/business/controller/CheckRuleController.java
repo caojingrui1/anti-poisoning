@@ -70,8 +70,7 @@ public class CheckRuleController {
      */
     @PostMapping(value = "/del/rule/set")
     public MultiResponse delRuleSet(@RequestBody RuleSetModel ruleSetModel) {
-        checkRuleService.delRuleSet(ruleSetModel);
-        return new MultiResponse().code(200).message("success");
+        return checkRuleService.delRuleSet(ruleSetModel);
     }
 
     /**

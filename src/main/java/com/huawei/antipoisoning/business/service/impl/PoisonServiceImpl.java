@@ -72,7 +72,7 @@ public class PoisonServiceImpl implements PoisonService {
             for (CheckRuleSet checkRuleSet : taskRuleSet.get(0).getAntiCheckRules()) {
                 RuleSetModel ruleSetModel = new RuleSetModel();
                 ruleSetModel.setId(checkRuleSet.getRuleSetId());
-                List<RuleSetResult> ruleSetModels = checkRuleOperation.queryRuleSet(ruleSetModel);
+                List<RuleSetModel> ruleSetModels = checkRuleOperation.queryRuleSet(ruleSetModel);
                 if (ruleSetModels.size() > 0) {
                     ruleIds.addAll(ruleSetModels.get(0).getRuleIds());
                 } else {
@@ -114,6 +114,7 @@ public class PoisonServiceImpl implements PoisonService {
             antiEntity.setBranch(repoInfo.getRepoBranchName());
             antiEntity.setRepoUrl(repoInfo.getRepoUrl());
             antiEntity.setRepoName(repoInfo.getRepoName());
+            antiEntity.setBranchRepositoryId(repoInfo.getId());
             StringBuffer stringBuffer = new StringBuffer();
             for (int i = 0; i < languageList.size(); i++) {
                 stringBuffer.append(languageList.get(i));

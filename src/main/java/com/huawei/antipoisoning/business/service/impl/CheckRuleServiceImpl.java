@@ -60,7 +60,7 @@ public class CheckRuleServiceImpl implements CheckRuleService {
             RuleSetModel ruleSet = new RuleSetModel();
             ruleSet.setProjectName(ruleSetModel.getProjectName());
             ruleSet.setTemplateName(ruleSetModel.getTemplateName());
-            List<RuleSetResult> models = checkRuleOperation.queryRuleSet(ruleSet);
+            List<RuleSetModel> models = checkRuleOperation.queryRuleSet(ruleSet);
             if (models.size() != 0) {
                 return new MultiResponse().code(400).message("templateName is repeat");
             }
@@ -93,15 +93,15 @@ public class CheckRuleServiceImpl implements CheckRuleService {
         // 查出所有的系统规则集
         RuleSetModel ruleSets = new RuleSetModel();
         ruleSets.setDefaultTemplate(0);
-        List<RuleSetResult> ruleSetModels = checkRuleOperation.queryRuleSet(ruleSets);
+        List<RuleSetModel> ruleSetModels = checkRuleOperation.queryRuleSet(ruleSets);
         // 查询该社区自定义的规则集
         ruleSetModel.setDefaultTemplate(1);
-        List<RuleSetResult> modelList = checkRuleOperation.queryRuleSet(ruleSetModel);
+        List<RuleSetModel> modelList = checkRuleOperation.queryRuleSet(ruleSetModel);
         if (modelList.size() > 0) {
             ruleSetModels.addAll(modelList);
         }
         // 得到每个规则集的规则个数
-        for (RuleSetResult ruleSet : ruleSetModels) {
+        for (RuleSetModel ruleSet : ruleSetModels) {
             if (ruleSet.getRuleIds().size() > 0) {
                 List<RuleModel> ruleByIds = checkRuleOperation.getRuleByIds(ruleSet.getRuleIds());
                 ruleSet.setRuleCount(ruleByIds.size());
@@ -143,11 +143,10 @@ public class CheckRuleServiceImpl implements CheckRuleService {
      */
     @Override
     public MultiResponse delRuleSet(RuleSetModel ruleSetModel) {
-        if (StringUtils.isNotEmpty(ruleSetModel.getId())) {
+        if (StringUtils.isEmpty(ruleSetModel.getId())) {
             return new MultiResponse().code(400).message("ruleSet is error");
         }
-        checkRuleOperation.delRuleSet(ruleSetModel.getId());
-        return new MultiResponse().code(200).message("success");
+        return checkRuleOperation.delRuleSet(ruleSetModel.getId());
     }
 
     /**

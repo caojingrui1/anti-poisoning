@@ -170,6 +170,9 @@ public class PoisonTaskOperation {
         if (antiEntity.getScanId() != null) {
             update.set("scan_id", antiEntity.getScanId());
         }
+        if (antiEntity.getBranchRepositoryId() != null) {
+            update.set("branch_repository_id", antiEntity.getBranchRepositoryId());
+        }
         if (antiEntity.getLanguage() != null){
             update.set("language", antiEntity.getLanguage());
         }
@@ -254,6 +257,9 @@ public class PoisonTaskOperation {
         }
         if (antiEntity.getTips() != null) {
             update.set("tips", antiEntity.getTips());
+        }
+        if (antiEntity.getBranchRepositoryId() != null) {
+            update.set("branch_repository_id", antiEntity.getBranchRepositoryId());
         }
         if (taskEntity.getLogs() != null) {
             update.set("logs", taskEntity.getLogs());

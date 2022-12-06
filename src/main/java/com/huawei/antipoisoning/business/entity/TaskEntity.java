@@ -186,7 +186,7 @@ public class TaskEntity {
     /**
      * 仓库id
      */
-    @Transient
+    @Field("branch_repository_id")
     private String branchRepositoryId;
 
     /**
