@@ -11,6 +11,7 @@ import com.huawei.antipoisoning.business.entity.checkrule.RuleSetModel;
 import com.huawei.antipoisoning.business.entity.checkrule.TaskRuleSetVo;
 import com.huawei.antipoisoning.business.entity.checkrule.RuleResultDetailsVo;
 import com.huawei.antipoisoning.business.entity.vo.PageVo;
+import com.huawei.antipoisoning.common.entity.MultiResponse;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -164,13 +165,11 @@ public class CheckRuleOperation {
      *
      * @param id 主键id
      */
-    public void delRuleSet(String id) {
-        LOGGER.info("delete rule set");
-        RuleSetModel ruleSetModel = mongoTemplate.findOne(Query.query(Criteria.where("_id").is(id)),
-                RuleSetModel.class, CollectionTableName.ANTI_CHECK_RULE_SET);
-        LOGGER.info("The rule is : {}", ruleSetModel);
-        mongoTemplate.remove(ruleSetModel,
-                CollectionTableName.ANTI_CHECK_RULE_SET);
+    public MultiResponse delRuleSet(String id) {
+        RuleSetModel ruleSetModel = new RuleSetModel();
+        ruleSetModel.setId(id);
+        mongoTemplate.remove(ruleSetModel, CollectionTableName.ANTI_CHECK_RULE_SET);
+        return  new MultiResponse().code(200).message("success");
     }
 
     /**
