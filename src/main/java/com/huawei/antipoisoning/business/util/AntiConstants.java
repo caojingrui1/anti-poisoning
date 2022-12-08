@@ -5,37 +5,25 @@
 package com.huawei.antipoisoning.business.util;
 
 /**
- * @description
- * @since: 2022/6/1 13:55
+ * 防投毒公共参数。
+ *
+ * @author zyx
+ * @since 2022/10/22 13:55
  */
 public class AntiConstants {
-    /**
-     * 查询类型-外部漏洞源
-     */
-    public static final String REQUEST_TYPE_SOURCE_OUT = "getSourceOut";
+    public static final String SCANRESULTPATH = "/tools/softwareFile/report/";
 
-    /**
-     * 查询类型—漏洞基本信息
-     */
-    public static final String REQUEST_TYPE_VULN_INFO = "getVulnInfo";
+    public static final String PR_SCANRESULTPATH = "/tools/SoftwareSupplyChainSecurity-v1/pr_report/";
 
-    /**
-     * 查询类型-根据华为漏洞编号查询
-     */
-    public static final String QUERY_TYPE_ID = "1";
+    public static final String SCANTOOLPATH = "/tools/SoftwareSupplyChainSecurity-v1/openeuler_scan.py";
 
-    /**
-     * 查询类型-根据起止时间查询
-     */
-    public static final String QUERY_TYPE_TIME = "2";
+    public static final String SCANTOOLFILE = "/tools/SoftwareSupplyChainSecurity-v1/";
 
-    /**
-     * 查询类型-HWID
-     */
-    public static final String query_id_type_HWID = "HWID";
+    public static final String REPOPATH = "/tools/softwareFile/download/";
 
-    /**
-     * 查询类型-CVEID
-     */
-    public static final String query_id_type_CVEID = "CVEID";
+    public static final String PR_REPOPATH = "/tools/SoftwareSupplyChainSecurity-v1/prDownload/";
+
+    public static final String CONFIG_PATH = "/tools/SoftwareSupplyChainSecurity-v1/ruleYaml/";
+
+    public static final String DOWN_PATH = "prDownload/";
 }
