@@ -11,6 +11,7 @@ import com.huawei.antipoisoning.business.entity.AntiEntity;
 import com.huawei.antipoisoning.business.entity.pr.PullRequestInfo;
 import com.huawei.antipoisoning.business.entity.RepoInfo;
 import com.huawei.antipoisoning.business.entity.TaskEntity;
+import com.huawei.antipoisoning.business.entity.vo.AntiPoisonRunStatusModel;
 import com.huawei.antipoisoning.business.service.PoisonService;
 import com.huawei.antipoisoning.common.entity.MultiResponse;
 import org.slf4j.Logger;
@@ -157,6 +158,22 @@ public class PoisonController {
             method = RequestMethod.POST)
     public MultiResponse getPrDiff(@RequestBody PullRequestInfo info) {
         return poisonService.getPrDiff(info);
+    }
+
+
+
+    /**
+     * 运维看板防投毒统计数据
+     *
+     * @param
+     * @return MultiResponse
+     */
+    @RequestMapping(value = "/poisonRunstatusData",
+            produces = {"application/json"},
+            consumes = {"application/json"},
+            method = RequestMethod.POST)
+    public MultiResponse poisonRunstatusData(@RequestBody AntiPoisonRunStatusModel runStatusModel) {
+        return poisonService.poisonRunstatusData(runStatusModel);
     }
 }
 

@@ -9,6 +9,7 @@ import com.huawei.antipoisoning.business.entity.AntiEntity;
 import com.huawei.antipoisoning.business.entity.pr.PullRequestInfo;
 import com.huawei.antipoisoning.business.entity.RepoInfo;
 import com.huawei.antipoisoning.business.entity.TaskEntity;
+import com.huawei.antipoisoning.business.entity.vo.AntiPoisonRunStatusModel;
 import com.huawei.antipoisoning.common.entity.MultiResponse;
 
 public interface PoisonService {
@@ -59,4 +60,11 @@ public interface PoisonService {
      * @return MultiResponse
      */
     MultiResponse getPrDiff(PullRequestInfo info);
+
+    /**
+     * 运维看板防投毒统计数据
+      * @param runStatusModel 防投毒运维看板数据数据统计查询实体类
+     * @return
+     */
+    MultiResponse poisonRunstatusData(AntiPoisonRunStatusModel runStatusModel);
 }
