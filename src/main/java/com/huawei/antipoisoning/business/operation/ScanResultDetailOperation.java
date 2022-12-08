@@ -11,6 +11,8 @@ import com.huawei.antipoisoning.business.entity.pr.PRResultEntity;
 import com.huawei.antipoisoning.business.entity.pr.PRTaskEntity;
 import com.huawei.antipoisoning.business.entity.shield.ParamModel;
 import com.huawei.antipoisoning.business.entity.shield.PoisonReportModel;
+import com.huawei.antipoisoning.business.util.AntiConstants;
+import com.huawei.antipoisoning.business.util.YamlUtil;
 import com.huawei.antipoisoning.common.entity.MultiResponse;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -102,7 +104,7 @@ public class ScanResultDetailOperation {
             criteria.and("status").is(resultDetail.getStatus());
         }
         if (StringUtils.isNotBlank(resultDetail.getFileName())) {
-            criteria.and("suspicious_file_name").is(resultDetail.getFileName());
+            criteria.and("suspicious_file_name").is(YamlUtil.getToolPath() + AntiConstants.REPOPATH+resultDetail.getFileName());
         }
         if (StringUtils.isNotBlank(resultDetail.getReviewerStatus())) {
             tableName = CollectionTableName.SHIELD_RESULT_DETAIL;
@@ -157,7 +159,7 @@ public class ScanResultDetailOperation {
             criteria.and("status").is(resultDetail.getStatus());
         }
         if (StringUtils.isNotBlank(resultDetail.getFileName())) {
-            criteria.and("suspicious_file_name").is(resultDetail.getFileName());
+            criteria.and("suspicious_file_name").is(YamlUtil.getToolPath() +AntiConstants.PR_REPOPATH+resultDetail.getFileName());
         }
         if (StringUtils.isNotBlank(resultDetail.getReviewerStatus())) {
             tableName = CollectionTableName.SHIELD_PR_RESULT_DETAIL;
