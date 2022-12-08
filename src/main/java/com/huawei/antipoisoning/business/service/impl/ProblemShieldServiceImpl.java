@@ -147,7 +147,7 @@ public class ProblemShieldServiceImpl implements ProblemShieldService {
         resultEntityList.stream().collect(Collectors.groupingBy(PoisonReportModel::getFileName,
                 Collectors.summingInt(PoisonReportModel::getTotal)))
                 .entrySet().stream().sorted(Map.Entry.<String, Integer>comparingByValue().reversed())
-                .forEach(value -> fileNameReport.put(value.getKey(), value.getValue()));
+                .forEach(value -> fileNameReport.put(value.getKey().replace("/usr/local/anti-poisoning/tools/softwareFile/download/",""), value.getValue()));
         // 根据规则统计
         resultEntityList.stream().collect(Collectors.groupingBy(PoisonReportModel::getRuleName,
                 Collectors.summingInt(PoisonReportModel::getTotal)))
