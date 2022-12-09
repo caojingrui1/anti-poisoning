@@ -158,11 +158,9 @@ public class ProblemShieldServiceImpl implements ProblemShieldService {
         // 根据文件名统计
         String replaceStr = "";
         if (StringUtils.isEmptyOrNull(type)) {
-            replaceStr = YamlUtil.getToolPath() + AntiConstants.REPOPATH
-                    + paramModel.getRepoName() + "-" + paramModel.getBranch();
+            replaceStr = YamlUtil.getToolPath() + AntiConstants.REPOPATH;
         } else {
-            replaceStr = YamlUtil.getToolPath() + AntiConstants.PR_REPOPATH + paramModel.getProjectName() +
-                    "-" + paramModel.getRepoName() + "-" + paramModel.getBranch();
+            replaceStr = YamlUtil.getToolPath() + AntiConstants.PR_REPOPATH;
         }
         final String pathStr = replaceStr;
         resultEntityList.stream().collect(Collectors.groupingBy(PoisonReportModel::getFileName,
