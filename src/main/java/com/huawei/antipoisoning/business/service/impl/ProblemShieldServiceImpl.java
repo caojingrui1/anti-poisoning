@@ -19,11 +19,10 @@ import com.huawei.antipoisoning.business.util.AntiConstants;
 import com.huawei.antipoisoning.business.util.YamlUtil;
 import com.huawei.antipoisoning.common.entity.MultiResponse;
 import org.eclipse.jgit.util.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.io.File;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -38,8 +37,6 @@ public class ProblemShieldServiceImpl implements ProblemShieldService {
     private ShieldResultDetailOperation shieldResultDetailOperation;
     @Autowired
     private ScanResultDetailOperation scanResultDetailOperation;
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(ProblemShieldServiceImpl.class);
 
     /**
      * 查询我的申请和待我审批数量
@@ -108,11 +105,9 @@ public class ProblemShieldServiceImpl implements ProblemShieldService {
         Map<String, Object> result = new HashMap<>(2);
         result.put("count", count);
         resultEntities.forEach(resultEntity -> {
-            LOGGER.info("文件路径：{}", resultEntity.getSuspiciousFileName());
-            LOGGER.info("文件路径前缀：{}",
-                    YamlUtil.getToolPath().substring(0, YamlUtil.getToolPath().length() - 1) + AntiConstants.REPOPATH);
             resultEntity.setSuspiciousFileName(resultEntity.getSuspiciousFileName().replace(
-                    YamlUtil.getToolPath() + AntiConstants.REPOPATH, ""));
+                    YamlUtil.getToolPath() + AntiConstants.REPOPATH + File.separator +
+                            resultEntity.getProjectName() + "-" + resultEntity.getBranch(), ""));
         });
         result.put("data", resultEntities);
         return new MultiResponse().code(200).result(result);
@@ -134,13 +129,10 @@ public class ProblemShieldServiceImpl implements ProblemShieldService {
         int count = scanResultDetailOperation.getPRResultDetail(scanId, userId, paramModel).size();
         Map<String, Object> result = new HashMap<>(2);
         resultEntities.forEach(resultEntity -> {
-            LOGGER.info("pr文件路径：{}", resultEntity.getSuspiciousFileName());
-            LOGGER.info("pr文件替换前缀：{}", YamlUtil.getToolPath().substring(0,YamlUtil.getToolPath().length()-1) +AntiConstants.PR_REPOPATH);
-            resultEntity.setSuspiciousFileName(resultEntity.getSuspiciousFileName().replace(  YamlUtil.getToolPath().substring(0,YamlUtil.getToolPath().length()-1) +AntiConstants.PR_REPOPATH, ""));
             resultEntity.setSuspiciousFileName(resultEntity.getSuspiciousFileName().replace(
-                    YamlUtil.getToolPath().substring(0,YamlUtil.getToolPath().length()-1) + AntiConstants.PR_REPOPATH, ""));
+                    YamlUtil.getToolPath() + AntiConstants.PR_REPOPATH +
+                            resultEntity.getProjectName() + "-" + resultEntity.getBranch(), ""));
         });
-
         result.put("count", count);
         result.put("data", resultEntities);
         return new MultiResponse().code(200).result(result);
@@ -166,11 +158,12 @@ public class ProblemShieldServiceImpl implements ProblemShieldService {
         // 根据文件名统计
         String replaceStr = "";
         if (StringUtils.isEmptyOrNull(type)) {
-            replaceStr = YamlUtil.getToolPath().substring(0,YamlUtil.getToolPath().length()-1) + AntiConstants.REPOPATH;
+            replaceStr = YamlUtil.getToolPath() + AntiConstants.REPOPATH + File.separator
+                    + paramModel.getProjectName() + "-" + paramModel.getBranch();
         } else {
-            replaceStr = YamlUtil.getToolPath().substring(0,YamlUtil.getToolPath().length()-1) +AntiConstants.PR_REPOPATH;
+            replaceStr = YamlUtil.getToolPath() + AntiConstants.PR_REPOPATH + File.separator
+                    + paramModel.getProjectName() + "-" + paramModel.getBranch();
         }
-        LOGGER.error("文件替换前缀：{}", replaceStr);
         final String pathStr = replaceStr;
         resultEntityList.stream().collect(Collectors.groupingBy(PoisonReportModel::getFileName,
                         Collectors.summingInt(PoisonReportModel::getTotal)))
