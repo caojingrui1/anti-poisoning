@@ -19,6 +19,8 @@ import com.huawei.antipoisoning.business.util.AntiConstants;
 import com.huawei.antipoisoning.business.util.YamlUtil;
 import com.huawei.antipoisoning.common.entity.MultiResponse;
 import org.eclipse.jgit.util.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -36,6 +38,8 @@ public class ProblemShieldServiceImpl implements ProblemShieldService {
     private ShieldResultDetailOperation shieldResultDetailOperation;
     @Autowired
     private ScanResultDetailOperation scanResultDetailOperation;
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(CheckRuleServiceImpl.class);
 
     /**
      * 查询我的申请和待我审批数量
@@ -104,8 +108,11 @@ public class ProblemShieldServiceImpl implements ProblemShieldService {
         Map<String, Object> result = new HashMap<>(2);
         result.put("count", count);
         resultEntities.forEach(resultEntity -> {
+            LOGGER.info("文件路径：{}", resultEntity.getSuspiciousFileName());
+            LOGGER.info("文件路径前缀：{}", YamlUtil.getToolPath().substring(0,YamlUtil.getToolPath().length()-1) +AntiConstants.REPOPATH);
             resultEntity.setSuspiciousFileName(resultEntity.getSuspiciousFileName().replace( YamlUtil.getToolPath().substring(0,YamlUtil.getToolPath().length()-1)+ AntiConstants.REPOPATH, ""));
         });
+        LOGGER.error("文件替换前缀：{} 不存在！", YamlUtil.getToolPath().substring(0,YamlUtil.getToolPath().length()-1)+ AntiConstants.REPOPATH);
         result.put("data", resultEntities);
         return new MultiResponse().code(200).result(result);
     }
@@ -126,8 +133,11 @@ public class ProblemShieldServiceImpl implements ProblemShieldService {
         int count = scanResultDetailOperation.getPRResultDetail(scanId, userId, paramModel).size();
         Map<String, Object> result = new HashMap<>(2);
         resultEntities.forEach(resultEntity -> {
+            LOGGER.info("pr文件路径：{}", resultEntity.getSuspiciousFileName());
+            LOGGER.info("pr文件替换前缀：{}", YamlUtil.getToolPath().substring(0,YamlUtil.getToolPath().length()-1) +AntiConstants.PR_REPOPATH);
             resultEntity.setSuspiciousFileName(resultEntity.getSuspiciousFileName().replace(  YamlUtil.getToolPath().substring(0,YamlUtil.getToolPath().length()-1) +AntiConstants.PR_REPOPATH, ""));
         });
+
         result.put("count", count);
         result.put("data", resultEntities);
         return new MultiResponse().code(200).result(result);
@@ -157,6 +167,7 @@ public class ProblemShieldServiceImpl implements ProblemShieldService {
         } else {
             replaceStr = YamlUtil.getToolPath().substring(0,YamlUtil.getToolPath().length()-1) +AntiConstants.PR_REPOPATH;
         }
+        LOGGER.error("文件替换前缀：{}", replaceStr);
         final String pathStr = replaceStr;
         resultEntityList.stream().collect(Collectors.groupingBy(PoisonReportModel::getFileName,
                         Collectors.summingInt(PoisonReportModel::getTotal)))
