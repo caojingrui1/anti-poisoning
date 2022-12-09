@@ -104,7 +104,7 @@ public class ProblemShieldServiceImpl implements ProblemShieldService {
         Map<String, Object> result = new HashMap<>(2);
         result.put("count", count);
         resultEntities.forEach(resultEntity -> {
-            resultEntity.setSuspiciousFileName(resultEntity.getSuspiciousFileName().replace( YamlUtil.getToolPath() + AntiConstants.REPOPATH, ""));
+            resultEntity.setSuspiciousFileName(resultEntity.getSuspiciousFileName().replace( YamlUtil.getToolPath().substring(0,YamlUtil.getToolPath().length()-1)+ AntiConstants.REPOPATH, ""));
         });
         result.put("data", resultEntities);
         return new MultiResponse().code(200).result(result);
@@ -126,7 +126,7 @@ public class ProblemShieldServiceImpl implements ProblemShieldService {
         int count = scanResultDetailOperation.getPRResultDetail(scanId, userId, paramModel).size();
         Map<String, Object> result = new HashMap<>(2);
         resultEntities.forEach(resultEntity -> {
-            resultEntity.setSuspiciousFileName(resultEntity.getSuspiciousFileName().replace(  YamlUtil.getToolPath() +AntiConstants.PR_REPOPATH, ""));
+            resultEntity.setSuspiciousFileName(resultEntity.getSuspiciousFileName().replace(  YamlUtil.getToolPath().substring(0,YamlUtil.getToolPath().length()-1) +AntiConstants.PR_REPOPATH, ""));
         });
         result.put("count", count);
         result.put("data", resultEntities);
