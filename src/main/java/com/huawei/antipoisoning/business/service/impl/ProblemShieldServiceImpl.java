@@ -39,7 +39,7 @@ public class ProblemShieldServiceImpl implements ProblemShieldService {
     @Autowired
     private ScanResultDetailOperation scanResultDetailOperation;
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(CheckRuleServiceImpl.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ProblemShieldServiceImpl.class);
 
     /**
      * 查询我的申请和待我审批数量
@@ -109,12 +109,11 @@ public class ProblemShieldServiceImpl implements ProblemShieldService {
         result.put("count", count);
         resultEntities.forEach(resultEntity -> {
             LOGGER.info("文件路径：{}", resultEntity.getSuspiciousFileName());
-            LOGGER.info("文件路径前缀：{}", YamlUtil.getToolPath().substring(0,YamlUtil.getToolPath().length()-1) +AntiConstants.REPOPATH);
-            resultEntity.setSuspiciousFileName(resultEntity.getSuspiciousFileName().replace( YamlUtil.getToolPath().substring(0,YamlUtil.getToolPath().length()-1)+ AntiConstants.REPOPATH, ""));
+            LOGGER.info("文件路径前缀：{}",
+                    YamlUtil.getToolPath().substring(0, YamlUtil.getToolPath().length() - 1) + AntiConstants.REPOPATH);
             resultEntity.setSuspiciousFileName(resultEntity.getSuspiciousFileName().replace(
                     YamlUtil.getToolPath() + AntiConstants.REPOPATH, ""));
         });
-        LOGGER.error("文件替换前缀：{} 不存在！", YamlUtil.getToolPath().substring(0,YamlUtil.getToolPath().length()-1)+ AntiConstants.REPOPATH);
         result.put("data", resultEntities);
         return new MultiResponse().code(200).result(result);
     }
