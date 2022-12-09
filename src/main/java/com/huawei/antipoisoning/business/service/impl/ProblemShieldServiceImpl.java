@@ -106,8 +106,8 @@ public class ProblemShieldServiceImpl implements ProblemShieldService {
         result.put("count", count);
         resultEntities.forEach(resultEntity -> {
             resultEntity.setSuspiciousFileName(resultEntity.getSuspiciousFileName().replace(
-                    YamlUtil.getToolPath() + AntiConstants.REPOPATH + File.separator +
-                            resultEntity.getProjectName() + "-" + resultEntity.getBranch(), ""));
+                    YamlUtil.getToolPath() + AntiConstants.REPOPATH +
+                            resultEntity.getRepoName() + "-" + resultEntity.getBranch(), ""));
         });
         result.put("data", resultEntities);
         return new MultiResponse().code(200).result(result);
@@ -130,8 +130,8 @@ public class ProblemShieldServiceImpl implements ProblemShieldService {
         Map<String, Object> result = new HashMap<>(2);
         resultEntities.forEach(resultEntity -> {
             resultEntity.setSuspiciousFileName(resultEntity.getSuspiciousFileName().replace(
-                    YamlUtil.getToolPath() + AntiConstants.PR_REPOPATH +
-                            resultEntity.getProjectName() + "-" + resultEntity.getBranch(), ""));
+                    YamlUtil.getToolPath() + AntiConstants.PR_REPOPATH + resultEntity.getProjectName() +
+                            "-" + resultEntity.getRepoName() + "-" + resultEntity.getBranch(), ""));
         });
         result.put("count", count);
         result.put("data", resultEntities);
@@ -158,11 +158,11 @@ public class ProblemShieldServiceImpl implements ProblemShieldService {
         // 根据文件名统计
         String replaceStr = "";
         if (StringUtils.isEmptyOrNull(type)) {
-            replaceStr = YamlUtil.getToolPath() + AntiConstants.REPOPATH + File.separator
-                    + paramModel.getProjectName() + "-" + paramModel.getBranch();
+            replaceStr = YamlUtil.getToolPath() + AntiConstants.REPOPATH
+                    + paramModel.getRepoName() + "-" + paramModel.getBranch();
         } else {
-            replaceStr = YamlUtil.getToolPath() + AntiConstants.PR_REPOPATH + File.separator
-                    + paramModel.getProjectName() + "-" + paramModel.getBranch();
+            replaceStr = YamlUtil.getToolPath() + AntiConstants.PR_REPOPATH + paramModel.getProjectName() +
+                    "-" + paramModel.getRepoName() + "-" + paramModel.getBranch();
         }
         final String pathStr = replaceStr;
         resultEntityList.stream().collect(Collectors.groupingBy(PoisonReportModel::getFileName,
