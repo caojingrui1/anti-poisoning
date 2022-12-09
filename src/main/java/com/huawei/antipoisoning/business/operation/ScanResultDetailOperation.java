@@ -104,7 +104,8 @@ public class ScanResultDetailOperation {
             criteria.and("status").is(resultDetail.getStatus());
         }
         if (StringUtils.isNotBlank(resultDetail.getFileName())) {
-            criteria.and("suspicious_file_name").is(YamlUtil.getToolPath().substring(0,YamlUtil.getToolPath().length()-1) + AntiConstants.REPOPATH+resultDetail.getFileName());
+            criteria.and("suspicious_file_name").is(YamlUtil.getToolPath().substring(0,
+                    YamlUtil.getToolPath().length() - 1) + AntiConstants.REPOPATH + resultDetail.getFileName());
         }
         if (StringUtils.isNotBlank(resultDetail.getReviewerStatus())) {
             tableName = CollectionTableName.SHIELD_RESULT_DETAIL;
