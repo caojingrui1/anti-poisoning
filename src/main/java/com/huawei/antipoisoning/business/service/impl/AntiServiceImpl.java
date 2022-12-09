@@ -18,6 +18,7 @@ import com.huawei.antipoisoning.business.operation.AntiOperation;
 import com.huawei.antipoisoning.business.operation.PoisonResultOperation;
 import com.huawei.antipoisoning.business.operation.PoisonTaskOperation;
 import com.huawei.antipoisoning.business.service.AntiService;
+import com.huawei.antipoisoning.business.util.AntiConstants;
 import com.huawei.antipoisoning.business.util.FileUtil;
 import com.huawei.antipoisoning.business.util.YamlUtil;
 import com.huawei.antipoisoning.common.entity.MultiResponse;
@@ -49,21 +50,21 @@ public class AntiServiceImpl implements AntiService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AntiServiceImpl.class);
 
-    private static final String SCANRESULTPATH = "/tools/softwareFile/report/";
-
-    private static final String PR_SCANRESULTPATH = "/tools/SoftwareSupplyChainSecurity-v1/pr_report/";
-
-    private static final String SCANTOOLPATH = "/tools/SoftwareSupplyChainSecurity-v1/openeuler_scan.py";
-
-    private static final String SCANTOOLFILE = "/tools/SoftwareSupplyChainSecurity-v1/";
-
-    private static final String REPOPATH = "/tools/softwareFile/download/";
-
-    private static final String PR_REPOPATH = "/tools/SoftwareSupplyChainSecurity-v1/prDownload/";
-
-    private static final String CONFIG_PATH = "/tools/SoftwareSupplyChainSecurity-v1/ruleYaml/";
-
-    private static final String DOWN_PATH = "prDownload/";
+//    private static final String SCANRESULTPATH = "/tools/softwareFile/report/";
+//
+//    private static final String PR_SCANRESULTPATH = "/tools/SoftwareSupplyChainSecurity-v1/pr_report/";
+//
+//    private static final String SCANTOOLPATH = "/tools/SoftwareSupplyChainSecurity-v1/openeuler_scan.py";
+//
+//    private static final String SCANTOOLFILE = "/tools/SoftwareSupplyChainSecurity-v1/";
+//
+//    private static final String REPOPATH = "/tools/softwareFile/download/";
+//
+//    private static final String PR_REPOPATH = "/tools/SoftwareSupplyChainSecurity-v1/prDownload/";
+//
+//    private static final String CONFIG_PATH = "/tools/SoftwareSupplyChainSecurity-v1/ruleYaml/";
+//
+//    private static final String DOWN_PATH = "prDownload/";
 
     private SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss:SSS");
 
@@ -105,7 +106,7 @@ public class AntiServiceImpl implements AntiService {
                     // 工具执行
                     String sb = AntiMainUtil.execute(arguments);
                     // 保存日志内容
-                    String url = YamlUtil.getToolPath() + SCANTOOLFILE + "poison_logs"  + File.separator;
+                    String url = YamlUtil.getToolPath() + AntiConstants.SCANTOOLFILE + "poison_logs"  + File.separator;
                     taskEntity.setLogs(AntiMainUtil.getTxtContent(url, uuid));
                     // 设置任务结束时间
                     long endTime = System.currentTimeMillis();
@@ -122,8 +123,8 @@ public class AntiServiceImpl implements AntiService {
                         long time = taskTime + downloadTime;
                         taskEntity.setTimeConsuming(time + "s");
                     }
-                    String result = AntiMainUtil.getJsonContent(YamlUtil.getToolPath() + SCANRESULTPATH,
-                            antiEntity.getRepoName());
+                    String result = AntiMainUtil.getJsonContent(YamlUtil.getToolPath() +
+                                    AntiConstants.SCANRESULTPATH, antiEntity.getRepoName());
                     LOGGER.info("The scan result is : {}", result);
                     List<ResultEntity> results = JSONArray.parseArray(result, ResultEntity.class);
                     // 扫描结果详情
@@ -173,7 +174,8 @@ public class AntiServiceImpl implements AntiService {
                 return MultiResponse.error(ConstantsArgs.CODE_FAILED, "scan error : " + e.getCause());
             } finally {
                 // 删除下载的代码仓
-                FileUtil.deleteDirectory(YamlUtil.getToolPath() + REPOPATH + File.separator + antiEntity.getRepoName() +
+                FileUtil.deleteDirectory(YamlUtil.getToolPath() + AntiConstants.REPOPATH +
+                        File.separator + antiEntity.getRepoName() +
                         "-" + antiEntity.getBranch());
             }
         } else {
@@ -230,15 +232,16 @@ public class AntiServiceImpl implements AntiService {
             try {
                 if (prAntiEntity.getIsDownloaded()) {
                     String[] arguments = new String[]{"/bin/sh", "-c",
-                            "python3 " + YamlUtil.getToolPath() + SCANTOOLPATH +
+                            "python3 " + YamlUtil.getToolPath() + AntiConstants.SCANTOOLPATH +
                                     // 仓库下载后存放地址
-                                    " " + YamlUtil.getToolPath() + PR_REPOPATH + info.getWorkspace() +
+                                    " " + YamlUtil.getToolPath() + AntiConstants.PR_REPOPATH + info.getWorkspace() +
                                     File.separator + "modify_dirs " +
                                     // 扫描完成后结果存放地址
-                                    YamlUtil.getToolPath() + PR_SCANRESULTPATH + prAntiEntity.getRepoName() + ".json " +
+                                    YamlUtil.getToolPath() + AntiConstants.PR_SCANRESULTPATH +
+                                    prAntiEntity.getRepoName() + ".json " +
                                     // 支持多语言规则扫描
-                                    "--custom-yaml " + YamlUtil.getToolPath() + CONFIG_PATH +
-                                    prAntiEntity.getRulesName() + " > " + YamlUtil.getToolPath() + SCANTOOLFILE +
+                                    "--custom-yaml " + YamlUtil.getToolPath() + AntiConstants.CONFIG_PATH +
+                                    prAntiEntity.getRulesName() + " > " + YamlUtil.getToolPath() + AntiConstants.SCANTOOLFILE +
                                     "poison_logs" + File.separator + scanId + ".txt"};
                     // 设置任务开始时间
                     LOGGER.info("扫描指令：{}" , arguments[2]);
@@ -248,7 +251,7 @@ public class AntiServiceImpl implements AntiService {
                     // 工具执行
                     String sb = AntiMainUtil.execute(arguments);
                     // 保存日志内容
-                    String url = YamlUtil.getToolPath() + SCANTOOLFILE + "poison_logs"  + File.separator;
+                    String url = YamlUtil.getToolPath() + AntiConstants.SCANTOOLFILE + "poison_logs"  + File.separator;
                     prTaskEntity.setLogs(AntiMainUtil.getTxtContent(url, scanId));
                     // 设置任务结束时间
                     long endTime = System.currentTimeMillis();
@@ -265,8 +268,8 @@ public class AntiServiceImpl implements AntiService {
                         long time = taskTime + downloadTime;
                         prTaskEntity.setTimeConsuming(time + "s");
                     }
-                    String result = AntiMainUtil.getJsonContent(YamlUtil.getToolPath() + PR_SCANRESULTPATH,
-                            prAntiEntity.getRepoName());
+                    String result = AntiMainUtil.getJsonContent(YamlUtil.getToolPath() +
+                                    AntiConstants.PR_SCANRESULTPATH, prAntiEntity.getRepoName());
                     LOGGER.info("The scan result is : {}", result);
                     List<PRResultEntity> results = JSONArray.parseArray(result, PRResultEntity.class);
                     // 扫描结果详情
@@ -324,7 +327,7 @@ public class AntiServiceImpl implements AntiService {
                 LOGGER.error(e.getMessage());
                 return MultiResponse.error(ConstantsArgs.CODE_FAILED, "scan error : " + e.getCause());
             } finally {
-                FileUtil.deleteDirectory(DOWN_PATH + File.separator + info.getWorkspace());
+                FileUtil.deleteDirectory(AntiConstants.DOWN_PATH + File.separator + info.getWorkspace());
             }
         } else {
             return MultiResponse.error(ConstantsArgs.CODE_FAILED, "scan error , task not exist!");
@@ -355,7 +358,7 @@ public class AntiServiceImpl implements AntiService {
         if (StringUtils.isEmpty(antiEntity.getBranch())) {
             antiEntity.setBranch("master");
         }
-        String workspace = YamlUtil.getToolPath() + REPOPATH + File.separator + antiEntity.getRepoName() +
+        String workspace = YamlUtil.getToolPath() + AntiConstants.REPOPATH + File.separator + antiEntity.getRepoName() +
                 "-" + antiEntity.getBranch();
         antiOperation.insertScanResult(antiEntity);
         long startTime = System.currentTimeMillis();
@@ -457,9 +460,10 @@ public class AntiServiceImpl implements AntiService {
      */
     public int cloneRepository(PullRequestInfo info) {
         JGitUtil jGitUtil = new JGitUtil(info.getPullInfo(), info.getUser(), info.getPassword(),
-                info.getBranch(), info.getVersion(), DOWN_PATH + info.getWorkspace());
+                info.getBranch(), info.getVersion(), AntiConstants.DOWN_PATH + info.getWorkspace());
         int getPullCode = jGitUtil.pullPr(info.getGitUrl());
-        StringBuffer sb = jGitUtil.cmdOfPullRequest(DOWN_PATH + info.getWorkspace(), info.getTarget());
+        StringBuffer sb = jGitUtil.cmdOfPullRequest(AntiConstants.DOWN_PATH +
+                info.getWorkspace(), info.getTarget());
         List<String> strList = new ArrayList<String>();
         try {
             LOGGER.info("get diff tree start!");
@@ -495,7 +499,7 @@ public class AntiServiceImpl implements AntiService {
         // 设置下载所需的用户权限
         buffer.append(info.getUser()).append(":").append(info.getPassword()).append(" -o ");
         // 设置文件下载存放路径
-        buffer.append(DOWN_PATH).append(info.getWorkspace()).append("/modify_dirs/")
+        buffer.append(AntiConstants.DOWN_PATH).append(info.getWorkspace()).append("/modify_dirs/")
                 .append(filePath).append(" >/dev/null 2>&1");
         buffer.append(" --create-dir ").append(url);
         return buffer;
@@ -553,15 +557,15 @@ public class AntiServiceImpl implements AntiService {
      */
     public String[] versionScan(String repoName, String branch, String ruleName, String scanId) {
         String[] versionScan = new String[]{"/bin/sh", "-c",
-                    "python3 " + YamlUtil.getToolPath() + SCANTOOLPATH +
+                    "python3 " + YamlUtil.getToolPath() + AntiConstants.SCANTOOLPATH +
                         // 仓库下载后存放地址
-                        " " + YamlUtil.getToolPath() + REPOPATH +
+                        " " + YamlUtil.getToolPath() + AntiConstants.REPOPATH +
                         repoName + "-" + branch + " " +
                         // 扫描完成后结果存放地址
-                        YamlUtil.getToolPath() + SCANRESULTPATH + repoName + ".json " +
+                        YamlUtil.getToolPath() + AntiConstants.SCANRESULTPATH + repoName + ".json " +
                         // 支持多语言规则扫描
-                        "--custom-yaml " + YamlUtil.getToolPath() + CONFIG_PATH +
-                        ruleName + " > " + YamlUtil.getToolPath() + SCANTOOLFILE +
+                        "--custom-yaml " + YamlUtil.getToolPath() + AntiConstants.CONFIG_PATH +
+                        ruleName + " > " + YamlUtil.getToolPath() + AntiConstants.SCANTOOLFILE +
                         "poison_logs" + File.separator + scanId + ".txt"};
         return versionScan;
     }

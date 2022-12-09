@@ -8,21 +8,22 @@ import com.huawei.antipoisoning.business.entity.ResultEntity;
 import com.huawei.antipoisoning.business.entity.TaskEntity;
 import com.huawei.antipoisoning.business.entity.pr.PRResultEntity;
 import com.huawei.antipoisoning.business.entity.pr.PRTaskEntity;
-import com.huawei.antipoisoning.business.entity.shield.*;
+import com.huawei.antipoisoning.business.entity.shield.ParamModel;
+import com.huawei.antipoisoning.business.entity.shield.PoisonReportModel;
+import com.huawei.antipoisoning.business.entity.shield.Referral;
+import com.huawei.antipoisoning.business.entity.shield.Revision;
 import com.huawei.antipoisoning.business.operation.ScanResultDetailOperation;
 import com.huawei.antipoisoning.business.operation.ShieldResultDetailOperation;
 import com.huawei.antipoisoning.business.service.ProblemShieldService;
+import com.huawei.antipoisoning.business.util.AntiConstants;
+import com.huawei.antipoisoning.business.util.YamlUtil;
 import com.huawei.antipoisoning.common.entity.MultiResponse;
+import org.eclipse.jgit.util.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -96,12 +97,15 @@ public class ProblemShieldServiceImpl implements ProblemShieldService {
      */
     @Override
     public MultiResponse getResultDetail(String scanId, String userId, ParamModel paramModel) {
-        List<ResultEntity> resultEntities = scanResultDetailOperation.getResultDetail(scanId, userId,  paramModel);
+        List<ResultEntity> resultEntities = scanResultDetailOperation.getResultDetail(scanId, userId, paramModel);
         paramModel.setPageNum(null);
         paramModel.setPageSize(null);
         int count = scanResultDetailOperation.getResultDetail(scanId, userId, paramModel).size();
         Map<String, Object> result = new HashMap<>(2);
         result.put("count", count);
+        resultEntities.forEach(resultEntity -> {
+            resultEntity.setSuspiciousFileName(resultEntity.getSuspiciousFileName().replace( YamlUtil.getToolPath().substring(0,YamlUtil.getToolPath().length()-1)+ AntiConstants.REPOPATH, ""));
+        });
         result.put("data", resultEntities);
         return new MultiResponse().code(200).result(result);
     }
@@ -121,6 +125,9 @@ public class ProblemShieldServiceImpl implements ProblemShieldService {
         paramModel.setPageSize(null);
         int count = scanResultDetailOperation.getPRResultDetail(scanId, userId, paramModel).size();
         Map<String, Object> result = new HashMap<>(2);
+        resultEntities.forEach(resultEntity -> {
+            resultEntity.setSuspiciousFileName(resultEntity.getSuspiciousFileName().replace(  YamlUtil.getToolPath().substring(0,YamlUtil.getToolPath().length()-1) +AntiConstants.PR_REPOPATH, ""));
+        });
         result.put("count", count);
         result.put("data", resultEntities);
         return new MultiResponse().code(200).result(result);
@@ -129,8 +136,8 @@ public class ProblemShieldServiceImpl implements ProblemShieldService {
     /**
      * 获取扫描结果报告。
      *
-     * @param userId 用户ID
-     * @param type 查询类型
+     * @param userId     用户ID
+     * @param type       查询类型
      * @param paramModel 参数
      * @return MultiResponse
      */
@@ -144,13 +151,23 @@ public class ProblemShieldServiceImpl implements ProblemShieldService {
         statusReport = resultEntityList.stream().collect(Collectors.groupingBy(PoisonReportModel::getStatus,
                 Collectors.summingInt(PoisonReportModel::getTotal)));
         // 根据文件名统计
+        String replaceStr = "";
+        if (StringUtils.isEmptyOrNull(type)) {
+            replaceStr = YamlUtil.getToolPath().substring(0,YamlUtil.getToolPath().length()-1) + AntiConstants.REPOPATH;
+        } else {
+            replaceStr = YamlUtil.getToolPath().substring(0,YamlUtil.getToolPath().length()-1) +AntiConstants.PR_REPOPATH;
+        }
+        final String pathStr = replaceStr;
         resultEntityList.stream().collect(Collectors.groupingBy(PoisonReportModel::getFileName,
-                Collectors.summingInt(PoisonReportModel::getTotal)))
+                        Collectors.summingInt(PoisonReportModel::getTotal)))
                 .entrySet().stream().sorted(Map.Entry.<String, Integer>comparingByValue().reversed())
-                .forEach(value -> fileNameReport.put(value.getKey(), value.getValue()));
+                .forEach(value -> {
+                    fileNameReport.put(value.getKey()
+                            .replace(pathStr, ""), value.getValue());
+                });
         // 根据规则统计
         resultEntityList.stream().collect(Collectors.groupingBy(PoisonReportModel::getRuleName,
-                Collectors.summingInt(PoisonReportModel::getTotal)))
+                        Collectors.summingInt(PoisonReportModel::getTotal)))
                 .entrySet().stream().sorted(Map.Entry.<String, Integer>comparingByValue().reversed())
                 .forEach(value -> ruleNameReport.put(value.getKey(), value.getValue()));
         HashMap<String, Integer> ruleReport = new LinkedHashMap<>();

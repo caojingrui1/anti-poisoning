@@ -10,6 +10,7 @@ import com.huawei.antipoisoning.business.entity.TaskEntity;
 import com.huawei.antipoisoning.business.entity.pr.PRAntiEntity;
 import com.huawei.antipoisoning.business.entity.pr.PRTaskEntity;
 import com.huawei.antipoisoning.business.entity.vo.PageVo;
+import com.huawei.antipoisoning.business.entity.vo.PoisonInspectionVo;
 import com.mongodb.client.result.UpdateResult;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -18,12 +19,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.aggregation.Aggregation;
+import org.springframework.data.mongodb.core.aggregation.AggregationOperation;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Component;
 import org.springframework.util.ObjectUtils;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -42,7 +46,7 @@ public class PoisonTaskOperation {
     /**
      * 保存扫描结果
      *
-     * @param antiEntity 扫描数据
+     * @param antiEntity    扫描数据
      * @param newtaskEntity 新参数
      */
     public void insertTaskResult(AntiEntity antiEntity, TaskEntity newtaskEntity) {
@@ -69,7 +73,7 @@ public class PoisonTaskOperation {
     /**
      * 保存门禁扫描结果
      *
-     * @param antiEntity 扫描数据
+     * @param antiEntity    扫描数据
      * @param newtaskEntity 新参数
      */
     public void insertPRTaskResult(PRAntiEntity antiEntity, PRTaskEntity newtaskEntity) {
@@ -99,7 +103,7 @@ public class PoisonTaskOperation {
      * 保存扫描结果
      *
      * @param antiEntity 扫描数据
-     * @param taskId 任务ID
+     * @param taskId     任务ID
      */
     public long updateTaskResult(AntiEntity antiEntity, String taskId) {
         if (ObjectUtils.isEmpty(antiEntity)) {
@@ -173,7 +177,7 @@ public class PoisonTaskOperation {
         if (antiEntity.getBranchRepositoryId() != null) {
             update.set("branch_repository_id", antiEntity.getBranchRepositoryId());
         }
-        if (antiEntity.getLanguage() != null){
+        if (antiEntity.getLanguage() != null) {
             update.set("language", antiEntity.getLanguage());
         }
         if (antiEntity.getCreateTime() != null) {
@@ -205,7 +209,7 @@ public class PoisonTaskOperation {
         if (antiEntity.getScanId() != null) {
             update.set("scan_id", antiEntity.getScanId());
         }
-        if (antiEntity.getLanguage() != null){
+        if (antiEntity.getLanguage() != null) {
             update.set("language", antiEntity.getLanguage());
         }
         if (antiEntity.getCreateTime() != null) {
@@ -403,7 +407,7 @@ public class PoisonTaskOperation {
      * 修改同社区统仓的语言
      *
      * @param antiEntity 扫描数据
-     * @param language 语言
+     * @param language   语言
      * @return UpdateResult
      */
     public UpdateResult updateTaskLanguage(AntiEntity antiEntity, String language) {
@@ -423,7 +427,7 @@ public class PoisonTaskOperation {
      * 修改同社区统仓的语言
      *
      * @param prTaskEntity 扫描数据
-     * @param language 语言
+     * @param language     语言
      * @return UpdateResult
      */
     public UpdateResult updatePRTaskLanguage(PRTaskEntity prTaskEntity, String language) {
@@ -437,5 +441,34 @@ public class PoisonTaskOperation {
             update.set("language", language);
         }
         return mongoTemplate.updateMulti(query, update, CollectionTableName.POISON_PR_TASK);
+    }
+
+
+    /**
+     * @param tableName
+     * @param repoList
+     * @param projectNameList
+     * @return
+     */
+    public List<PoisonInspectionVo> getPoisonTaskSummary(String tableName, List<String> repoList, List<String> projectNameList) {
+
+        List<AggregationOperation> operations = new ArrayList<>();
+        //operations.add(Aggregation.match(Criteria.where("project_name").nin(SystemMonitorConstants.OPEN_MAJUN)));
+        operations.add(Aggregation.match(Criteria.where("issue_count").ne(null)));
+        if (repoList.size() != 0) {
+            operations.add(Aggregation.match(Criteria.where("repo_name").in(repoList)));
+            operations.add(Aggregation.match(Criteria.where("project_name").in(projectNameList)));
+        }
+        operations.add(Aggregation.sort(Sort.Direction.DESC, "create_time"));
+        operations.add(Aggregation.group("project_name", "repo_name")
+                .first("project_name").as("projectName")
+                .first("repo_name").as("repoName")
+                .first("solve_Count").as("solveCount")
+                .first("issue_count").as("issueCount"));
+
+        List<PoisonInspectionVo> mappedResults = mongoTemplate.aggregate(Aggregation.newAggregation(operations), tableName, PoisonInspectionVo.class)
+                .getMappedResults();
+        return mappedResults;
+
     }
 }

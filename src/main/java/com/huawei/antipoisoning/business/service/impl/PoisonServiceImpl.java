@@ -6,14 +6,20 @@ package com.huawei.antipoisoning.business.service.impl;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.huawei.antipoisoning.business.enmu.CollectionTableName;
 import com.huawei.antipoisoning.business.enmu.CommonConstants;
 import com.huawei.antipoisoning.business.entity.AntiEntity;
 import com.huawei.antipoisoning.business.entity.RepoInfo;
 import com.huawei.antipoisoning.business.entity.ResultEntity;
 import com.huawei.antipoisoning.business.entity.TaskEntity;
-import com.huawei.antipoisoning.business.entity.checkrule.*;
+import com.huawei.antipoisoning.business.entity.checkrule.CheckRuleSet;
+import com.huawei.antipoisoning.business.entity.checkrule.RuleModel;
+import com.huawei.antipoisoning.business.entity.checkrule.RuleSetModel;
+import com.huawei.antipoisoning.business.entity.checkrule.TaskRuleSetVo;
 import com.huawei.antipoisoning.business.entity.pr.PullRequestInfo;
+import com.huawei.antipoisoning.business.entity.vo.AntiPoisonRunStatusModel;
 import com.huawei.antipoisoning.business.entity.vo.PageVo;
+import com.huawei.antipoisoning.business.entity.vo.PoisonInspectionVo;
 import com.huawei.antipoisoning.business.operation.CheckRuleOperation;
 import com.huawei.antipoisoning.business.operation.PoisonResultOperation;
 import com.huawei.antipoisoning.business.operation.PoisonScanOperation;
@@ -23,9 +29,9 @@ import com.huawei.antipoisoning.business.service.PoisonService;
 import com.huawei.antipoisoning.business.util.YamlUtil;
 import com.huawei.antipoisoning.common.entity.MultiResponse;
 import com.huawei.antipoisoning.common.util.JGitUtil;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -316,6 +322,45 @@ public class PoisonServiceImpl implements PoisonService {
             LOGGER.error("errInfo is {}", e.getMessage());
         }
         return MultiResponse.success(200, "success");
+    }
+
+    /**
+     * 运维看板防投毒统计数据
+     * @param runStatusModel 防投毒运维看板数据数据统计查询实体类
+     * @return
+     */
+    @Override
+    public MultiResponse poisonRunstatusData(AntiPoisonRunStatusModel runStatusModel) {
+
+        List<String> repoList = runStatusModel.getRepoList();
+        List<String> projectNameList = runStatusModel.getProjectNameList();
+        Map<String, Map<String, Long>> longResult = new HashMap<>();
+        //查询防投毒任务表
+        List<PoisonInspectionVo> poisonTaskSummary = poisonTaskOperation.getPoisonTaskSummary(CollectionTableName
+                .POISON_VERSION_TASK, repoList, projectNameList);
+        //版本级防投毒已解决问题数
+        Map<String, Long> poisonIssueCount = poisonTaskSummary.stream().collect(Collectors
+                .groupingBy(PoisonInspectionVo::getProjectName, Collectors.summingLong(PoisonInspectionVo::getIssueCount)));
+        longResult.put("poisonIssueCount", poisonIssueCount);
+        //版本级防投毒未解决数
+        Map<String, Long> poisonSolveCount = poisonTaskSummary.stream().collect(Collectors
+                .groupingBy(PoisonInspectionVo::getProjectName, Collectors.summingLong(PoisonInspectionVo::getSolveCount)));
+        longResult.put("poisonSolveCount", poisonSolveCount);
+
+        //防投毒版本级仓库数
+        List<PoisonInspectionVo> repoPosionSummary  = poisonScanOperation.getRepoSummary(CollectionTableName
+                .SCAN_RESULTS, repoList, projectNameList);
+        Map<String, Long> poisonRepoCount = repoPosionSummary.stream().collect(Collectors.groupingBy(PoisonInspectionVo::getProjectName,
+                Collectors.counting()));
+        longResult.put("poisonRepoCount", poisonRepoCount);
+
+        //防投毒门禁级仓库数
+        List<PoisonInspectionVo> prPoisonSummary  = poisonScanOperation.getRepoSummary(CollectionTableName
+                .SCAN_PR_RESULTS, repoList, projectNameList);
+        Map<String, Long> prPoisonRepoCount= prPoisonSummary.stream().collect(Collectors.groupingBy(PoisonInspectionVo::getProjectName,
+                Collectors.counting()));
+        longResult.put("prPoisonRepoCount", prPoisonRepoCount);
+        return  new MultiResponse().code(200).result(longResult);
     }
 
 
