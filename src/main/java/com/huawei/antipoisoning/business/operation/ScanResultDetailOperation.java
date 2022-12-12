@@ -11,6 +11,8 @@ import com.huawei.antipoisoning.business.entity.pr.PRResultEntity;
 import com.huawei.antipoisoning.business.entity.pr.PRTaskEntity;
 import com.huawei.antipoisoning.business.entity.shield.ParamModel;
 import com.huawei.antipoisoning.business.entity.shield.PoisonReportModel;
+import com.huawei.antipoisoning.business.util.AntiConstants;
+import com.huawei.antipoisoning.business.util.YamlUtil;
 import com.huawei.antipoisoning.common.entity.MultiResponse;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -102,7 +104,8 @@ public class ScanResultDetailOperation {
             criteria.and("status").is(resultDetail.getStatus());
         }
         if (StringUtils.isNotBlank(resultDetail.getFileName())) {
-            criteria.and("suspicious_file_name").is(resultDetail.getFileName());
+            criteria.and("suspicious_file_name").is(YamlUtil.getToolPath() +
+                    AntiConstants.REPOPATH + resultDetail.getFileName());
         }
         if (StringUtils.isNotBlank(resultDetail.getReviewerStatus())) {
             tableName = CollectionTableName.SHIELD_RESULT_DETAIL;
@@ -157,7 +160,7 @@ public class ScanResultDetailOperation {
             criteria.and("status").is(resultDetail.getStatus());
         }
         if (StringUtils.isNotBlank(resultDetail.getFileName())) {
-            criteria.and("suspicious_file_name").is(resultDetail.getFileName());
+            criteria.and("suspicious_file_name").is(YamlUtil.getToolPath() + AntiConstants.PR_REPOPATH+resultDetail.getFileName());
         }
         if (StringUtils.isNotBlank(resultDetail.getReviewerStatus())) {
             tableName = CollectionTableName.SHIELD_PR_RESULT_DETAIL;
@@ -259,7 +262,7 @@ public class ScanResultDetailOperation {
         operations.add(Aggregation.project("project_name", "repo_name", "branch", "pr_number",
                 "result_count", "issue_count", "solve_Count", "time_consuming", "repo_url", "execute_start_time",
                 "execute_end_time", "pr_url", "create_time", "is_success", "tips", "rules_name", "executor_name",
-                "executor_id", "logs", "execution_status", "is_downloaded", "is_scan",
+                "executor_id", "logs", "execution_status", "is_downloaded", "is_scan", "is_pass",
                 "download_consuming", "task_consuming", "task_id", "scan_id", "total")
         );
         operations.add(Aggregation.match(criteria));
@@ -282,6 +285,8 @@ public class ScanResultDetailOperation {
                 .first("execute_start_time").as("execute_start_time")
                 .first("execute_end_time").as("execute_end_time")
                 .first("is_success").as("is_success")
+                .first("is_downloaded").as("is_downloaded")
+                .first("is_pass").as("is_pass")
                 .first("tips").as("tips")
                 .first("rules_name").as("rules_name")
                 .first("executor_name").as("executor_name")

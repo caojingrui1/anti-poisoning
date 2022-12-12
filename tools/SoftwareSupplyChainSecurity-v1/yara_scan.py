@@ -39,7 +39,8 @@ class YaraScan(object):
                 _check_name = os.path.relpath(one_file, self.source_dir).lower()
                 for exclude in exclude_list:
                     if exclude in _check_name:
-                        print(f"Skip{one_file}. (match {exclude})   ")
+                        print(f"Skip{one_file}. (match {exclude})")
+                        break
                     else:
                         self.all_files.append(one_file)
         print("Found files:", len(self.all_files))
@@ -96,9 +97,21 @@ class YaraScan(object):
         处理扫描结果
         """
         for yara_match in yara_matches:
+            # apply post handler
+            post_strings = yara_match.strings
+            if yara_match.rule == 'const_b64_or_hex':
+                post_strings = postH_const_b64_or_hex(post_strings)
+            elif yara_match.rule == 'os_related':
+                post_strings = postH_os_related(post_strings)
+            elif yara_match.rule == 'connect_related':
+                post_strings = postH_connect_related(post_strings)
+
+            if not post_strings:
+                continue
+
             # 1. 先区分开普通匹配和核心匹配
             core_match, normal_match = [], []
-            for offset, condition, match_bytes in yara_match.strings:
+            for offset, condition, match_bytes in post_strings:
                 if '_CORE' in condition:
                     core_match.append((offset, condition, match_bytes))
                 else:
@@ -114,6 +127,10 @@ class YaraScan(object):
                     # 2.5 针对Java文件，忽略它的javadoc代码
                     if file_path.endswith('.java'):
                         if line_content.strip().startswith('*') or line_content.strip().startswith('//'):
+                            continue
+                    # 2.5 针对Python文件，忽略它的注释代码
+                    if file_path.endswith('.py'):
+                        if line_content.strip().startswith('#'):
                             continue
                     result['checkResult'] = f'{line_number} : {line_content}'
                     result['keyLogInfo'] = f'{line_number} : {piece}'
@@ -133,11 +150,24 @@ class YaraScan(object):
                     if file_path.endswith('.java'):
                         if line_content.strip().startswith('*') or line_content.strip().startswith('//'):
                             continue
+                    # 2.5 针对Python文件，忽略它的注释代码
+                    if file_path.endswith('.py'):
+                        if line_content.strip().startswith('#'):
+                            continue
                     _with_line_number: list[tuple[int, str, str]] = list()
                     _with_line_number.append((line_number, piece, line_content))
+
+                    # 某些行，会别两条特征同时检测到，需要使用 line_number 对结果进行去重
+                    _collected_lines: set[int] = set()
+                    _collected_lines.add(line_number)
                     for _offset, _, _match_bytes in normal_match:
-                        _with_line_number.append((self.offset_to_content(data, _match_bytes, _offset)))
+                        _line_number, _piece, _line_content = self.offset_to_content(data, _match_bytes, _offset)
+                        if _line_number not in _collected_lines:
+                            _with_line_number.append((_line_number, _piece, _line_content))
+                            _collected_lines.add(_line_number)
                     _with_line_number.sort()
+
+
                     result['checkResult'] = '\n'.join(
                         [f'{line_number} : {line_content}' for line_number, _, line_content in _with_line_number]
                     )
@@ -161,6 +191,39 @@ class YaraScan(object):
             piece = "DECODE ERROR"
             line_content = "DECODE ERROR"
         return line_number, piece, line_content
+
+
+def postH_const_b64_or_hex(yara_strings) -> list[tuple]:
+    # 由于规则中错误地匹配了 '*' ，只要 '*' 出现了，就认为是bug需要被移除
+    striped = list()
+    for idx, (offset, condition, match_bytes) in enumerate(yara_strings):
+        if condition == '$reg_b64' and match_bytes.count(b'*') > 0:
+            striped.append(idx)
+    if not striped:
+        return yara_strings
+    return [i for j, i in enumerate(yara_strings) if j not in striped]
+
+
+def postH_os_related(yara_strings) -> list[tuple]:
+    # 由于规则中错误地展示了 'os.*'，需要将其移除
+    striped = list()
+    for idx, (offset, condition, match_bytes) in enumerate(yara_strings):
+        if condition == '$os_ini2':
+            striped.append(idx)
+    if not striped:
+        return yara_strings
+    return [i for j, i in enumerate(yara_strings) if j not in striped]
+
+
+def postH_connect_related(yara_strings) -> list[tuple]:
+    # 规则中 reg1和reg3 会冲，移除reg1的报告
+    striped = list()
+    for idx, (offset, condition, match_bytes) in enumerate(yara_strings):
+        if condition == '$ip_reg1':
+            striped.append(idx)
+    if not striped:
+        return yara_strings
+    return [i for j, i in enumerate(yara_strings) if j not in striped]
 
 
 class YaraJob(object):
