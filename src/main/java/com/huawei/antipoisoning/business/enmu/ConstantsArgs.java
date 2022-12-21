@@ -34,10 +34,10 @@ public class ConstantsArgs {
     /**
      * 成功码。
      */
-    public static int CODE_SUCCESS = 200;
+    public static final int CODE_SUCCESS = 200;
 
     /**
      * 错误码。
      */
-    public static int CODE_FAILED = 400;
+    public static final int CODE_FAILED = 400;
 }

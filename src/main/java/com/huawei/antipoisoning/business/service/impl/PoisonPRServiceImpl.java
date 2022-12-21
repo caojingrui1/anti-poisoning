@@ -13,7 +13,6 @@ import com.huawei.antipoisoning.business.entity.TaskEntity;
 import com.huawei.antipoisoning.business.entity.checkrule.CheckRuleSet;
 import com.huawei.antipoisoning.business.entity.checkrule.RuleSetModel;
 import com.huawei.antipoisoning.business.entity.checkrule.TaskRuleSetVo;
-import com.huawei.antipoisoning.business.entity.checkrule.RuleSetResult;
 import com.huawei.antipoisoning.business.entity.checkrule.RuleModel;
 import com.huawei.antipoisoning.business.entity.pr.PRInfo;
 import com.huawei.antipoisoning.business.entity.pr.PullRequestInfo;
@@ -237,6 +236,7 @@ public class PoisonPRServiceImpl implements PoisonPRService {
      */
     @Override
     public PullRequestInfo getPRInfo(PRInfo prInfo) {
+        LOGGER.info("prInfo is {}", prInfo.toString());
         Map<String, String> params = new HashMap<>();
         params.put("owner", prInfo.getProjectName());
         params.put("repo", prInfo.getRepoName());
