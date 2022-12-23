@@ -82,15 +82,20 @@ class YaraScan(object):
         """
         # 以文件名为 key，groupby，保证每个文件只需要打开一次
         for file_path, yara_group in itertools.groupby(self.job_set, lambda x: x[0]):
-            with open(file_path, 'rb') as fd:
-                data = fd.read()
-            for yara_path in [x[1] for x in yara_group]:
-                yara_rule = _get_yara_rule(yara_path)
-                if yara_rule is None:
-                    continue
-                yara_result = yara_rule.match(data=data)
-                if yara_result:
-                    self.handle_matches(file_path, data, yara_result, yara_path)
+            try:
+                with open(file_path, 'rb') as fd:
+                    data = fd.read()
+            except FileNotFoundError:
+                # 一些git仓里，软连接指向的位置是不存在的文件，会抛出该异常
+                print("Cannot find", file_path)
+            else:
+                for yara_path in [x[1] for x in yara_group]:
+                    yara_rule = _get_yara_rule(yara_path)
+                    if yara_rule is None:
+                        continue
+                    yara_result = yara_rule.match(data=data)
+                    if yara_result:
+                        self.handle_matches(file_path, data, yara_result, yara_path)
 
     def handle_matches(self, file_path: str, data: bytes, yara_matches: yara.Match, yara_path: str):
         """
