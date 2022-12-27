@@ -250,7 +250,8 @@ public class PoisonServiceImpl implements PoisonService {
             }
             for (TaskEntity taskEntity1 : taskEntities) {
                 //筛选出没跑过任务的仓库信息，赋予初始值
-                if (taskEntity1.getTaskId().equals(repoInfo.getPoisonTaskId())) {
+                if (taskEntity1.getTaskId().equals(repoInfo.getPoisonTaskId())
+                        || StringUtils.isNotEmpty(taskEntity1.getTaskId())) {
                     result.add(taskEntity1);
                     continue outer;
                 }
