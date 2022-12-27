@@ -13,7 +13,6 @@ import com.huawei.antipoisoning.business.entity.TaskEntity;
 import com.huawei.antipoisoning.business.entity.checkrule.CheckRuleSet;
 import com.huawei.antipoisoning.business.entity.checkrule.RuleSetModel;
 import com.huawei.antipoisoning.business.entity.checkrule.TaskRuleSetVo;
-import com.huawei.antipoisoning.business.entity.checkrule.RuleSetResult;
 import com.huawei.antipoisoning.business.entity.checkrule.RuleModel;
 import com.huawei.antipoisoning.business.entity.pr.PRInfo;
 import com.huawei.antipoisoning.business.entity.pr.PullRequestInfo;
@@ -148,8 +147,11 @@ public class PoisonPRServiceImpl implements PoisonPRService {
             antiService.downloadPRRepoFile(prAntiEntity, pullRequestInfo, fileArray);
             // 防投毒扫描
             antiService.scanPRFile(pullRequestInfo.getScanId(), pullRequestInfo);
-            return new MultiResponse().code(ConstantsArgs.CODE_SUCCESS).result(INC_URL + pullRequestInfo.getScanId() +
+            Map<String, Object> result = new HashMap<>();
+            result.put("url", INC_URL + pullRequestInfo.getScanId() +
                     "/" + prAntiEntity.getProjectName() + "/" + prAntiEntity.getRepoName());
+            result.put("isPass", prAntiEntity.getIsPass());
+            return new MultiResponse().code(ConstantsArgs.CODE_SUCCESS).result(result);
         } else {
             return new MultiResponse().code(ConstantsArgs.CODE_FAILED).message("create rule yaml is error");
         }
