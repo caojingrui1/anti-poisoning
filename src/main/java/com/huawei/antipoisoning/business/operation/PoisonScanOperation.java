@@ -85,26 +85,25 @@ public class PoisonScanOperation {
 
     /**
      * 查询防投毒扫描结果
+     *
      * @param tableName
      * @param repoList
      * @param projectNameList
      * @return
      */
     public List<PoisonInspectionVo> getRepoSummary(String tableName, List<String> repoList, List<String> projectNameList) {
-
         List<AggregationOperation> operations = new ArrayList<>();
         if (repoList.size() != 0) {
             operations.add(Aggregation.match(Criteria.where("repo_name").in(repoList)));
             operations.add(Aggregation.match(Criteria.where("project_name").in(projectNameList)));
         }
         operations.add(Aggregation.sort(Sort.Direction.DESC, "create_time"));
-        operations.add(Aggregation.group("project_name", "repo_name")
+        operations.add(Aggregation.group("project_name", "repo_name", "branch")
                 .first("project_name").as("projectName")
-                .first("repo_name").as("repoName"));
-
+                .first("repo_name").as("repoName")
+                .first("branch").as("branch"));
         List<PoisonInspectionVo> mappedResults = mongoTemplate.aggregate(Aggregation.newAggregation(operations), tableName, PoisonInspectionVo.class)
                 .getMappedResults();
-
         return mappedResults;
     }
 }
