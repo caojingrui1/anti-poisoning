@@ -5,6 +5,7 @@
 package com.huawei.antipoisoning.business.operation;
 
 import com.huawei.antipoisoning.business.enmu.CollectionTableName;
+import com.huawei.antipoisoning.business.enmu.ConstantsArgs;
 import com.huawei.antipoisoning.business.entity.AntiEntity;
 import com.huawei.antipoisoning.business.entity.TaskEntity;
 import com.huawei.antipoisoning.business.entity.pr.PRAntiEntity;
@@ -445,30 +446,28 @@ public class PoisonTaskOperation {
 
 
     /**
-     * @param tableName
-     * @param repoList
-     * @param projectNameList
-     * @return
+     * @param tableName       表名称
+     * @param repoList        仓库名称列表
+     * @param projectNameList 项目名称列表
+     * @return List<PoisonInspectionVo>
      */
     public List<PoisonInspectionVo> getPoisonTaskSummary(String tableName, List<String> repoList, List<String> projectNameList) {
 
         List<AggregationOperation> operations = new ArrayList<>();
-        //operations.add(Aggregation.match(Criteria.where("project_name").nin(SystemMonitorConstants.OPEN_MAJUN)));
-        operations.add(Aggregation.match(Criteria.where("issue_count").ne(null)));
+        operations.add(Aggregation.match(Criteria.where("project_name").nin(ConstantsArgs.OPEN_MAJUN)));
         if (repoList.size() != 0) {
             operations.add(Aggregation.match(Criteria.where("repo_name").in(repoList)));
             operations.add(Aggregation.match(Criteria.where("project_name").in(projectNameList)));
         }
         operations.add(Aggregation.sort(Sort.Direction.DESC, "create_time"));
-        operations.add(Aggregation.group("project_name", "repo_name")
+        operations.add(Aggregation.group("project_name", "repo_name", "branch")
                 .first("project_name").as("projectName")
                 .first("repo_name").as("repoName")
-                .first("solve_Count").as("solveCount")
-                .first("issue_count").as("issueCount"));
-
+                .first("branch").as("branch")
+                .first("issue_count").as("issueCount")
+                .first("solve_Count").as("solveCount"));
         List<PoisonInspectionVo> mappedResults = mongoTemplate.aggregate(Aggregation.newAggregation(operations), tableName, PoisonInspectionVo.class)
                 .getMappedResults();
         return mappedResults;
-
     }
 }

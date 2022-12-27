@@ -40,4 +40,9 @@ public class ConstantsArgs {
      * 错误码。
      */
     public static int CODE_FAILED = 400;
+
+    /**
+     * openMajun projectName
+     */
+    public static final String OPEN_MAJUN = "openMajun";
 }
