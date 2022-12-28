@@ -18,6 +18,7 @@ import org.springframework.data.mongodb.core.aggregation.AggregationOperation;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -86,16 +87,14 @@ public class PoisonScanOperation {
     /**
      * 查询防投毒扫描结果
      *
-     * @param tableName
-     * @param repoList
-     * @param projectNameList
+     * @param tableName    数据表明称
+     * @param repoUrlList  仓库地址列表
      * @return
      */
-    public List<PoisonInspectionVo> getRepoSummary(String tableName, List<String> repoList, List<String> projectNameList) {
+    public List<PoisonInspectionVo> getRepoSummary(String tableName, List<String> repoUrlList) {
         List<AggregationOperation> operations = new ArrayList<>();
-        if (repoList.size() != 0) {
-            operations.add(Aggregation.match(Criteria.where("repo_name").in(repoList)));
-            operations.add(Aggregation.match(Criteria.where("project_name").in(projectNameList)));
+        if (!CollectionUtils.isEmpty(repoUrlList)) {
+            operations.add(Aggregation.match(Criteria.where("repo_url").in(repoUrlList)));
         }
         operations.add(Aggregation.sort(Sort.Direction.DESC, "create_time"));
         operations.add(Aggregation.group("project_name", "repo_name", "branch")
