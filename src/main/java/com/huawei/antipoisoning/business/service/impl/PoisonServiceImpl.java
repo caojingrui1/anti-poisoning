@@ -333,12 +333,10 @@ public class PoisonServiceImpl implements PoisonService {
      */
     @Override
     public MultiResponse poisonRunstatusData(AntiPoisonRunStatusModel runStatusModel) {
-        List<String> repoList = runStatusModel.getRepoList();
-        List<String> projectNameList = runStatusModel.getProjectNameList();
         Map<String, Map<String, Long>> longResult = new HashMap<>();
         //查询防投毒任务表
         List<PoisonInspectionVo> poisonTaskSummary = poisonTaskOperation.getPoisonTaskSummary(CollectionTableName
-                .POISON_VERSION_TASK, repoList, projectNameList);
+                .POISON_VERSION_TASK,  runStatusModel.getRepoUrlList());
         //版本级防投毒问题数
         Map<String, Long> poisonIssueCount = poisonTaskSummary.stream().collect(Collectors
                 .groupingBy(PoisonInspectionVo::getProjectName, Collectors.summingLong(PoisonInspectionVo::getIssueCount)));
@@ -349,13 +347,13 @@ public class PoisonServiceImpl implements PoisonService {
         longResult.put("poisonSolveCount", poisonSolveCount);
         //防投毒版本级仓库数
         List<PoisonInspectionVo> repoPosionSummary  = poisonScanOperation.getRepoSummary(CollectionTableName
-                .SCAN_RESULTS, repoList, projectNameList);
+                .SCAN_RESULTS,  runStatusModel.getRepoUrlList());
         Map<String, Long> poisonRepoCount = repoPosionSummary.stream().collect(Collectors.groupingBy(PoisonInspectionVo::getProjectName,
                 Collectors.counting()));
         longResult.put("poisonRepoCount", poisonRepoCount);
         //防投毒门禁级仓库数
         List<PoisonInspectionVo> prPoisonSummary  = poisonScanOperation.getRepoSummary(CollectionTableName
-                .SCAN_PR_RESULTS, repoList, projectNameList);
+                .SCAN_PR_RESULTS,  runStatusModel.getRepoUrlList());
         Map<String, Long> prPoisonRepoCount= prPoisonSummary.stream().collect(Collectors.groupingBy(PoisonInspectionVo::getProjectName,
                 Collectors.counting()));
         longResult.put("prPoisonRepoCount", prPoisonRepoCount);
