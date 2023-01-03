@@ -19,6 +19,9 @@ public class AntiPoisonRunStatusModel {
     //仓库名列表
     private List<String> repoList;
 
+    //项目名称列表
     private List<String> projectNameList;
 
+    //仓库地址列表
+    private List<String> repoUrlList;
 }

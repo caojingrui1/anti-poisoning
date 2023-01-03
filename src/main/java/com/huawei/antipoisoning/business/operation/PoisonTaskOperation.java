@@ -5,6 +5,7 @@
 package com.huawei.antipoisoning.business.operation;
 
 import com.huawei.antipoisoning.business.enmu.CollectionTableName;
+import com.huawei.antipoisoning.business.enmu.ConstantsArgs;
 import com.huawei.antipoisoning.business.entity.AntiEntity;
 import com.huawei.antipoisoning.business.entity.TaskEntity;
 import com.huawei.antipoisoning.business.entity.pr.PRAntiEntity;
@@ -25,6 +26,7 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
 
 import java.util.ArrayList;
@@ -445,30 +447,25 @@ public class PoisonTaskOperation {
 
 
     /**
-     * @param tableName
-     * @param repoList
-     * @param projectNameList
-     * @return
+     * @param tableName       表名称
+     * @param repoUrlList     仓库地址列表
+     * @return List<PoisonInspectionVo>
      */
-    public List<PoisonInspectionVo> getPoisonTaskSummary(String tableName, List<String> repoList, List<String> projectNameList) {
-
+    public List<PoisonInspectionVo> getPoisonTaskSummary(String tableName, List<String> repoUrlList) {
         List<AggregationOperation> operations = new ArrayList<>();
-        //operations.add(Aggregation.match(Criteria.where("project_name").nin(SystemMonitorConstants.OPEN_MAJUN)));
-        operations.add(Aggregation.match(Criteria.where("issue_count").ne(null)));
-        if (repoList.size() != 0) {
-            operations.add(Aggregation.match(Criteria.where("repo_name").in(repoList)));
-            operations.add(Aggregation.match(Criteria.where("project_name").in(projectNameList)));
+        operations.add(Aggregation.match(Criteria.where("project_name").nin(ConstantsArgs.OPEN_MAJUN)));
+        if (!CollectionUtils.isEmpty(repoUrlList)) {
+            operations.add(Aggregation.match(Criteria.where("repo_url").in(repoUrlList)));
         }
         operations.add(Aggregation.sort(Sort.Direction.DESC, "create_time"));
-        operations.add(Aggregation.group("project_name", "repo_name")
+        operations.add(Aggregation.group("project_name", "repo_name", "branch")
                 .first("project_name").as("projectName")
                 .first("repo_name").as("repoName")
-                .first("solve_Count").as("solveCount")
-                .first("issue_count").as("issueCount"));
-
+                .first("branch").as("branch")
+                .first("issue_count").as("issueCount")
+                .first("solve_Count").as("solveCount"));
         List<PoisonInspectionVo> mappedResults = mongoTemplate.aggregate(Aggregation.newAggregation(operations), tableName, PoisonInspectionVo.class)
                 .getMappedResults();
         return mappedResults;
-
     }
 }
