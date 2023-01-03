@@ -105,7 +105,8 @@ class YaraScan(object):
             # apply post handler
             post_strings = yara_match.strings
             if yara_match.rule == 'const_b64_or_hex':
-                post_strings = postH_const_b64_or_hex(post_strings)
+                # python: 由于过长的驼峰API会触发b64的规则，而b64规则可以由其他规则覆盖，因此移除该类误报
+                continue
             elif yara_match.rule == 'os_related':
                 post_strings = postH_os_related(post_strings)
             elif yara_match.rule == 'connect_related':
@@ -197,23 +198,12 @@ class YaraScan(object):
             line_content = "DECODE ERROR"
         return line_number, piece, line_content
 
-
-def postH_const_b64_or_hex(yara_strings) -> list[tuple]:
-    # 由于规则中错误地匹配了 '*' ，只要 '*' 出现了，就认为是bug需要被移除
-    striped = list()
-    for idx, (offset, condition, match_bytes) in enumerate(yara_strings):
-        if condition == '$reg_b64' and match_bytes.count(b'*') > 0:
-            striped.append(idx)
-    if not striped:
-        return yara_strings
-    return [i for j, i in enumerate(yara_strings) if j not in striped]
-
-
 def postH_os_related(yara_strings) -> list[tuple]:
     # 由于规则中错误地展示了 'os.*'，需要将其移除
+    # 单纯导入 os 包并不能与恶意行为划等号，需要将其移除
     striped = list()
     for idx, (offset, condition, match_bytes) in enumerate(yara_strings):
-        if condition == '$os_ini2':
+        if condition == '$os_ini1' or condition == '$os_ini2':
             striped.append(idx)
     if not striped:
         return yara_strings
