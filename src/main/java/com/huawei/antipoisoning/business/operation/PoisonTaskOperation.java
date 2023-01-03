@@ -26,6 +26,7 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
 
 import java.util.ArrayList;
@@ -447,17 +448,14 @@ public class PoisonTaskOperation {
 
     /**
      * @param tableName       表名称
-     * @param repoList        仓库名称列表
-     * @param projectNameList 项目名称列表
+     * @param repoUrlList     仓库地址列表
      * @return List<PoisonInspectionVo>
      */
-    public List<PoisonInspectionVo> getPoisonTaskSummary(String tableName, List<String> repoList, List<String> projectNameList) {
-
+    public List<PoisonInspectionVo> getPoisonTaskSummary(String tableName, List<String> repoUrlList) {
         List<AggregationOperation> operations = new ArrayList<>();
         operations.add(Aggregation.match(Criteria.where("project_name").nin(ConstantsArgs.OPEN_MAJUN)));
-        if (repoList.size() != 0) {
-            operations.add(Aggregation.match(Criteria.where("repo_name").in(repoList)));
-            operations.add(Aggregation.match(Criteria.where("project_name").in(projectNameList)));
+        if (!CollectionUtils.isEmpty(repoUrlList)) {
+            operations.add(Aggregation.match(Criteria.where("repo_url").in(repoUrlList)));
         }
         operations.add(Aggregation.sort(Sort.Direction.DESC, "create_time"));
         operations.add(Aggregation.group("project_name", "repo_name", "branch")
