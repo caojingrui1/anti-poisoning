@@ -139,6 +139,7 @@ class YaraScan(object):
                         if line_content.strip().startswith('#'):
                             continue
                     result['checkResult'] = f'{line_number} : {line_content}'
+                    result['checkResultV2'] = self.linenum_around(data, line_number)
                     result['keyLogInfo'] = f'{line_number} : {piece}'
                     result['hash'] = md5(line_content.encode()).hexdigest()
                     # 对于同一个触发点，不需要报告多次，使用hash去重
@@ -177,6 +178,7 @@ class YaraScan(object):
                     result['checkResult'] = '\n'.join(
                         [f'{line_number} : {line_content}' for line_number, _, line_content in _with_line_number]
                     )
+                    result['checkResultV2'] = self.linenum_around(data, line_number, [_[0] for _ in _with_line_number])
                     result['keyLogInfo'] = '\n'.join(
                         [f'{line_number} : {piece}' for line_number, piece, _ in _with_line_number]
                     )
@@ -185,11 +187,45 @@ class YaraScan(object):
                     if not any(x for x in self.result if x['hash'] == result['hash']):
                         self.result.append(result)
 
+    AROUND_COUNT = 3
+
+    @staticmethod
+    def linenum_around(data: bytes, hit_line_number: int, extra_line_numbers=None) -> list:
+        """
+        返回用于前端展示的扫描结果
+        :param data: 文本内容
+        :param hit_line_number: 核心命中的行号
+        :param extra_line_numbers: 其余相关的行号列表
+        :return: 返回list，list每个元素是dict，包含 "line", "content", "highlight" 3个字段
+        """
+        all_lines = ['PLACE_HOLDER']
+        all_lines.extend(data.split(os.linesep.encode()))
+        line_start = max(hit_line_number - YaraScan.AROUND_COUNT, 1)
+        line_end = min(hit_line_number + YaraScan.AROUND_COUNT, len(all_lines) + 1)
+        output_lines = list(range(line_start, line_end + 1))
+        if extra_line_numbers:
+            output_lines.extend(extra_line_numbers)
+            output_lines = list(set(output_lines))
+            output_lines.sort()
+        try:
+            ret = [{
+                'line': i,
+                'content': all_lines[i].decode(),
+                'highlight': True if i == hit_line_number else False,
+            } for i in output_lines]
+        except UnicodeDecodeError:
+            return [{'line': 1,
+                     'content': "DECODE_ERROR",
+                     'highlight': False,
+                     }]
+        else:
+            return ret
+
     @staticmethod
     def offset_to_content(data, match_bytes, offset) -> (int, str, str):
-        line_number = data[:offset].count(b'\n') + 1
-        line_start = data.rfind(b'\n', 0, offset) + 1
-        line_end = data.find(b'\n', offset) + 1
+        line_number = data[:offset].count(os.linesep.encode()) + 1
+        line_start = data.rfind(os.linesep.encode(), 0, offset) + 1
+        line_end = data.find(os.linesep.encode(), offset) + 1
         try:
             piece = match_bytes.decode()
             line_content = data[line_start: line_end].decode()
@@ -197,6 +233,7 @@ class YaraScan(object):
             piece = "DECODE ERROR"
             line_content = "DECODE ERROR"
         return line_number, piece, line_content
+
 
 def postH_os_related(yara_strings) -> list[tuple]:
     # 由于规则中错误地展示了 'os.*'，需要将其移除
