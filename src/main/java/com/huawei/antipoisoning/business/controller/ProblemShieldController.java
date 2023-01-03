@@ -251,7 +251,7 @@ public class ProblemShieldController {
      * @param paramModel 请求参数体
      * @return MultiResponse
      */
-    @PostMapping("/shield-pr-referral")
+    @PostMapping("/problem-pr-referral")
     public MultiResponse shieldPRReferral(@RequestBody ParamModel paramModel) {
         return problemShieldService.shieldPRReferral(paramModel);
     }
