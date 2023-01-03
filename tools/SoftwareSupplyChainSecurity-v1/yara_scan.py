@@ -201,7 +201,7 @@ class YaraScan(object):
         all_lines = ['PLACE_HOLDER']
         all_lines.extend(data.split(os.linesep.encode()))
         line_start = max(hit_line_number - YaraScan.AROUND_COUNT, 1)
-        line_end = min(hit_line_number + YaraScan.AROUND_COUNT, len(all_lines) + 1)
+        line_end = min(hit_line_number + YaraScan.AROUND_COUNT, len(all_lines) - 1)
         output_lines = list(range(line_start, line_end + 1))
         if extra_line_numbers:
             output_lines.extend(extra_line_numbers)
