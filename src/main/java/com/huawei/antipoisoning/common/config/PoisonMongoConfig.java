@@ -27,7 +27,7 @@ public class PoisonMongoConfig {
     private final String mongouri =
             System.getenv("spring.data.mongodb.uri");
 
-    private final String dbName =
+    private final String dbName = 
             System.getenv("spring.data.mongodb.dbname");
 
     /**
