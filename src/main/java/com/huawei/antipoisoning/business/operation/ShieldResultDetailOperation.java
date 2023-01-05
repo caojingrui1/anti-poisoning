@@ -148,7 +148,7 @@ public class ShieldResultDetailOperation {
             savePR(resultEntity);
         }
         List<String> detailsId = resultEntityList.stream().map(PRResultEntity::getDetailId).collect(Collectors.toList());
-        scanResultDetailOperation.updateStatus(detailsId, status);
+        scanResultDetailOperation.updatePRStatus(detailsId, status);
         // 修改扫描结果表中解决问题数
         if ("2".equals(status)) {
             PRTaskEntity taskEntity =

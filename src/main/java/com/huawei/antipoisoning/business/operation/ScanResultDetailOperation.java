@@ -352,6 +352,19 @@ public class ScanResultDetailOperation {
     }
 
     /**
+     * 修改门禁问题状态
+     *
+     * @param detailsId 问题id列表
+     * @param status    状态
+     */
+    public void updatePRStatus(List<String> detailsId, String status) {
+        Criteria criteria = Criteria.where("_id").in(detailsId);
+        Query query = Query.query(criteria);
+        Update update = Update.update("status", status);
+        mongoTemplate.updateMulti(query, update, CollectionTableName.SCAN_PR_RESULT_DETAILS);
+    }
+
+    /**
      * 根据条件查询result
      *
      * @param userId      用户id

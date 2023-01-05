@@ -79,6 +79,12 @@ public class PRResultEntity {
     private String checkResult;
 
     /**
+     * 代码上下文+问题行高亮
+     */
+    @Field("check_result_v2")
+    private String checkResultV2;
+
+    /**
      * 问题关键字
      */
     @Field("key_log_info")
