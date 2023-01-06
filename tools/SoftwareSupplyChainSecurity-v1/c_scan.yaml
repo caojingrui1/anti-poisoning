@@ -1,18 +1,13 @@
 scan_tasks:
   - name: Yara scan (c)
-    rule_dir: c_scan/c_yara
     rules:
-      - rule: c_password_strcmp.yar_all
-        description: "检测源码中的硬编码口令"
+      - rule: c_scan/c_yara/c_password_strcmp.yar_all
         type: [ .c, .h, .cpp, .cc, .cxx, .hpp, .c++ ]
-      - rule: decode_exec.yar_all
-        description: "检测源码中的解密执行恶意代码"
+      - rule: c_scan/c_yara/decode_exec.yar_all
         type: [ .c, .h, .cpp, .cc, .cxx, .hpp, .c++ ]
-      - rule: hardcode_pw_define.yar
-        description: "检测源码中的宏定义口令"
+      - rule: c_scan/c_yara/hardcode_pw_define.yar
         type: [ .c, .h, .cpp, .cc, .cxx, .hpp, .c++ ]
-      - rule: shelldetect1.yar_all
-        description: "检测源码中加密过的恶意代码"
+      - rule: c_scan/c_yara/shelldetect1.yar_all
         type: [ .c, .h, .cpp, .cc, .cxx, .hpp, .c++ ]
 
 exclude:

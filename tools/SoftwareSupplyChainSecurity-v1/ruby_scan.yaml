@@ -1,63 +1,31 @@
 scan_tasks:
   - name: Yara scan (ruby)
-    rule_dir: ruby_scan
     rules:
-      - rule: ruby_backdoor.yar_all
-        description: "检测反弹shell的行为"
+      - rule: ruby_scan/ruby_backdoor.yar_all
         type: [ .rb, .gemspec, Rakefile ]
-      - rule: ruby_decode_exec.yar
-        description: "检测源码中的解密执行恶意代码"
+      - rule: ruby_scan/ruby_decode_exec.yar
         type: [ .rb, .gemspec, Rakefile ]
-      - rule: ruby_decode_to_system.yar
-        description: "检测源码中的解密执行恶意代码"
+      - rule: ruby_scan/ruby_decode_to_system.yar
         type: [ .rb, .gemspec, Rakefile ]
-      - rule: ruby_download_exec.yar
-        description: "检测下载和执行木马"
+      - rule: ruby_scan/ruby_download_exec.yar
         type: [ .rb, .gemspec, Rakefile ]
-      - rule: ruby_download_exec.yar_all
-        description: "检测下载和执行木马"
+      - rule: ruby_scan/ruby_evil_url.yar_all
         type: [ .rb, .gemspec, Rakefile ]
-      - rule: ruby_download_exec1.yar
-        description: "检测下载和执行木马"
+      - rule: ruby_scan/ruby_exec_evil_cmd.yar
         type: [ .rb, .gemspec, Rakefile ]
-      - rule: ruby_download_exec2.yar
-        description: "检测下载和执行木马"
+      - rule: ruby_scan/ruby_exec_evil_vbs.yar_all
         type: [ .rb, .gemspec, Rakefile ]
-      - rule: ruby_evil_url.yar_all
-        description: "检测恶意网站"
+      - rule: ruby_scan/ruby_miner.yar
         type: [ .rb, .gemspec, Rakefile ]
-      - rule: ruby_exec_evil_cmd.yar
-        description: "检测恶意命令"
+      - rule: ruby_scan/ruby_obfuscator.yar_all
         type: [ .rb, .gemspec, Rakefile ]
-      - rule: ruby_exec_evil_cmd.yar_all
-        description: "检测恶意命令"
+      - rule: ruby_scan/ruby_rename_exec.yar_all
         type: [ .rb, .gemspec, Rakefile ]
-      - rule: ruby_exec_evil_vbs.yar_all
-        description: "检测恶意命令"
+      - rule: ruby_scan/ruby_sendinfo.yar
         type: [ .rb, .gemspec, Rakefile ]
-      - rule: ruby_obfuscator.yar_all
-        description: "检测混淆的ruby代码"
+      - rule: ruby_scan/ruby_sensitive_access.yar
         type: [ .rb, .gemspec, Rakefile ]
-      - rule: ruby_rename_exec.yar_all
-        description: "检测ruby代码中重命名并执行代码"
-        type: [ .rb, .gemspec, Rakefile ]
-      - rule: ruby_sendinfo.yar
-        description: "检测敏感信息外发"
-        type: [ .rb, .gemspec, Rakefile ]
-      - rule: ruby_sendinfo.yar_all
-        description: "检测敏感信息外发"
-        type: [ .rb, .gemspec, Rakefile ]
-      - rule: ruby_sendinfo_all2.yar_all
-        description: "检测敏感信息外发"
-        type: [ .rb, .gemspec, Rakefile ]
-      - rule: ruby_sendinfo_email.yar_all
-        description: "检测敏感信息外发"
-        type: [ .rb, .gemspec, Rakefile ]
-      - rule: ruby_sensitive_word.yar
-        description: "检测机密文件访问和ruby挖矿"
-        type: [ .rb, .gemspec, Rakefile ]
-      - rule: ruby_write_system_file_all.yar_all
-        description: "检测写入系统文件"
+      - rule: ruby_scan/ruby_write_system_file_all.yar_all
         type: [ .rb, .gemspec, Rakefile ]
 
 exclude:

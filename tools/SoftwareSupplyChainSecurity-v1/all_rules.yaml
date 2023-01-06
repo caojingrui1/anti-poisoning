@@ -1,0 +1,89 @@
+scan_tasks:
+  - name: all rules
+    rules:
+      - rule: c_scan/c_yara/c_password_strcmp.yar_all
+        type: [ .c, .h, .cpp, .cc, .cxx, .hpp, .c++ ]
+      - rule: c_scan/c_yara/decode_exec.yar_all
+        type: [ .c, .h, .cpp, .cc, .cxx, .hpp, .c++ ]
+      - rule: c_scan/c_yara/hardcode_pw_define.yar
+        type: [ .c, .h, .cpp, .cc, .cxx, .hpp, .c++ ]
+      - rule: c_scan/c_yara/shelldetect1.yar_all
+        type: [ .c, .h, .cpp, .cc, .cxx, .hpp, .c++ ]
+      - rule: js_scan/common_discord_file.yar
+        type: [ .ts, .js ]
+      - rule: js_scan/js_decode_exec1.yar_strong
+        type: [ .ts, .js ]
+      - rule: js_scan/js_mine_scan.yar
+        type: [ .js, .ts, .html, .htm, .xhtml, .jhtml ]
+      - rule: js_scan/js_net_backdoor.yar
+        type: [ .ts, .js ]
+      - rule: js_scan/js_obfuscate_uglifyjs.yar
+        type: [ .ts, .js ]
+      - rule: js_scan/js_script_blacklist.yar
+        type: [ .js, .ts, package.json, .sh ]
+      - rule: js_scan/js_send_info.yar
+        type: [ .js, .ts, package.json, .sh ]
+      - rule: js_scan/shell_damge_sys.yar
+        type: [ .js, .ts, package.json, .sh ]
+      - rule: js_scan/shell_download_execute.yar
+        type: [ .js, .ts, package.json, .sh ]
+      - rule: js_scan/shell_sensitive_info.yar
+        type: [ .js, .ts, package.json, .sh ]
+      - rule: java_scan/download_exec.yar
+        type: [ .java ]
+      - rule: java_scan/info_leak.yar
+        type: [ .java ]
+      - rule: python_scan/python_connect_string.yar
+        type: [ setup.py, __init__.py ]
+      - rule: python_scan/python_dangerous_command.yar
+        type: [ setup.py, __init__.py ]
+      - rule: python_scan/python_encode_string.yar
+        type: [ setup.py, __init__.py ]
+      - rule: python_scan/python_os_rule.yar
+        type: [ setup.py, __init__.py ]
+      - rule: ruby_scan/ruby_backdoor.yar_all
+        type: [ .rb, .gemspec, Rakefile ]
+      - rule: ruby_scan/ruby_decode_exec.yar
+        type: [ .rb, .gemspec, Rakefile ]
+      - rule: ruby_scan/ruby_decode_to_system.yar
+        type: [ .rb, .gemspec, Rakefile ]
+      - rule: ruby_scan/ruby_download_exec.yar
+        type: [ .rb, .gemspec, Rakefile ]
+      - rule: ruby_scan/ruby_evil_url.yar_all
+        type: [ .rb, .gemspec, Rakefile ]
+      - rule: ruby_scan/ruby_exec_evil_cmd.yar
+        type: [ .rb, .gemspec, Rakefile ]
+      - rule: ruby_scan/ruby_exec_evil_vbs.yar_all
+        type: [ .rb, .gemspec, Rakefile ]
+      - rule: ruby_scan/ruby_miner.yar
+        type: [ .rb, .gemspec, Rakefile ]
+      - rule: ruby_scan/ruby_obfuscator.yar_all
+        type: [ .rb, .gemspec, Rakefile ]
+      - rule: ruby_scan/ruby_rename_exec.yar_all
+        type: [ .rb, .gemspec, Rakefile ]
+      - rule: ruby_scan/ruby_sendinfo.yar
+        type: [ .rb, .gemspec, Rakefile ]
+      - rule: ruby_scan/ruby_sensitive_access.yar
+        type: [ .rb, .gemspec, Rakefile ]
+      - rule: ruby_scan/ruby_write_system_file_all.yar_all
+        type: [ .rb, .gemspec, Rakefile ]
+      - rule: password_scan/linux_api_key_reg.yar_all
+        type: [ .sh, .c, .h, .cpp, .cc, .cxx, .hpp, .py, .go, .java, .rb, .js, .ts, .php ]
+      - rule: password_scan/password_in_command.yar_all
+        type: [ .sh, .c, .h, .cpp, .cc, .cxx, .hpp, .py, .go, .java, .rb, .js, .ts, .php ]
+      - rule: password_scan/password_in_var.yar_strong
+        type: [ '*' ]
+      - rule: password_scan/password_in_conf.yar_all
+        type: [ '*' ]
+      - rule: password_scan/secret_key_reg.yar_all
+        type: [ .sh, .c, .h, .cpp, .cc, .cxx, .hpp, .py, .go, .java, .rb, .js, .ts, .php ]
+      - rule: password_scan/trojan_scan.yar_all
+        type: [ .sh, .c, .h, .cpp, .cc, .cxx, .hpp, .py, .go, .java, .rb, .js, .ts, .php ]
+
+
+
+exclude:
+  - test
+  - demo
+  - example
+shebang_exam: no
