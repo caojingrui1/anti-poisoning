@@ -9,7 +9,7 @@ def main():
     parser = prepare_parser()
     args = parser.parse_args()
 
-    if not any([args.enable_diff, args.enable_c, args.enable_java, args.enable_javascript,
+    if not any([args.enable_c, args.enable_java, args.enable_javascript,
                 args.enable_python, args.enable_ruby, args.custom_yaml]):
         parser.print_help()
         print("请开启至少 1 个扫描规则")
@@ -24,8 +24,6 @@ def main():
     if args.custom_yaml:
         enabled_scanner.append(YaraScan(source_dir, args.custom_yaml))
     else:
-        if args.enable_diff:
-            enabled_scanner.append(YaraScan(source_dir, 'diff_scan.yaml'))
         if args.enable_c:
             enabled_scanner.append(YaraScan(source_dir, 'c_scan.yaml'))
         if args.enable_java:
@@ -55,7 +53,6 @@ def main():
 
 def prepare_parser():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--enable-diff", help='开启diff扫描', action='store_true')
     parser.add_argument("--enable-c", help='开启c扫描', action='store_true')
     parser.add_argument("--enable-java", help='开启java扫描', action='store_true')
     parser.add_argument("--enable-javascript", help='开启javascript扫描', action='store_true')

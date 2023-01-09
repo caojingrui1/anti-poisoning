@@ -1,43 +1,27 @@
 scan_tasks:
   - name: Yara scan (javascript)
-    rule_dir: js_scan
     rules:
-      - rule: common_discord_file.yar
-        description: "检查源码中的Discord敏感文件"
+      - rule: js_scan/common_discord_file.yar
         type: [ .ts, .js ]
-      - rule: js_decode_exec1.yar_strong
-        description: "检测解密执行恶意代码"
+      - rule: js_scan/js_decode_exec1.yar_strong
         type: [ .ts, .js ]
-      - rule: js_mine_scan.yar
-        description: "检测挖矿行为"
+      - rule: js_scan/js_mine_scan.yar
         type: [ .js, .ts, .html, .htm, .xhtml, .jhtml ]
-      - rule: js_net_backdoor.yar
-        description: "检测下载和执行木马"
+      - rule: js_scan/js_net_backdoor.yar
         type: [ .ts, .js ]
-      - rule: js_obfuscate_detect.yar
-        description: "检测被混淆的js代码"
+      - rule: js_scan/js_obfuscate_uglifyjs.yar
         type: [ .ts, .js ]
-      - rule: js_script_blacklist.yar
-        description: "检测黑名单网址"
+      - rule: js_scan/js_script_blacklist.yar
         type: [ .js, .ts, package.json, .sh ]
-      - rule: js_send_info.yar
-        description: "检测侧信道信息外发"
+      - rule: js_scan/js_send_info.yar
         type: [ .js, .ts, package.json, .sh ]
-      - rule: js_sensitive_file.yar
-        description: "检测敏感文件访问"
+      - rule: js_scan/shell_damge_sys.yar
         type: [ .js, .ts, package.json, .sh ]
-      - rule: js_sensitive_info.yar
-        description: "检测敏感文件访问"
-        type: [ .ts, .js ]
-      - rule: shell_damge_sys.yar
-        description: "检测执行破坏性指令"
+      - rule: js_scan/shell_download_execute.yar
         type: [ .js, .ts, package.json, .sh ]
-      - rule: shell_download_execute.yar
-        description: "检测下载执行木马"
+      - rule: js_scan/shell_sensitive_info.yar
         type: [ .js, .ts, package.json, .sh ]
-      - rule: shell_sensitive_info.yar
-        description: "检测敏感信息外发"
-        type: [ .js, .ts, package.json, .sh ]
+
 exclude:
   - test
   - demo
