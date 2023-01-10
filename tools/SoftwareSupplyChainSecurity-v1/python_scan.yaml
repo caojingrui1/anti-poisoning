@@ -1,24 +1,13 @@
 scan_tasks:
   - name: Yara scan (python)
-    rule_dir: python_scan
     rules:
-      - rule: python_b64_decode_rule.yar
-        description: "检测__init__.py和setup.py中的解密执行恶意代码"
+      - rule: python_scan/python_connect_string.yar
         type: [ setup.py, __init__.py ]
-      - rule: python_dangerous_command.yar
-        description: "检测__init__.py和setup.py中执行破坏性指令"
+      - rule: python_scan/python_dangerous_command.yar
         type: [ setup.py, __init__.py ]
-      - rule: python_hex_decode_rule.yar
-        description: "检测__init__.py和setup.py中的解密执行恶意代码"
+      - rule: python_scan/python_encode_string.yar
         type: [ setup.py, __init__.py ]
-      - rule: python_os_rule.yar
-        description: "检测__init__.py和setup.py中的危险调用"
-        type: [ setup.py, __init__.py ]
-      - rule: python_reverse_shell.yar
-        description: "检测__init__.py和setup.py中的反弹shell"
-        type: [ setup.py, __init__.py ]
-      - rule: python_sensitive_keyword.yar
-        description: "检测__init__.py和setup.py中的危险调用"
+      - rule: python_scan/python_os_rule.yar
         type: [ setup.py, __init__.py ]
 
 exclude:

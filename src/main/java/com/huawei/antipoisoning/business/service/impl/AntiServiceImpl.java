@@ -143,6 +143,8 @@ public class AntiServiceImpl implements AntiService {
                         if ((results.size() - solveCount) > 0) { // 未解决问题数大于0，扫描不通过
                             antiEntity.setIsPass(false);
                         }
+                    } else {
+                        antiEntity.setIssueCount(0);
                     }
                     // 执行成功  0：未执行、1：执行中、2：执行成功、3：执行失败
                     taskEntity.setExecutionStatus(2);

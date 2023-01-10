@@ -111,6 +111,10 @@ class YaraScan(object):
                 post_strings = postH_os_related(post_strings)
             elif yara_match.rule == 'connect_related':
                 post_strings = postH_connect_related(post_strings)
+            elif yara_match.rule == 'dangerous_command':
+                post_strings = postH_dangerous_command(post_strings)
+            elif yara_match.rule == 'define_password':
+                post_strings = postH_define_password(post_strings)
 
             if not post_strings:
                 continue
@@ -235,23 +239,50 @@ class YaraScan(object):
         return line_number, piece, line_content
 
 
-def postH_os_related(yara_strings) -> list[tuple]:
-    # 由于规则中错误地展示了 'os.*'，需要将其移除
-    # 单纯导入 os 包并不能与恶意行为划等号，需要将其移除
+def postH_os_related(yara_strings) -> list:
     striped = list()
     for idx, (offset, condition, match_bytes) in enumerate(yara_strings):
+        # 由于规则中错误地展示了 'os.*'，需要将其移除
+        # 单纯导入 os 包并不能与恶意行为划等号，需要将其移除
         if condition == '$os_ini1' or condition == '$os_ini2':
+            striped.append(idx)
+        # 创建目录和移除文件不能视为投毒行为，目前尚未有相关案例
+        elif condition == '$os_ope8' or condition == '$os_ope9' or condition == '$os_ope10':
             striped.append(idx)
     if not striped:
         return yara_strings
     return [i for j, i in enumerate(yara_strings) if j not in striped]
 
 
-def postH_connect_related(yara_strings) -> list[tuple]:
+def postH_connect_related(yara_strings) -> list:
     # 规则中 reg1和reg3 会冲，移除reg1的报告
     striped = list()
     for idx, (offset, condition, match_bytes) in enumerate(yara_strings):
         if condition == '$ip_reg1':
+            striped.append(idx)
+    if not striped:
+        return yara_strings
+    return [i for j, i in enumerate(yara_strings) if j not in striped]
+
+def postH_dangerous_command(yara_strings) -> list:
+    striped = list()
+    for idx, (offset, condition, match_bytes) in enumerate(yara_strings):
+        # 修改当前进程的环境变量不会影响到整个系统，屏蔽该类误报
+        if condition == '$dangerous_command11':
+            striped.append(idx)
+    if not striped:
+        return yara_strings
+    return [i for j, i in enumerate(yara_strings) if j not in striped]
+
+
+def postH_define_password(yara_strings) -> list:
+    striped = list()
+    for idx, (offset, condition, match_bytes) in enumerate(yara_strings):
+        # 宏定义的内容如果是数字和枚举，并非字符串，则不应当视为密码
+        _slices = match_bytes.split()
+        if len(_slices) < 3 \
+                or _slices[2].isdigit() \
+                or _slices[2].startswith(b'0'):  # 0x 0o 0b
             striped.append(idx)
     if not striped:
         return yara_strings
