@@ -1,6 +1,6 @@
-
 server:
   port: 8086
+  name: anti-poisoning
 git:
   username: openlibing@163.com
   password: ENC(ac2sDLzYl/zj9MFEwF7wmZsYjn7V1B5J)
@@ -19,4 +19,4 @@ management:
       show-details: always
   metrics:
     tags:
-      application: anti-poisoning
+      application: ${server.name}
