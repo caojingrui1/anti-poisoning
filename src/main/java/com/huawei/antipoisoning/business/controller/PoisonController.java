@@ -11,6 +11,7 @@ import com.huawei.antipoisoning.business.entity.AntiEntity;
 import com.huawei.antipoisoning.business.entity.pr.PullRequestInfo;
 import com.huawei.antipoisoning.business.entity.RepoInfo;
 import com.huawei.antipoisoning.business.entity.TaskEntity;
+import com.huawei.antipoisoning.business.entity.vo.AntiPoisonChangeBoardModel;
 import com.huawei.antipoisoning.business.entity.vo.AntiPoisonRunStatusModel;
 import com.huawei.antipoisoning.business.service.PoisonService;
 import com.huawei.antipoisoning.common.entity.MultiResponse;
@@ -22,7 +23,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
-
 import java.util.Objects;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -174,6 +174,32 @@ public class PoisonController {
             method = RequestMethod.POST)
     public MultiResponse poisonRunstatusData(@RequestBody AntiPoisonRunStatusModel runStatusModel) {
         return poisonService.poisonRunstatusData(runStatusModel);
+    }
+
+    /**
+     * 防投毒运营数据统计
+     * @param changeBoardModel 查询实体类
+     * @return
+     */
+    @RequestMapping(value = "/poisonChangeBoardData",
+            produces = {"application/json"},
+            consumes = {"application/json"},
+            method = RequestMethod.POST)
+    public MultiResponse poisonChangeBoardData(@RequestBody AntiPoisonChangeBoardModel changeBoardModel) {
+        return poisonService.poisonChangeBoardData(changeBoardModel);
+    }
+
+    /**
+     * 开源变革防投毒门禁查询
+     * @param changeBoardModel 查询实体类
+     * @return
+     */
+    @RequestMapping(value = "/poisonPrquery",
+            produces = {"application/json"},
+            consumes = {"application/json"},
+            method = RequestMethod.POST)
+    public MultiResponse poisonPrquery(@RequestBody AntiPoisonChangeBoardModel changeBoardModel) {
+        return poisonService.poisonPrquery(changeBoardModel);
     }
 }
 
