@@ -391,7 +391,8 @@ public class PoisonServiceImpl implements PoisonService {
     }
 
     /**
-     *开源变革防投毒门禁查询
+     * 开源变革防投毒门禁查询
+     *
      * @param changeBoardModel 查询实体
      * @return
      */
@@ -400,10 +401,10 @@ public class PoisonServiceImpl implements PoisonService {
         List<PoisonPrSummaryVo> prSummaryVos = poisonTaskOperation.poisonPrSummary(changeBoardModel);
         List<AntiPoisonPrModel> poisonPrModelList = poisonPrModelData(prSummaryVos);
         Map<String, Object> result = new HashMap<>();
-        if (!CollectionUtils.isEmpty(poisonPrModelList)){
-            result.put("poisonPrModelList",poisonPrModelList);
+        if (!CollectionUtils.isEmpty(poisonPrModelList)) {
+            result.put("poisonPrModelList", poisonPrModelList);
             return new MultiResponse().code(200).result(result);
-        }else {
+        } else {
             return new MultiResponse().code(200).message("为查询到数据");
         }
     }
