@@ -4,6 +4,9 @@
 
 package com.huawei.antipoisoning.business.enmu;
 
+import java.util.Arrays;
+import java.util.List;
+
 /**
  * 常量参数。
  *
@@ -45,4 +48,9 @@ public class ConstantsArgs {
      * openMajun projectName
      */
     public static final String OPEN_MAJUN = "openMajun";
+
+    /**
+     * 三大特殊社区
+     */
+    public static final List<String> SPECIAL_PRO = Arrays.asList("openeuler", "opengauss", "mindspore");
 }

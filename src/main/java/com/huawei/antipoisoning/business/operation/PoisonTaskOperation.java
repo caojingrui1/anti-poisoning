@@ -5,13 +5,16 @@
 package com.huawei.antipoisoning.business.operation;
 
 import com.huawei.antipoisoning.business.enmu.CollectionTableName;
+import com.huawei.antipoisoning.business.enmu.CommonConstants;
 import com.huawei.antipoisoning.business.enmu.ConstantsArgs;
 import com.huawei.antipoisoning.business.entity.AntiEntity;
 import com.huawei.antipoisoning.business.entity.TaskEntity;
 import com.huawei.antipoisoning.business.entity.pr.PRAntiEntity;
 import com.huawei.antipoisoning.business.entity.pr.PRTaskEntity;
+import com.huawei.antipoisoning.business.entity.vo.AntiPoisonChangeBoardModel;
 import com.huawei.antipoisoning.business.entity.vo.PageVo;
 import com.huawei.antipoisoning.business.entity.vo.PoisonInspectionVo;
+import com.huawei.antipoisoning.business.entity.vo.PoisonPrSummaryVo;
 import com.mongodb.client.result.UpdateResult;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -28,7 +31,6 @@ import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -445,10 +447,9 @@ public class PoisonTaskOperation {
         return mongoTemplate.updateMulti(query, update, CollectionTableName.POISON_PR_TASK);
     }
 
-
     /**
-     * @param tableName       表名称
-     * @param repoUrlList     仓库地址列表
+     * @param tableName   表名称
+     * @param repoUrlList 仓库地址列表
      * @return List<PoisonInspectionVo>
      */
     public List<PoisonInspectionVo> getPoisonTaskSummary(String tableName, List<String> repoUrlList) {
@@ -467,5 +468,32 @@ public class PoisonTaskOperation {
         List<PoisonInspectionVo> mappedResults = mongoTemplate.aggregate(Aggregation.newAggregation(operations), tableName, PoisonInspectionVo.class)
                 .getMappedResults();
         return mappedResults;
+    }
+
+    public List<PoisonPrSummaryVo> poisonPrSummary(AntiPoisonChangeBoardModel changeBoardModel) {
+        Criteria criteria = new Criteria();
+        criteria.and("create_time").gte(changeBoardModel.getStartTime()).lte(changeBoardModel.getEndTime());
+        if (StringUtils.isNotBlank(changeBoardModel.getProjectName())) {
+            criteria.and("project_name").in(changeBoardModel.getProjectName()).nin(ConstantsArgs.OPEN_MAJUN);
+        } else {
+            criteria.and("project_name").in(ConstantsArgs.SPECIAL_PRO).nin(ConstantsArgs.OPEN_MAJUN);
+        }
+        if (!CollectionUtils.isEmpty(changeBoardModel.getInfo())) {
+            criteria.andOperator(Criteria.where("repo_url").in(changeBoardModel.getInfo()));
+        }
+        List<AggregationOperation> operations = new ArrayList<>();
+        operations.add(Aggregation.match(criteria));
+        operations.add(Aggregation.group("pr_url")
+                .first("project_name").as("projectName")
+                .first("repo_name").as("repoNameEn")
+                .first("branch").as("branch")
+                .first("execute_end_time").as("executeEndTime")
+                .first("execute_start_time").as("executeStartTime")
+                .first("pr_url").as("prUrl")
+                .first("is_success").as("result")
+        );
+        return mongoTemplate.aggregate(Aggregation.newAggregation(operations),
+                CollectionTableName.POISON_PR_TASK, PoisonPrSummaryVo.class).getMappedResults();
+
     }
 }
