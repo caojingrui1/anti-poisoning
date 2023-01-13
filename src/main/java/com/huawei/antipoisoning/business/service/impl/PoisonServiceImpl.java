@@ -8,6 +8,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.huawei.antipoisoning.business.enmu.CollectionTableName;
 import com.huawei.antipoisoning.business.enmu.CommonConstants;
+import com.huawei.antipoisoning.business.enmu.ConstantsArgs;
 import com.huawei.antipoisoning.business.entity.AntiEntity;
 import com.huawei.antipoisoning.business.entity.RepoInfo;
 import com.huawei.antipoisoning.business.entity.ResultEntity;
@@ -17,9 +18,12 @@ import com.huawei.antipoisoning.business.entity.checkrule.RuleModel;
 import com.huawei.antipoisoning.business.entity.checkrule.RuleSetModel;
 import com.huawei.antipoisoning.business.entity.checkrule.TaskRuleSetVo;
 import com.huawei.antipoisoning.business.entity.pr.PullRequestInfo;
+import com.huawei.antipoisoning.business.entity.vo.AntiPoisonChangeBoardModel;
+import com.huawei.antipoisoning.business.entity.vo.AntiPoisonPrModel;
 import com.huawei.antipoisoning.business.entity.vo.AntiPoisonRunStatusModel;
 import com.huawei.antipoisoning.business.entity.vo.PageVo;
 import com.huawei.antipoisoning.business.entity.vo.PoisonInspectionVo;
+import com.huawei.antipoisoning.business.entity.vo.PoisonPrSummaryVo;
 import com.huawei.antipoisoning.business.operation.CheckRuleOperation;
 import com.huawei.antipoisoning.business.operation.PoisonResultOperation;
 import com.huawei.antipoisoning.business.operation.PoisonScanOperation;
@@ -34,13 +38,16 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
+import org.springframework.util.CollectionUtils;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.LineNumberReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -225,8 +232,8 @@ public class PoisonServiceImpl implements PoisonService {
             List<TaskRuleSetVo> taskRuleSet = checkRuleOperation.getTaskRuleSet("", task.getProjectName(), task.getRepoName());
             if (taskRuleSet.size() == CommonConstants.CommonNumber.NUMBER_ONE) {
                 task.setTaskRuleSetVo(taskRuleSet.get(0));
-                for (RepoInfo repoInfo : repoInfos){
-                    if (StringUtils.isNotBlank(repoInfo.getPoisonTaskId()) && repoInfo.getPoisonTaskId().equals(task.getTaskId())){
+                for (RepoInfo repoInfo : repoInfos) {
+                    if (StringUtils.isNotBlank(repoInfo.getPoisonTaskId()) && repoInfo.getPoisonTaskId().equals(task.getTaskId())) {
                         task.setBranchRepositoryId(repoInfo.getId());
                     }
                 }
@@ -245,7 +252,7 @@ public class PoisonServiceImpl implements PoisonService {
         List<TaskEntity> result = new ArrayList<>();
         outer:
         for (RepoInfo repoInfo : repoInfos) {
-            if(taskEntities.size() == 0 && StringUtils.isNotBlank(repoInfo.getPoisonTaskId())){
+            if (taskEntities.size() == 0 && StringUtils.isNotBlank(repoInfo.getPoisonTaskId())) {
                 continue outer;
             }
             for (TaskEntity taskEntity1 : taskEntities) {
@@ -310,12 +317,12 @@ public class PoisonServiceImpl implements PoisonService {
         List<String> strList = new ArrayList<String>();
         try {
             LOGGER.info("get diff tree start!");
-            Process process = Runtime.getRuntime().exec(new String[]{"/bin/sh", "-c", sb.toString()},null,null);
+            Process process = Runtime.getRuntime().exec(new String[]{"/bin/sh", "-c", sb.toString()}, null, null);
             InputStreamReader ir = new InputStreamReader(process.getInputStream());
             LineNumberReader input = new LineNumberReader(ir);
             String line;
             process.waitFor();
-            while ((line = input.readLine()) != null){
+            while ((line = input.readLine()) != null) {
                 strList.add(line);
                 LOGGER.info(line);
             }
@@ -328,6 +335,7 @@ public class PoisonServiceImpl implements PoisonService {
 
     /**
      * 运维看板防投毒统计数据
+     *
      * @param runStatusModel 防投毒运维看板数据数据统计查询实体类
      * @return
      */
@@ -336,7 +344,7 @@ public class PoisonServiceImpl implements PoisonService {
         Map<String, Map<String, Long>> longResult = new HashMap<>();
         //查询防投毒任务表
         List<PoisonInspectionVo> poisonTaskSummary = poisonTaskOperation.getPoisonTaskSummary(CollectionTableName
-                .POISON_VERSION_TASK,  runStatusModel.getRepoUrlList());
+                .POISON_VERSION_TASK, runStatusModel.getRepoUrlList());
         //版本级防投毒问题数
         Map<String, Long> poisonIssueCount = poisonTaskSummary.stream().collect(Collectors
                 .groupingBy(PoisonInspectionVo::getProjectName, Collectors.summingLong(PoisonInspectionVo::getIssueCount)));
@@ -346,26 +354,129 @@ public class PoisonServiceImpl implements PoisonService {
                 .groupingBy(PoisonInspectionVo::getProjectName, Collectors.summingLong(PoisonInspectionVo::getSolveCount)));
         longResult.put("poisonSolveCount", poisonSolveCount);
         //防投毒版本级仓库数
-        List<PoisonInspectionVo> repoPosionSummary  = poisonScanOperation.getRepoSummary(CollectionTableName
-                .SCAN_RESULTS,  runStatusModel.getRepoUrlList());
+        List<PoisonInspectionVo> repoPosionSummary = poisonScanOperation.getRepoSummary(CollectionTableName
+                .SCAN_RESULTS, runStatusModel.getRepoUrlList());
         Map<String, Long> poisonRepoCount = repoPosionSummary.stream().collect(Collectors.groupingBy(PoisonInspectionVo::getProjectName,
                 Collectors.counting()));
         longResult.put("poisonRepoCount", poisonRepoCount);
         //防投毒门禁级仓库数
-        List<PoisonInspectionVo> prPoisonSummary  = poisonScanOperation.getRepoSummary(CollectionTableName
-                .SCAN_PR_RESULTS,  runStatusModel.getRepoUrlList());
-        Map<String, Long> prPoisonRepoCount= prPoisonSummary.stream().collect(Collectors.groupingBy(PoisonInspectionVo::getProjectName,
+        List<PoisonInspectionVo> prPoisonSummary = poisonScanOperation.getRepoSummary(CollectionTableName
+                .SCAN_PR_RESULTS, runStatusModel.getRepoUrlList());
+        Map<String, Long> prPoisonRepoCount = prPoisonSummary.stream().collect(Collectors.groupingBy(PoisonInspectionVo::getProjectName,
                 Collectors.counting()));
         longResult.put("prPoisonRepoCount", prPoisonRepoCount);
-        return  new MultiResponse().code(200).result(longResult);
+        return new MultiResponse().code(200).result(longResult);
     }
 
+    /**
+     * 防投毒运营数据统计
+     *
+     * @param changeBoardModel 查询实体
+     * @return
+     */
+    @Override
+    public MultiResponse poisonChangeBoardData(AntiPoisonChangeBoardModel changeBoardModel) {
+        Map<String, Object> result = new HashMap<>();
+        List<PoisonPrSummaryVo> prSummaryVos = poisonTaskOperation.poisonPrSummary(changeBoardModel);
+        Optional.ofNullable(prSummaryVos).ifPresent(poisonPrSummaryVos -> {
+            //防投毒门禁pe数据
+            List<AntiPoisonPrModel> poisonPrModelList = poisonPrModelData(prSummaryVos);
+            result.put("poisonPrModelList", poisonPrModelList);
+            //防投毒门禁反馈时长
+            poisonPrTime(result, prSummaryVos);
+        });
+        //防投毒版本合规
+        poisonIssueCount(changeBoardModel, result);
+        return new MultiResponse().code(200).result(result);
+    }
+
+    /**
+     * 开源变革防投毒门禁查询
+     *
+     * @param changeBoardModel 查询实体
+     * @return
+     */
+    @Override
+    public MultiResponse poisonPrquery(AntiPoisonChangeBoardModel changeBoardModel) {
+        List<PoisonPrSummaryVo> prSummaryVos = poisonTaskOperation.poisonPrSummary(changeBoardModel);
+        List<AntiPoisonPrModel> poisonPrModelList = poisonPrModelData(prSummaryVos);
+        Map<String, Object> result = new HashMap<>();
+        if (!CollectionUtils.isEmpty(poisonPrModelList)) {
+            result.put("poisonPrModelList", poisonPrModelList);
+            return new MultiResponse().code(200).result(result);
+        } else {
+            return new MultiResponse().code(200).message("为查询到数据");
+        }
+    }
+
+    /**
+     * 开源变革防投毒门禁数据模型获取
+     *
+     * @param prSummaryVos 防投毒门禁vo
+     */
+    private List<AntiPoisonPrModel> poisonPrModelData(List<PoisonPrSummaryVo> prSummaryVos) {
+        //查询总量prUrls
+        List<AntiPoisonPrModel> poisonPrModelList = null;
+        if (!CollectionUtils.isEmpty(prSummaryVos)) {
+            poisonPrModelList = prSummaryVos.stream().map(pr -> {
+                AntiPoisonPrModel antiPoisonPrModel = new AntiPoisonPrModel();
+                antiPoisonPrModel.setProjectName(pr.getProjectName())
+                        .setRepoName(pr.getRepoName())
+                        .setResult(pr.getResult())
+                        .setPrUrl(pr.getPrUrl());
+                return antiPoisonPrModel;
+            }).collect(Collectors.toList());
+        }
+        return poisonPrModelList;
+    }
+
+    /**
+     * 防投毒版本问题总数
+     *
+     * @param changeBoardModel 查询实体
+     * @param result
+     */
+    private void poisonIssueCount(AntiPoisonChangeBoardModel changeBoardModel, Map<String, Object> result) {
+        //查询防投毒任务表
+        List<PoisonInspectionVo> poisonTaskSummary = poisonTaskOperation.getPoisonTaskSummary(CollectionTableName
+                .POISON_VERSION_TASK, changeBoardModel.getInfo());
+        List<PoisonInspectionVo> collect = poisonTaskSummary.stream().filter(po -> ConstantsArgs.SPECIAL_PRO.contains(po.getProjectName()))
+                .collect(Collectors.toList());
+        //版本级防投毒问题数
+        Map<String, Long> poisonIssueCount = collect.stream().collect(Collectors
+                .groupingBy(PoisonInspectionVo::getProjectName, Collectors.summingLong(PoisonInspectionVo::getIssueCount)));
+        result.put("poisonIssueCount", poisonIssueCount);
+    }
+
+    /**
+     * 门禁反馈时长
+     *
+     * @param result
+     * @param prSummaryVos 防投毒门禁vo
+     */
+    private void poisonPrTime(Map<String, Object> result, List<PoisonPrSummaryVo> prSummaryVos) {
+        List<PoisonPrSummaryVo> collect = prSummaryVos.stream().map(svo -> {
+            String executeStartTime = svo.getExecuteStartTime();
+            String executeEndTime = svo.getExecuteEndTime();
+            DateTimeFormatter parseFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss:SSS");
+            long endTime = LocalDateTime.parse(executeEndTime, parseFormatter).atOffset(ZoneOffset.UTC).toInstant().toEpochMilli();
+            long startTime = LocalDateTime.parse(executeStartTime, parseFormatter).atOffset(ZoneOffset.UTC).toInstant().toEpochMilli();
+            svo.setExcuteTime(endTime - startTime);
+            return svo;
+        }).collect(Collectors.toList());
+        Map<String, Double> poisonPrTime = collect.stream().collect(Collectors.groupingBy(PoisonPrSummaryVo::getProjectName, Collectors
+                .averagingLong(PoisonPrSummaryVo::getExcuteTime)));        // 将时间转为分钟
+        poisonPrTime.forEach((key, value) -> {
+            poisonPrTime.put(key, Double.valueOf(String.format("%.2f", value / (60 * 1000))));
+        });
+        result.put("poisonPrTime", poisonPrTime);
+    }
 
     /**
      * 检查中心列表手动分页
      *
      * @param results List<TaskEntity>
-     *                * @param results List<TaskEntity>
+     * @param results List<TaskEntity>
      */
     public List<TaskEntity> manualPaging(List<TaskEntity> results, TaskEntity taskEntity) {
         int pageNum = taskEntity.getPageNum();
