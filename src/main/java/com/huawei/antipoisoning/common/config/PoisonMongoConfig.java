@@ -8,6 +8,8 @@ import com.mongodb.ConnectionString;
 import com.mongodb.MongoClientSettings;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -24,6 +26,7 @@ import java.net.URLDecoder;
  */
 @Configuration
 public class PoisonMongoConfig {
+    private static final Logger LOGGER = LoggerFactory.getLogger(PoisonMongoConfig.class);
     private final String mongouri =
             System.getenv("spring.data.mongodb.uri");
 
@@ -44,7 +47,7 @@ public class PoisonMongoConfig {
         try {
             uri = URLDecoder.decode(uri, "utf-8");
         } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
+            LOGGER.error(e.getMessage());
         }
         ConnectionString connectionString = new ConnectionString(uri);
         MongoClientSettings settings = MongoClientSettings.builder().applyConnectionString(connectionString)
