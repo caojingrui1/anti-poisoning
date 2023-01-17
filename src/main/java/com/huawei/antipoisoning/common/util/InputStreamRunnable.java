@@ -4,7 +4,6 @@
 
 package com.huawei.antipoisoning.common.util;
 
-import com.huawei.antipoisoning.business.service.impl.AntiServiceImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,7 +33,7 @@ class InputStreamRunnable implements Runnable {
         try {
             bReader = new BufferedReader(new InputStreamReader(new BufferedInputStream(is), "UTF-8"));
         } catch (Exception ex) {
-            ex.printStackTrace();
+            LOGGER.error(ex.getMessage());
         }
     }
 
@@ -48,7 +47,7 @@ class InputStreamRunnable implements Runnable {
             }
             bReader.close();
         } catch (Exception ex) {
-            ex.printStackTrace();
+            LOGGER.error(ex.getMessage());
         }
     }
 }

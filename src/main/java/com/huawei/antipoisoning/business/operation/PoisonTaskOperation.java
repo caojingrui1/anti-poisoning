@@ -5,7 +5,6 @@
 package com.huawei.antipoisoning.business.operation;
 
 import com.huawei.antipoisoning.business.enmu.CollectionTableName;
-import com.huawei.antipoisoning.business.enmu.CommonConstants;
 import com.huawei.antipoisoning.business.enmu.ConstantsArgs;
 import com.huawei.antipoisoning.business.entity.AntiEntity;
 import com.huawei.antipoisoning.business.entity.TaskEntity;
@@ -465,9 +464,8 @@ public class PoisonTaskOperation {
                 .first("branch").as("branch")
                 .first("issue_count").as("issueCount")
                 .first("solve_Count").as("solveCount"));
-        List<PoisonInspectionVo> mappedResults = mongoTemplate.aggregate(Aggregation.newAggregation(operations), tableName, PoisonInspectionVo.class)
+        return mongoTemplate.aggregate(Aggregation.newAggregation(operations), tableName, PoisonInspectionVo.class)
                 .getMappedResults();
-        return mappedResults;
     }
 
     public List<PoisonPrSummaryVo> poisonPrSummary(AntiPoisonChangeBoardModel changeBoardModel) {
