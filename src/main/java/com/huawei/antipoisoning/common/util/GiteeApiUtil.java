@@ -9,7 +9,6 @@ import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.lang.StringUtils;
 
 import java.io.Serializable;
-import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -60,21 +59,4 @@ public class GiteeApiUtil implements Serializable {
        String result = httpUtil.doGet("", path);
        return JSONArray.parseArray(result);
    }
-
-    public static void main(String[] args) {
-       Map<String, String> param = new HashMap<>();
-       param.put("owner", "zzyy95_1");
-       param.put("repo", "helper");
-       param.put("pullNumber", "2");
-       GiteeApiUtil giteeApiUtil = new GiteeApiUtil(param);
-       JSONArray result = giteeApiUtil.getPrDiffFiles();
-       for (Object file : result) {
-           JSONObject json = (JSONObject) file;
-           String url = json.getString("raw_url");
-           String prePath = url.substring(url.indexOf("gitee.com") + 10, url.indexOf("raw/"));
-           String lastPath = url.substring(url.indexOf("raw/") + 4);
-           String filePath = prePath + lastPath.substring(lastPath.indexOf("/") + 1);
-           StringBuffer buffer = new StringBuffer();
-       }
-    }
 }
