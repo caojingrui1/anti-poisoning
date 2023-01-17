@@ -101,8 +101,7 @@ public class PoisonScanOperation {
                 .first("project_name").as("projectName")
                 .first("repo_name").as("repoName")
                 .first("branch").as("branch"));
-        List<PoisonInspectionVo> mappedResults = mongoTemplate.aggregate(Aggregation.newAggregation(operations), tableName, PoisonInspectionVo.class)
+        return mongoTemplate.aggregate(Aggregation.newAggregation(operations), tableName, PoisonInspectionVo.class)
                 .getMappedResults();
-        return mappedResults;
     }
 }

@@ -6,7 +6,6 @@ package com.huawei.antipoisoning.common.util;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.StringUtils;
 
 import java.io.Serializable;
@@ -43,8 +42,7 @@ public class GiteeApiUtil implements Serializable {
         }
         HttpUtil httpUtil = new HttpUtil(URL);
         String result = httpUtil.doGet("", path);
-        JSONObject body = JSONObject.parseObject(result);
-        return body;
+        return JSONObject.parseObject(result);
     }
 
     /**
@@ -60,8 +58,7 @@ public class GiteeApiUtil implements Serializable {
        }
        HttpUtil httpUtil = new HttpUtil(URL);
        String result = httpUtil.doGet("", path);
-       JSONArray body = JSONArray.parseArray(result);
-       return body;
+       return JSONArray.parseArray(result);
    }
 
     public static void main(String[] args) {
@@ -69,7 +66,6 @@ public class GiteeApiUtil implements Serializable {
        param.put("owner", "zzyy95_1");
        param.put("repo", "helper");
        param.put("pullNumber", "2");
-//       param.put("accessToken", "885b0b978a4edf5f4f9156b6e0d82672");
        GiteeApiUtil giteeApiUtil = new GiteeApiUtil(param);
        JSONArray result = giteeApiUtil.getPrDiffFiles();
        for (Object file : result) {

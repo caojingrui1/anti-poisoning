@@ -4,11 +4,11 @@
 
 package com.huawei.antipoisoning.business.util;
 
-import com.huawei.antipoisoning.business.service.impl.AntiServiceImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
+import java.io.IOException;
 
 /**
  * 文件处理工具类。
@@ -39,16 +39,20 @@ public class FileUtil {
         File[] files = dirFile.listFiles();
         for (int i = 0; i < files.length; i++) {
             // 删除子文件
-            if (files[i].isFile()) {
-                flag = deleteFile(files[i].getAbsolutePath());
-                if (!flag)
-                    break;
-            }
-            // 删除子目录
-            else if (files[i].isDirectory()) {
-                flag = deleteDirectory(files[i].getAbsolutePath());
-                if (!flag)
-                    break;
+            try {
+                if (files[i].isFile()) {
+                    flag = deleteFile(files[i].getCanonicalPath());
+                    if (!flag)
+                        break;
+                }
+                // 删除子目录
+                else if (files[i].isDirectory()) {
+                    flag = deleteDirectory(files[i].getCanonicalPath());
+                    if (!flag)
+                        break;
+                }
+            } catch (IOException e) {
+                LOGGER.error(e.getMessage());
             }
         }
         if (!flag) {

@@ -25,6 +25,7 @@ import com.huawei.antipoisoning.common.entity.MultiResponse;
 import com.huawei.antipoisoning.common.util.AntiMainUtil;
 import com.huawei.antipoisoning.common.util.HttpUtil;
 import com.huawei.antipoisoning.common.util.JGitUtil;
+import com.huawei.antipoisoning.common.util.StreamConsumer;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -439,12 +440,15 @@ public class AntiServiceImpl implements AntiService {
             String url = json.getString("raw_url");
             StringBuffer sb = cmdOfCurl(info, url);
             try {
-                Process process = Runtime.getRuntime().exec(
-                        new String[]{"/bin/sh", "-c", sb.toString()},null,null);
-                InputStreamReader ir = new InputStreamReader(process.getInputStream());
-                LineNumberReader input = new LineNumberReader(ir);
-                String line;
-                process.waitFor();
+                List<String> strList = new ArrayList<>();
+                Process proc = Runtime.getRuntime().exec(new String[]{"/bin/sh", "-c", sb.toString()}, null, null);
+                StreamConsumer errConsumer = new StreamConsumer(proc.getErrorStream(), strList);
+                StreamConsumer outputConsumer = new StreamConsumer(proc.getInputStream(), strList);
+                errConsumer.start();
+                outputConsumer.start();
+                proc.waitFor();
+                errConsumer.join();
+                outputConsumer.join();
             } catch (IOException | InterruptedException e) {
                 pullCode[0] = 1;
                 LOGGER.error("errInfo is {}", e.getMessage());
@@ -469,15 +473,14 @@ public class AntiServiceImpl implements AntiService {
         List<String> strList = new ArrayList<String>();
         try {
             LOGGER.info("get diff tree start!");
-            Process process = Runtime.getRuntime().exec(new String[]{"/bin/sh", "-c", sb.toString()},null,null);
-            InputStreamReader ir = new InputStreamReader(process.getInputStream());
-            LineNumberReader input = new LineNumberReader(ir);
-            String line;
-            process.waitFor();
-            while ((line = input.readLine()) != null){
-                strList.add(line);
-                LOGGER.info(line);
-            }
+            Process proc = Runtime.getRuntime().exec(new String[]{"/bin/sh", "-c", sb.toString()}, null, null);
+            StreamConsumer errConsumer = new StreamConsumer(proc.getErrorStream(), strList);
+            StreamConsumer outputConsumer = new StreamConsumer(proc.getInputStream(), strList);
+            errConsumer.start();
+            outputConsumer.start();
+            proc.waitFor();
+            errConsumer.join();
+            outputConsumer.join();
             LOGGER.info("get diff tree end!");
         } catch (IOException | InterruptedException e) {
             LOGGER.error("errInfo is {}", e.getMessage());
@@ -558,7 +561,7 @@ public class AntiServiceImpl implements AntiService {
      * @return String[]
      */
     public String[] versionScan(String repoName, String branch, String ruleName, String scanId) {
-        String[] versionScan = new String[]{"/bin/sh", "-c",
+        return new String[]{"/bin/sh", "-c",
                     "python3 " + YamlUtil.getToolPath() + AntiConstants.SCANTOOLPATH +
                         // 仓库下载后存放地址
                         " " + YamlUtil.getToolPath() + AntiConstants.REPOPATH +
@@ -569,6 +572,5 @@ public class AntiServiceImpl implements AntiService {
                         "--custom-yaml " + YamlUtil.getToolPath() + AntiConstants.CONFIG_PATH +
                         ruleName + " > " + YamlUtil.getToolPath() + AntiConstants.SCANTOOLFILE +
                         "poison_logs" + File.separator + scanId + ".txt"};
-        return versionScan;
     }
 }

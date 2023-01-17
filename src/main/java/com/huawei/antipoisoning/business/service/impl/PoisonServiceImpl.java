@@ -33,6 +33,7 @@ import com.huawei.antipoisoning.business.service.PoisonService;
 import com.huawei.antipoisoning.business.util.YamlUtil;
 import com.huawei.antipoisoning.common.entity.MultiResponse;
 import com.huawei.antipoisoning.common.util.JGitUtil;
+import com.huawei.antipoisoning.common.util.StreamConsumer;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,9 +43,9 @@ import org.springframework.util.CollectionUtils;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.LineNumberReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
@@ -198,7 +199,7 @@ public class PoisonServiceImpl implements PoisonService {
             HttpURLConnection urlCon = (HttpURLConnection) url.openConnection();
             urlCon.setConnectTimeout(5000);
             urlCon.setReadTimeout(5000);
-            BufferedReader br = new BufferedReader(new InputStreamReader(urlCon.getInputStream()));
+            BufferedReader br = new BufferedReader(new InputStreamReader(urlCon.getInputStream(), StandardCharsets.UTF_8));
             while ((read = br.readLine()) != null) {
                 readStr = readStr + read;
             }
@@ -317,15 +318,14 @@ public class PoisonServiceImpl implements PoisonService {
         List<String> strList = new ArrayList<String>();
         try {
             LOGGER.info("get diff tree start!");
-            Process process = Runtime.getRuntime().exec(new String[]{"/bin/sh", "-c", sb.toString()}, null, null);
-            InputStreamReader ir = new InputStreamReader(process.getInputStream());
-            LineNumberReader input = new LineNumberReader(ir);
-            String line;
-            process.waitFor();
-            while ((line = input.readLine()) != null) {
-                strList.add(line);
-                LOGGER.info(line);
-            }
+            Process proc = Runtime.getRuntime().exec(new String[]{"/bin/sh", "-c", sb.toString()}, null, null);
+            StreamConsumer errConsumer = new StreamConsumer(proc.getErrorStream(), strList);
+            StreamConsumer outputConsumer = new StreamConsumer(proc.getInputStream(), strList);
+            errConsumer.start();
+            outputConsumer.start();
+            proc.waitFor();
+            errConsumer.join();
+            outputConsumer.join();
             LOGGER.info("get diff tree end!");
         } catch (IOException | InterruptedException e) {
             LOGGER.error("errInfo is {}", e.getMessage());

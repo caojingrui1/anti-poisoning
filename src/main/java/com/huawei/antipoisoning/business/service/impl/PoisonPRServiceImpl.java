@@ -295,7 +295,6 @@ public class PoisonPRServiceImpl implements PoisonPRService {
         params.put("pullNumber", prInfo.getPullNumber());
         params.put("accessToken", prInfo.getAccessToken());
         GiteeApiUtil giteeApiUtil = new GiteeApiUtil(params);
-        JSONArray fileArray = giteeApiUtil.getPrDiffFiles();
-        return fileArray;
+        return giteeApiUtil.getPrDiffFiles();
     }
 }
