@@ -5,7 +5,6 @@
 package com.huawei.antipoisoning.common.util;
 
 import com.alibaba.fastjson.JSONObject;
-import com.huawei.antipoisoning.business.service.impl.AntiServiceImpl;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.HttpResponseException;
 import org.apache.http.client.methods.CloseableHttpResponse;

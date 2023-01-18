@@ -13,7 +13,7 @@ RUN yum update -y && yum install -y python3 python3-pip python3-devel gcc java-1
 VOLUME /tmp
 
 # 拉取代码
-RUN git clone -b master http://source.openeuler.sh/openMajun/anti-poisoning.git $PROJECT_HOME
+RUN git clone -b dev http://source.openeuler.sh/openMajun/anti-poisoning.git $PROJECT_HOME
 WORKDIR $PROJECT_HOME/
 RUN mvn clean install -s setting-new.xml
 
@@ -24,4 +24,4 @@ ENV TZ=Asia/Shanghai
 
 WORKDIR $PROJECT_HOME/tools/SoftwareSupplyChainSecurity-v1/
 
-ENTRYPOINT /usr/bin/java -jar -Xms1536m -Xmx1536m $PROJECT_HOME/target/$PROJECT_NAME-0.0.1-SNAPSHOT.jar --logging.file.name=$PROJECT_HOME/tools/SoftwareSupplyChainSecurity-v1/service.out
+ENTRYPOINT /usr/bin/java -jar -Xms2600m -Xmx2600m $PROJECT_HOME/target/$PROJECT_NAME-0.0.1-SNAPSHOT.jar --logging.file.name=$PROJECT_HOME/tools/SoftwareSupplyChainSecurity-v1/service.out
