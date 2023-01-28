@@ -53,4 +53,14 @@ public class ConstantsArgs {
      * 三大特殊社区
      */
     public static final List<String> SPECIAL_PRO = Arrays.asList("openeuler", "opengauss", "mindspore");
+
+    /**
+     * 错误输出线程名称
+     */
+    public static final String ERR_CONSUMER = "errConsumer";
+
+    /**
+     * 正常输出线程名称
+     */
+    public static final String OUTPUT_CONSUMER = "outputConsumer";
 }
