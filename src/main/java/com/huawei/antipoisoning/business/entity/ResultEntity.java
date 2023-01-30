@@ -122,7 +122,7 @@ public class ResultEntity {
     private AntiEntity scanResult;
 
     /**
-     * 文件相对路径
+     * 文件链接路径
      */
     private String fileUrl;
 }
