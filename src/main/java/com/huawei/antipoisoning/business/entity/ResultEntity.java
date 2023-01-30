@@ -117,7 +117,7 @@ public class ResultEntity {
     private Map link;
 
     /**
-     * 文件名
+     * 文件相对路径
      */
     private String relativeFileName;
 }
