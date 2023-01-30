@@ -109,7 +109,7 @@ public class ProblemShieldServiceImpl implements ProblemShieldService {
         Map<String, Object> result = new HashMap<>(2);
         result.put("count", count);
         resultEntities.forEach(resultEntity -> {
-            resultEntity.setSuspiciousFileName(resultEntity.getSuspiciousFileName().replace(
+            resultEntity.setRelativeFileName(resultEntity.getSuspiciousFileName().replace(
                     YamlUtil.getToolPath() + AntiConstants.REPOPATH +
                             resultEntity.getRepoName() + "-" + resultEntity.getBranch(), ""));
         });

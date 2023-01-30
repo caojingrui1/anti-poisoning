@@ -115,4 +115,9 @@ public class ResultEntity {
     private String detailId;
 
     private Map link;
+
+    /**
+     * 文件名
+     */
+    private String relativeFileName;
 }
