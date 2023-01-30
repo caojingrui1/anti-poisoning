@@ -26,4 +26,6 @@ public class AntiConstants {
     public static final String CONFIG_PATH = "/tools/SoftwareSupplyChainSecurity-v1/ruleYaml/";
 
     public static final String DOWN_PATH = "prDownload/";
+
+    public static final String PATH_TREE = "/tree/";
 }
