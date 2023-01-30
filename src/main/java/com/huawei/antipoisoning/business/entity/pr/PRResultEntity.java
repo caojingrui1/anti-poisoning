@@ -111,4 +111,9 @@ public class PRResultEntity {
     private String detailId;
 
     private Map link;
+
+    /**
+     * 文件相对路径
+     */
+    private String relativeFileName;
 }
