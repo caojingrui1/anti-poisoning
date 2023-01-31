@@ -115,4 +115,14 @@ public class ResultEntity {
     private String detailId;
 
     private Map link;
+
+    /**
+     * 防投毒扫描结果实体类
+     */
+    private AntiEntity scanResult;
+
+    /**
+     * 文件链接路径
+     */
+    private String fileUrl;
 }

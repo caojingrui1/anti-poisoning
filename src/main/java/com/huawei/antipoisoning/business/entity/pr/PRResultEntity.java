@@ -111,4 +111,14 @@ public class PRResultEntity {
     private String detailId;
 
     private Map link;
+
+    /**
+     * 防投毒扫描结果实体类
+     */
+    private PRAntiEntity prScanResult;
+
+    /**
+     * 文件链接路径
+     */
+    private String fileUrl;
 }

@@ -135,6 +135,8 @@ public class ScanResultDetailOperation {
         operations.add(Aggregation.match(criteria));
         operations.add(lookup);
         operations.add(Aggregation.unwind("link"));
+        operations.add(lookupScanResult());
+        operations.add(Aggregation.unwind("scanResult"));
         operations.add(Aggregation.match(antiCriteria));
         if (resultDetail.getPageNum() != null && resultDetail.getPageSize() != null) {
             operations.add(Aggregation.skip((long) (resultDetail.getPageNum() - 1)
@@ -190,6 +192,8 @@ public class ScanResultDetailOperation {
         operations.add(Aggregation.match(criteria));
         operations.add(lookup);
         operations.add(Aggregation.unwind("link"));
+        operations.add(lookupPrScanResult());
+        operations.add(Aggregation.unwind("prScanResult"));
         operations.add(Aggregation.match(antiCriteria));
         if (resultDetail.getPageNum() != null && resultDetail.getPageSize() != null) {
             operations.add(Aggregation.skip((long) (resultDetail.getPageNum() - 1)
@@ -206,6 +210,22 @@ public class ScanResultDetailOperation {
                 .localField("rule_name")
                 .foreignField("rule_name")
                 .as("link");
+    }
+
+    private LookupOperation lookupScanResult() {
+        return LookupOperation.newLookup()
+                .from(CollectionTableName.SCAN_RESULTS)
+                .localField("scan_id")
+                .foreignField("scan_id")
+                .as("scanResult");
+    }
+
+    private LookupOperation lookupPrScanResult() {
+        return LookupOperation.newLookup()
+                .from(CollectionTableName.SCAN_PR_RESULTS)
+                .localField("scan_id")
+                .foreignField("scan_id")
+                .as("prScanResult");
     }
 
     /**

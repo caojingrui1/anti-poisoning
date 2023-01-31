@@ -21,7 +21,8 @@ public class StreamConsumer extends Thread {
     InputStream is;
     List<String> strList;
 
-    public StreamConsumer(InputStream is, List<String> strList) {
+    public StreamConsumer(InputStream is, List<String> strList,String name) {
+        super(name);
         this.is = is;
         this.strList = strList;
     }
