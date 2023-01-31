@@ -192,6 +192,8 @@ public class ScanResultDetailOperation {
         operations.add(Aggregation.match(criteria));
         operations.add(lookup);
         operations.add(Aggregation.unwind("link"));
+        operations.add(lookupScanResult());
+        operations.add(Aggregation.unwind("prScanResult"));
         operations.add(Aggregation.match(antiCriteria));
         if (resultDetail.getPageNum() != null && resultDetail.getPageSize() != null) {
             operations.add(Aggregation.skip((long) (resultDetail.getPageNum() - 1)
@@ -212,10 +214,10 @@ public class ScanResultDetailOperation {
 
     private LookupOperation lookupScanResult() {
         return LookupOperation.newLookup()
-                .from(CollectionTableName.SCAN_RESULTS)
+                .from(CollectionTableName.SCAN_PR_RESULTS)
                 .localField("scan_id")
                 .foreignField("scan_id")
-                .as("scanResult");
+                .as("prScanResult");
     }
 
     /**
