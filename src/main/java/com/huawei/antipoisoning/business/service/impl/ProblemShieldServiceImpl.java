@@ -113,7 +113,7 @@ public class ProblemShieldServiceImpl implements ProblemShieldService {
                     YamlUtil.getToolPath() + AntiConstants.REPOPATH +
                             resultEntity.getRepoName() + "-" + resultEntity.getBranch(), "");
             resultEntity.setSuspiciousFileName(relativeFileName);
-            resultEntity.setFileUrl(resultEntity.getScanResult().getRepoUrl()+AntiConstants.PATH_TREE+resultEntity.getScanResult().getBranch()+"/"+relativeFileName);
+            resultEntity.setFileUrl(resultEntity.getScanResult().getRepoUrl()+AntiConstants.PATH_TREE+resultEntity.getScanResult().getBranch()+relativeFileName);
         });
         result.put("data", resultEntities);
         return new MultiResponse().code(200).result(result);
@@ -139,7 +139,7 @@ public class ProblemShieldServiceImpl implements ProblemShieldService {
                     YamlUtil.getToolPath() + AntiConstants.REPOPATH +
                             resultEntity.getRepoName() + "-" + resultEntity.getBranch(), "");
             resultEntity.setSuspiciousFileName(relativeFileName);
-            resultEntity.setFileUrl(resultEntity.getPrScanResult().getRepoUrl()+AntiConstants.PATH_TREE+resultEntity.getPrScanResult().getBranch()+"/"+relativeFileName);
+            resultEntity.setFileUrl(resultEntity.getPrScanResult().getRepoUrl()+AntiConstants.PATH_TREE+resultEntity.getPrScanResult().getBranch()+relativeFileName);
         });
         result.put("count", count);
         result.put("data", resultEntities);
