@@ -327,8 +327,8 @@ public class PoisonServiceImpl implements PoisonService {
         try {
             LOGGER.info("get diff tree start!");
             Process proc = Runtime.getRuntime().exec(new String[]{"/bin/sh", "-c", sb.toString()}, null, null);
-            StreamConsumer errConsumer = new StreamConsumer(proc.getErrorStream(), strList);
-            StreamConsumer outputConsumer = new StreamConsumer(proc.getInputStream(), strList);
+            StreamConsumer errConsumer = new StreamConsumer(proc.getErrorStream(), strList,ConstantsArgs.ERR_CONSUMER);
+            StreamConsumer outputConsumer = new StreamConsumer(proc.getInputStream(), strList,ConstantsArgs.OUTPUT_CONSUMER);
             errConsumer.start();
             outputConsumer.start();
             proc.waitFor();

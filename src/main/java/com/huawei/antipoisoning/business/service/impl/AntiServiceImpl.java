@@ -35,8 +35,6 @@ import org.springframework.stereotype.Service;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.LineNumberReader;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -442,8 +440,8 @@ public class AntiServiceImpl implements AntiService {
             try {
                 List<String> strList = new ArrayList<>();
                 Process proc = Runtime.getRuntime().exec(new String[]{"/bin/sh", "-c", sb.toString()}, null, null);
-                StreamConsumer errConsumer = new StreamConsumer(proc.getErrorStream(), strList);
-                StreamConsumer outputConsumer = new StreamConsumer(proc.getInputStream(), strList);
+                StreamConsumer errConsumer = new StreamConsumer(proc.getErrorStream(), strList,ConstantsArgs.ERR_CONSUMER);
+                StreamConsumer outputConsumer = new StreamConsumer(proc.getInputStream(), strList,ConstantsArgs.OUTPUT_CONSUMER);
                 errConsumer.start();
                 outputConsumer.start();
                 proc.waitFor();
@@ -474,8 +472,8 @@ public class AntiServiceImpl implements AntiService {
         try {
             LOGGER.info("get diff tree start!");
             Process proc = Runtime.getRuntime().exec(new String[]{"/bin/sh", "-c", sb.toString()}, null, null);
-            StreamConsumer errConsumer = new StreamConsumer(proc.getErrorStream(), strList);
-            StreamConsumer outputConsumer = new StreamConsumer(proc.getInputStream(), strList);
+            StreamConsumer errConsumer = new StreamConsumer(proc.getErrorStream(), strList,ConstantsArgs.ERR_CONSUMER);
+            StreamConsumer outputConsumer = new StreamConsumer(proc.getInputStream(), strList,ConstantsArgs.OUTPUT_CONSUMER);
             errConsumer.start();
             outputConsumer.start();
             proc.waitFor();
