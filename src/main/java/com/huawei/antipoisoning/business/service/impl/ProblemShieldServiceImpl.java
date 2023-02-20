@@ -10,6 +10,7 @@ import com.huawei.antipoisoning.business.entity.pr.PRResultEntity;
 import com.huawei.antipoisoning.business.entity.pr.PRTaskEntity;
 import com.huawei.antipoisoning.business.entity.shield.ParamModel;
 import com.huawei.antipoisoning.business.entity.shield.PoisonReportModel;
+import com.huawei.antipoisoning.business.entity.shield.QueryShieldModel;
 import com.huawei.antipoisoning.business.entity.shield.Referral;
 import com.huawei.antipoisoning.business.entity.shield.Revision;
 import com.huawei.antipoisoning.business.operation.ScanResultDetailOperation;
@@ -109,11 +110,11 @@ public class ProblemShieldServiceImpl implements ProblemShieldService {
         Map<String, Object> result = new HashMap<>(2);
         result.put("count", count);
         resultEntities.forEach(resultEntity -> {
-            String relativeFileName =resultEntity.getSuspiciousFileName().replace(
+            String relativeFileName = resultEntity.getSuspiciousFileName().replace(
                     YamlUtil.getToolPath() + AntiConstants.REPOPATH +
                             resultEntity.getRepoName() + "-" + resultEntity.getBranch(), "");
             resultEntity.setSuspiciousFileName(relativeFileName);
-            resultEntity.setFileUrl(resultEntity.getScanResult().getRepoUrl()+AntiConstants.PATH_TREE+resultEntity.getScanResult().getBranch()+relativeFileName);
+            resultEntity.setFileUrl(resultEntity.getScanResult().getRepoUrl() + AntiConstants.PATH_TREE + resultEntity.getScanResult().getBranch() + relativeFileName);
         });
         result.put("data", resultEntities);
         return new MultiResponse().code(200).result(result);
@@ -135,11 +136,11 @@ public class ProblemShieldServiceImpl implements ProblemShieldService {
         int count = scanResultDetailOperation.getPRResultDetail(scanId, userId, paramModel).size();
         Map<String, Object> result = new HashMap<>(2);
         resultEntities.forEach(resultEntity -> {
-            String relativeFileName =resultEntity.getSuspiciousFileName().replace(
+            String relativeFileName = resultEntity.getSuspiciousFileName().replace(
                     YamlUtil.getToolPath() + AntiConstants.REPOPATH +
                             resultEntity.getRepoName() + "-" + resultEntity.getBranch(), "");
             resultEntity.setSuspiciousFileName(relativeFileName);
-            resultEntity.setFileUrl(resultEntity.getPrScanResult().getRepoUrl()+AntiConstants.PATH_TREE+resultEntity.getPrScanResult().getBranch()+relativeFileName);
+            resultEntity.setFileUrl(resultEntity.getPrScanResult().getRepoUrl() + AntiConstants.PATH_TREE + resultEntity.getPrScanResult().getBranch() + relativeFileName);
         });
         result.put("count", count);
         result.put("data", resultEntities);
@@ -172,7 +173,7 @@ public class ProblemShieldServiceImpl implements ProblemShieldService {
         }
         final String pathStr = replaceStr;
         resultEntityList.stream().collect(Collectors.groupingBy(PoisonReportModel::getFileName,
-                        Collectors.summingInt(PoisonReportModel::getTotal)))
+                Collectors.summingInt(PoisonReportModel::getTotal)))
                 .entrySet().stream().sorted(Map.Entry.<String, Integer>comparingByValue().reversed())
                 .forEach(value -> {
                     fileNameReport.put(value.getKey()
@@ -180,7 +181,7 @@ public class ProblemShieldServiceImpl implements ProblemShieldService {
                 });
         // 根据规则统计
         resultEntityList.stream().collect(Collectors.groupingBy(PoisonReportModel::getRuleName,
-                        Collectors.summingInt(PoisonReportModel::getTotal)))
+                Collectors.summingInt(PoisonReportModel::getTotal)))
                 .entrySet().stream().sorted(Map.Entry.<String, Integer>comparingByValue().reversed())
                 .forEach(value -> ruleNameReport.put(value.getKey(), value.getValue()));
         HashMap<String, Integer> ruleReport = new LinkedHashMap<>();
@@ -455,6 +456,7 @@ public class ProblemShieldServiceImpl implements ProblemShieldService {
         return scanResultDetailOperation.getPRPoisoningSelect();
     }
 
+
     /**
      * 问题撤销
      *
@@ -511,5 +513,61 @@ public class ProblemShieldServiceImpl implements ProblemShieldService {
         taskEntity.setSolveCount(solveCount - resultEntities.size());
         taskEntity.setIssueCount(taskEntity.getResultCount() - taskEntity.getSolveCount());
         scanResultDetailOperation.savePRTaskEntity(taskEntity);
+    }
+
+
+    /**
+     * 获取排名前十五的防投毒屏蔽规则
+     *
+     * @param queryShieldModel 方法参数请求体
+     * @return MultiResponse
+     */
+    @Override
+    public MultiResponse getPoisonTopFifteen(QueryShieldModel queryShieldModel) {
+        List<Map> list = shieldResultDetailOperation.getPoisonTopFifteen(queryShieldModel);
+        return new MultiResponse().code(200).result(list);
+    }
+
+    /**
+     * 获取防投毒屏蔽详情查询
+     *
+     * @param queryShieldModel 查询参数体
+     * @return MultiResponse
+     */
+    @Override
+    public MultiResponse poisonShieldDetail(QueryShieldModel queryShieldModel) {
+        List<Map> list = shieldResultDetailOperation.shieldDetail(queryShieldModel);
+        List<Map> mapList = list.stream().map(map -> {
+            String url = "https://gitee.com/" + map.get("project_name") + "/" + map.get("repo_name") + ".git";
+            map.put("gitUrl", url);
+            String suspicious_file_name =map.get("suspicious_file_name").toString().replace(
+                    YamlUtil.getToolPath() + AntiConstants.REPOPATH +
+                            map.get("project_name") + "-" + map.get("repo_name"),"");
+            map.put("file_name", suspicious_file_name);
+            return map;
+        }).collect(Collectors.toList());
+        int count = list.size();
+        HashMap<String, Object> result = new HashMap<>(2);
+        result.put("shieldDetail", mapList);
+        result.put("count", count);
+        return new MultiResponse().code(200).result(result);
+    }
+
+    /**
+     * 防投毒屏蔽类型分布
+     *
+     * @param queryShieldModel 方法参数请求体
+     * @return MultiResponse
+     */
+    @Override
+    public MultiResponse poisonShieldTypeMap(QueryShieldModel queryShieldModel) {
+        List<Map> list = shieldResultDetailOperation.shieldTypeMap(queryShieldModel);
+        Map<String, Integer> result = new HashMap<>();
+        for (Map map : list) {
+            if (map.get("count") instanceof Integer && map.get("_id") instanceof String) {
+                result.put(map.get("_id").toString(), (Integer) (map.get("count")));
+            }
+        }
+        return new MultiResponse().code(200).result(result);
     }
 }

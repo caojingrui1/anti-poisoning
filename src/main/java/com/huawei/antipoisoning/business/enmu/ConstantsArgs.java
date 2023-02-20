@@ -63,4 +63,14 @@ public class ConstantsArgs {
      * 正常输出线程名称
      */
     public static final String OUTPUT_CONSUMER = "outputConsumer";
+
+    /**
+     * 增量标识
+     */
+    public static final String HARMONY_INC = "inc";
+
+    /**
+     * 全量标识
+     */
+    public static final String HARMONY_FULL = "full";
 }
