@@ -546,7 +546,7 @@ public class ProblemShieldServiceImpl implements ProblemShieldService {
             map.put("file_name", suspicious_file_name);
             return map;
         }).collect(Collectors.toList());
-        int count = list.size();
+        int count = shieldResultDetailOperation.countShieldDetail(queryShieldModel);
         HashMap<String, Object> result = new HashMap<>(2);
         result.put("shieldDetail", mapList);
         result.put("count", count);

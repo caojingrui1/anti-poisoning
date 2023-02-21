@@ -303,4 +303,31 @@ public class ShieldResultDetailOperation {
         return mongoTemplate.aggregate(aggregation, tableName, Map.class).getMappedResults();
     }
 
+    /**
+     * 屏蔽详情数量
+     *
+     * @param queryShieldModel 请求参数
+     * @return int
+     */
+    public int countShieldDetail(QueryShieldModel queryShieldModel) {
+        List<AggregationOperation> operations = new ArrayList<>();
+        boolean isFull = ConstantsArgs.HARMONY_FULL.equals(queryShieldModel.getType());
+        Criteria criteria = querySummaryCriteria(queryShieldModel.getProjectName(), queryShieldModel.getRepoName());
+        Criteria criteria1 = queryShieldCriteria(queryShieldModel);
+        operations.add(Aggregation.match(criteria1));
+        operations.add(Aggregation.project("_id"));
+        operations.add(Aggregation.match(criteria));
+        operations.add(Aggregation.count().as("count"));
+        String tableName = isFull ? CollectionTableName
+                .SHIELD_RESULT_DETAIL : CollectionTableName.SHIELD_PR_RESULT_DETAIL;
+        List<Map> list =
+                mongoTemplate.aggregate(Aggregation.newAggregation(operations), tableName, Map.class)
+                        .getMappedResults();
+        int count = 0;
+        if (list.size() > 0) {
+            count = Integer.parseInt(list.get(0).get("count").toString());
+        }
+        return count;
+    }
+
 }
