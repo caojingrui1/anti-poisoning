@@ -213,7 +213,6 @@ public class ShieldResultDetailOperation {
         operations.add(Aggregation.project("project_name", "repo_name", "branch", "revision.shieldType",
                 "suspicious_file_name", "rule_name", "revision.userName", "revision.reason", "revision.applyDate", "revision.reviewerName")
                 .andExpression("{$substrCP:{'$revision.auditDate',9,24}}").as("auditDate"));
-
         operations.add(Aggregation.match(criteria));
         operations.add(Aggregation.sort(Sort.Direction.DESC, "auditDate"));
         if (queryShieldModel.getPageNum() != null && queryShieldModel.getPageSize() != null) {
