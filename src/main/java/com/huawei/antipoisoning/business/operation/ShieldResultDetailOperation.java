@@ -273,7 +273,6 @@ public class ShieldResultDetailOperation {
                 Aggregation.match(criteria),
                 Aggregation.group("shieldType").count().as("count")
         );
-
         String tableName = isFull ? CollectionTableName
                 .SHIELD_RESULT_DETAIL : CollectionTableName.SHIELD_PR_RESULT_DETAIL;
         return mongoTemplate.aggregate(aggregation, tableName, Map.class).getMappedResults();
