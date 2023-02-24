@@ -5,6 +5,7 @@
 package com.huawei.antipoisoning.business.controller;
 
 import com.huawei.antipoisoning.business.entity.shield.ParamModel;
+import com.huawei.antipoisoning.business.entity.shield.QueryShieldModel;
 import com.huawei.antipoisoning.business.service.ProblemShieldService;
 import com.huawei.antipoisoning.common.entity.MultiResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,7 +38,7 @@ public class ProblemShieldController {
      */
     @GetMapping("/applyAndAuditNumber")
     public MultiResponse applyAndAuditNumber(@RequestParam("userId") String userId,
-            @RequestParam("scanId") String scanId) {
+                                             @RequestParam("scanId") String scanId) {
         return problemShieldService.applyAndAuditNumber(userId, scanId);
     }
 
@@ -50,7 +51,7 @@ public class ProblemShieldController {
      */
     @GetMapping("/apply-audit-pr-number")
     public MultiResponse applyAndAuditPRNumber(@RequestParam("userId") String userId,
-            @RequestParam("scanId") String scanId) {
+                                               @RequestParam("scanId") String scanId) {
         return problemShieldService.applyAndAuditPRNumber(userId, scanId);
     }
 
@@ -86,7 +87,7 @@ public class ProblemShieldController {
      */
     @PostMapping("/getResultDetail")
     public MultiResponse getResultDetail(@RequestParam String scanId, @RequestParam String userId,
-            @RequestBody ParamModel paramModel) {
+                                         @RequestBody ParamModel paramModel) {
         return problemShieldService.getResultDetail(scanId, userId, paramModel);
     }
 
@@ -100,7 +101,7 @@ public class ProblemShieldController {
      */
     @PostMapping("/get-pr-result-details")
     public MultiResponse getPRResultDetail(@RequestParam String scanId, @RequestParam String userId,
-                                         @RequestBody ParamModel paramModel) {
+                                           @RequestBody ParamModel paramModel) {
         return problemShieldService.getPRResultDetail(scanId, userId, paramModel);
     }
 
@@ -172,7 +173,7 @@ public class ProblemShieldController {
      */
     @PostMapping("/poisonApply")
     public MultiResponse poisonApply(@RequestParam String userId,
-            @RequestParam String login, @RequestBody ParamModel paramModel) {
+                                     @RequestParam String login, @RequestBody ParamModel paramModel) {
         return problemShieldService.poisonApply(userId, login, paramModel);
     }
 
@@ -186,7 +187,7 @@ public class ProblemShieldController {
      */
     @PostMapping("/poison-pr-apply")
     public MultiResponse poisonPRApply(@RequestParam String userId,
-            @RequestParam String login, @RequestBody ParamModel paramModel) {
+                                       @RequestParam String login, @RequestBody ParamModel paramModel) {
         return problemShieldService.poisonPRApply(userId, login, paramModel);
     }
 
@@ -274,5 +275,38 @@ public class ProblemShieldController {
     @RequestMapping("/get-pr-poisoning-select")
     public MultiResponse getPRPoisoningSelect() {
         return problemShieldService.getPRPoisoningSelect();
+    }
+
+    /**
+     * 获取排名前十五的防投毒屏蔽规则
+     *
+     * @param queryShieldModel 方法参数请求体
+     * @return MultiResponse
+     */
+    @RequestMapping("/poison-topFifteen")
+    public MultiResponse getPoisonTopFifteen(@RequestBody QueryShieldModel queryShieldModel) {
+        return problemShieldService.getPoisonTopFifteen(queryShieldModel);
+    }
+
+    /**
+     * 获取防投毒屏蔽详情查询
+     *
+     * @param queryShieldModel 查询参数体
+     * @return MultiResponse
+     */
+    @RequestMapping("/poison-shieldDetail")
+    public MultiResponse poisonShieldDetail(@RequestBody QueryShieldModel queryShieldModel) {
+        return problemShieldService.poisonShieldDetail(queryShieldModel);
+    }
+
+    /**
+     * 防投毒屏蔽类型分布
+     *
+     * @param queryShieldModel 方法参数请求体
+     * @return MultiResponse
+     */
+    @RequestMapping("/poison-shieldTypeMap")
+    public MultiResponse poisonShieldTypeMap(@RequestBody QueryShieldModel queryShieldModel) {
+        return problemShieldService.poisonShieldTypeMap(queryShieldModel);
     }
 }

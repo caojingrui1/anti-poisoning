@@ -5,21 +5,31 @@
 package com.huawei.antipoisoning.business.operation;
 
 import com.huawei.antipoisoning.business.enmu.CollectionTableName;
+import com.huawei.antipoisoning.business.enmu.ConstantsArgs;
+import com.huawei.antipoisoning.business.enmu.ReviewerStatus;
+import com.huawei.antipoisoning.business.enmu.ShieldStatus;
 import com.huawei.antipoisoning.business.entity.ResultEntity;
 import com.huawei.antipoisoning.business.entity.TaskEntity;
 import com.huawei.antipoisoning.business.entity.pr.PRResultEntity;
 import com.huawei.antipoisoning.business.entity.pr.PRTaskEntity;
 import com.huawei.antipoisoning.business.entity.shield.ParamModel;
+import com.huawei.antipoisoning.business.entity.shield.QueryShieldModel;
 import com.huawei.antipoisoning.business.entity.shield.Revision;
 import com.huawei.antipoisoning.common.entity.MultiResponse;
+import com.huawei.antipoisoning.common.util.DateUtil;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.aggregation.Aggregation;
+import org.springframework.data.mongodb.core.aggregation.AggregationOperation;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -57,6 +67,7 @@ public class ShieldResultDetailOperation {
     public void savePRShieldResult(List<PRResultEntity> resultEntities) {
         mongoTemplate.insert(resultEntities, CollectionTableName.SHIELD_PR_RESULT_DETAIL);
     }
+
 
     /**
      * 根据id 获取屏蔽结果详情
@@ -165,7 +176,7 @@ public class ShieldResultDetailOperation {
      * 获取我的申请/待我审批数量
      *
      * @param userId 用户id
-     * @param type 查询类型
+     * @param type   查询类型
      * @param scanId 扫描id
      * @return Map<String, Long>
      */
@@ -192,4 +203,131 @@ public class ShieldResultDetailOperation {
         }
         return criteria;
     }
+
+    public List<Map> shieldDetail(QueryShieldModel queryShieldModel) {
+        List<AggregationOperation> operations = new ArrayList<>();
+        boolean isFull = ConstantsArgs.HARMONY_FULL.equals(queryShieldModel.getType());
+        Criteria criteria = querySummaryCriteria(queryShieldModel);
+        Criteria criteria1 = queryShieldCriteria(queryShieldModel);
+        operations.add(Aggregation.match(criteria1));
+        operations.add(Aggregation.project("project_name", "repo_name", "branch", "revision.shieldType",
+                "suspicious_file_name", "rule_name", "revision.userName", "revision.reason", "revision.applyDate", "revision.reviewerName")
+                .andExpression("{$substrCP:{'$revision.auditDate',9,24}}").as("auditDate"));
+        operations.add(Aggregation.match(criteria));
+        operations.add(Aggregation.sort(Sort.Direction.DESC, "auditDate"));
+        if (queryShieldModel.getPageNum() != null && queryShieldModel.getPageSize() != null) {
+            operations.add(Aggregation.skip((long) (queryShieldModel.getPageNum() - 1)
+                    * queryShieldModel.getPageSize()));
+            operations.add(Aggregation.limit(queryShieldModel.getPageSize()));
+        }
+        String tableName = isFull ? CollectionTableName
+                .SHIELD_RESULT_DETAIL : CollectionTableName.SHIELD_PR_RESULT_DETAIL;
+        return mongoTemplate.aggregate(Aggregation.newAggregation(operations), tableName, Map.class).getMappedResults();
+    }
+
+    private Criteria querySummaryCriteria(QueryShieldModel queryShieldModel) {
+        Criteria criteria = new Criteria();
+        if (StringUtils.isNotBlank(queryShieldModel.getProjectName())) {
+            criteria.and("link.projectName").is(queryShieldModel.getProjectName());
+        }
+        if (StringUtils.isNotBlank(queryShieldModel.getRepoName())) {
+            criteria.and("link.repoNameEn").is(queryShieldModel.getRepoName());
+        }
+        if (StringUtils.isNotBlank(queryShieldModel.getStartTime()) && StringUtils.isNotBlank(queryShieldModel.getEndTime())) {
+            criteria.and("auditDate").gte(queryShieldModel.getStartTime())
+                    .lte(queryShieldModel.getEndTime());
+        }
+        return criteria;
+    }
+
+    private Criteria queryShieldCriteria(QueryShieldModel query) {
+        Criteria criteria = Criteria.where("revision.reviewerStatus").is(ReviewerStatus.TWO.getCode()).and("status").is(ShieldStatus.TWO.getCode());
+        if (StringUtils.isNotBlank(query.getDefectCheckerName())) {
+            criteria.and("rule_name").is(query.getDefectCheckerName());
+        }
+        if (StringUtils.isNotBlank(query.getShieldType())) {
+            criteria.and("revision.shieldType").is(query.getShieldType());
+        }
+        if (StringUtils.isNotBlank(query.getApplyUser())) {
+            criteria.and("revision.userName").is(query.getApplyUser());
+        }
+        if (StringUtils.isNotBlank(query.getAuditUser())) {
+            criteria.and("revision.reviewerName").is(query.getAuditUser());
+        }
+        if (StringUtils.isNotBlank(query.getReason())) {
+            criteria.and("revision.reason").is(query.getReason());
+        }
+        return criteria;
+    }
+
+
+    public List<Map> shieldTypeMap(QueryShieldModel queryShieldModel) {
+        boolean isFull = ConstantsArgs.HARMONY_FULL.equals(queryShieldModel.getType());
+        Criteria criteria = querySummaryCriteria(queryShieldModel);
+        Criteria criteria1 = queryShieldCriteria(queryShieldModel);
+        Aggregation aggregation = Aggregation.newAggregation(
+                // 主表条件
+                Aggregation.match(criteria1),
+                Aggregation.project("revision.shieldType", "_id").andExpression("{$substrCP:{'$revision.auditDate',9,24}}").as("auditDate"),
+                Aggregation.match(criteria),
+                Aggregation.group("shieldType").count().as("count")
+        );
+        String tableName = isFull ? CollectionTableName
+                .SHIELD_RESULT_DETAIL : CollectionTableName.SHIELD_PR_RESULT_DETAIL;
+        return mongoTemplate.aggregate(aggregation, tableName, Map.class).getMappedResults();
+    }
+
+    /**
+     * 获取排名前十五的防投毒屏蔽规则
+     *
+     * @param queryShieldModel 方法参数请求体
+     * @return MultiResponse
+     */
+    public List<Map> getPoisonTopFifteen(QueryShieldModel queryShieldModel) {
+        boolean isFull = ConstantsArgs.HARMONY_FULL.equals(queryShieldModel.getType());
+        Criteria criteria = querySummaryCriteria(queryShieldModel);
+        Criteria criteria1 = queryShieldCriteria(queryShieldModel);
+        Aggregation aggregation = Aggregation.newAggregation(
+                // 主表条件
+                Aggregation.match(criteria1),
+                Aggregation.project("rule_name", "revision.shieldType", "_id")
+                        .andExpression("{$substrCP:{'$revision.auditDate',9,24}}").as("auditDate"),
+                Aggregation.match(criteria),
+                Aggregation.group("rule_name").count().as("count")
+                        .first("shieldType").as("shieldType"),
+                Aggregation.sort(Sort.Direction.DESC, "count"),
+                Aggregation.limit(15)
+        );
+        String tableName = isFull ? CollectionTableName
+                .SHIELD_RESULT_DETAIL : CollectionTableName.SHIELD_PR_RESULT_DETAIL;
+        return mongoTemplate.aggregate(aggregation, tableName, Map.class).getMappedResults();
+    }
+
+    /**
+     * 屏蔽详情数量
+     *
+     * @param queryShieldModel 请求参数
+     * @return int
+     */
+    public int countShieldDetail(QueryShieldModel queryShieldModel) {
+        List<AggregationOperation> operations = new ArrayList<>();
+        boolean isFull = ConstantsArgs.HARMONY_FULL.equals(queryShieldModel.getType());
+        Criteria criteria1 = queryShieldCriteria(queryShieldModel);
+        operations.add(Aggregation.match(criteria1));
+        operations.add(Aggregation.project("_id").andExpression("{$substrCP:{'$revision.auditDate',9,24}}").as("auditDate"));
+        Criteria criteria = querySummaryCriteria(queryShieldModel);
+        operations.add(Aggregation.match(criteria));
+        operations.add(Aggregation.count().as("count"));
+        String tableName = isFull ? CollectionTableName
+                .SHIELD_RESULT_DETAIL : CollectionTableName.SHIELD_PR_RESULT_DETAIL;
+        List<Map> list =
+                mongoTemplate.aggregate(Aggregation.newAggregation(operations), tableName, Map.class)
+                        .getMappedResults();
+        int count = 0;
+        if (list.size() > 0) {
+            count = Integer.parseInt(list.get(0).get("count").toString());
+        }
+        return count;
+    }
+
 }

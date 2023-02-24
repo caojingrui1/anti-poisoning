@@ -5,6 +5,7 @@
 package com.huawei.antipoisoning.business.service;
 
 import com.huawei.antipoisoning.business.entity.shield.ParamModel;
+import com.huawei.antipoisoning.business.entity.shield.QueryShieldModel;
 import com.huawei.antipoisoning.common.entity.MultiResponse;
 
 /**
@@ -182,4 +183,28 @@ public interface ProblemShieldService {
      * @return MultiResponse
      */
     MultiResponse getPRPoisoningSelect();
+
+    /**
+     * 获取防投毒屏蔽详情查询
+     *
+     * @param queryShieldModel 查询参数体
+     * @return MultiResponse
+     */
+    MultiResponse poisonShieldDetail(QueryShieldModel queryShieldModel);
+
+    /**
+     * 防投毒屏蔽类型分布
+     *
+     * @param queryShieldModel 方法参数请求体
+     * @return MultiResponse
+     */
+    MultiResponse poisonShieldTypeMap(QueryShieldModel queryShieldModel);
+
+    /**
+     * 获取排名前十五的防投毒屏蔽规则
+     *
+     * @param queryShieldModel 方法参数请求体
+     * @return MultiResponse
+     */
+    MultiResponse getPoisonTopFifteen(QueryShieldModel queryShieldModel);
 }
