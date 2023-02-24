@@ -10,23 +10,28 @@ public enum ReviewerStatus {
      * 审核状态 1:待审批 2:已审批 3:未审核前已撤销 4:审核通过后撤销
      */
     //定义枚举的值
-    ONE("1","待审批"),TWO("2","已审批"),TREE("3", "未审核前已撤销"),FOUR("4","审核通过后撤销");
+    ONE("1", "待审批"),
+    TWO("2", "已审批"),
+    TREE("3", "未审核前已撤销"),
+    FOUR("4", "审核通过后撤销");
 
     private String code;
     private String msg;
 
     //构造方法（枚举的构造方法只允许private类型）
-    private ReviewerStatus(String state, String info){
+    private ReviewerStatus(String state, String info)
+    {
         this.code = state;
         this.msg = info;
     }
 
-    public String getCode(){
+    public String getCode()
+    {
         return code;
     }
 
-    public String getMsg(){
+    public String getMsg()
+    {
         return msg;
     }
-
 }
