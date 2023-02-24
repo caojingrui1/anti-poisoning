@@ -15,7 +15,14 @@ public enum ReviewerStatus {
     TREE("3", "未审核前已撤销"),
     FOUR("4", "审核通过后撤销");
 
+    /**
+     * code编码
+     */
     private String code;
+
+    /**
+     * 信息描述
+     */
     private String msg;
 
     //构造方法（枚举的构造方法只允许private类型）
