@@ -80,4 +80,23 @@ public class DateUtil {
         calendar.set(Calendar.MILLISECOND,0);
         return dateFormat.format(calendar.getTime());
     }
+
+    /**
+     * 转换年月日格式的日期
+     *
+     * @param dateStr 日期
+     * @return Date
+     */
+    public static Date dateToDate(String dateStr) {
+        Date parse = null;
+        try {
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+            Date date = dateFormat.parse(dateStr);
+            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+            parse = simpleDateFormat.parse(simpleDateFormat.format(date));
+        } catch (ParseException e) {
+            logger.error("format string to date error : {}", e);
+        }
+        return parse;
+    }
 }
