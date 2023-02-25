@@ -16,7 +16,6 @@ import com.huawei.antipoisoning.business.entity.shield.ParamModel;
 import com.huawei.antipoisoning.business.entity.shield.QueryShieldModel;
 import com.huawei.antipoisoning.business.entity.shield.Revision;
 import com.huawei.antipoisoning.common.entity.MultiResponse;
-import com.huawei.antipoisoning.common.util.DateUtil;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -212,7 +211,7 @@ public class ShieldResultDetailOperation {
         operations.add(Aggregation.match(criteria1));
         operations.add(Aggregation.project("project_name", "repo_name", "branch", "revision.shieldType",
                 "suspicious_file_name", "rule_name", "revision.userName", "revision.reason", "revision.applyDate", "revision.reviewerName")
-                .andExpression("{$substrCP:{'$revision.auditDate',9,24}}").as("auditDate"));
+                .andExpression("{$substrCP:{'$revision.auditDate',0,24}}").as("auditDate"));
         operations.add(Aggregation.match(criteria));
         operations.add(Aggregation.sort(Sort.Direction.DESC, "auditDate"));
         if (queryShieldModel.getPageNum() != null && queryShieldModel.getPageSize() != null) {
@@ -268,7 +267,7 @@ public class ShieldResultDetailOperation {
         Aggregation aggregation = Aggregation.newAggregation(
                 // 主表条件
                 Aggregation.match(criteria1),
-                Aggregation.project("revision.shieldType", "_id").andExpression("{$substrCP:{'$revision.auditDate',9,24}}").as("auditDate"),
+                Aggregation.project("revision.shieldType", "_id").andExpression("{$substrCP:{'$revision.auditDate',0,24}}").as("auditDate"),
                 Aggregation.match(criteria),
                 Aggregation.group("shieldType").count().as("count")
         );
@@ -291,7 +290,7 @@ public class ShieldResultDetailOperation {
                 // 主表条件
                 Aggregation.match(criteria1),
                 Aggregation.project("rule_name", "revision.shieldType", "_id")
-                        .andExpression("{$substrCP:{'$revision.auditDate',9,24}}").as("auditDate"),
+                        .andExpression("{$substrCP:{'$revision.auditDate',0,24}}").as("auditDate"),
                 Aggregation.match(criteria),
                 Aggregation.group("rule_name").count().as("count")
                         .first("shieldType").as("shieldType"),
@@ -314,7 +313,7 @@ public class ShieldResultDetailOperation {
         boolean isFull = ConstantsArgs.HARMONY_FULL.equals(queryShieldModel.getType());
         Criteria criteria1 = queryShieldCriteria(queryShieldModel);
         operations.add(Aggregation.match(criteria1));
-        operations.add(Aggregation.project("_id").andExpression("{$substrCP:{'$revision.auditDate',9,24}}").as("auditDate"));
+        operations.add(Aggregation.project("_id").andExpression("{$substrCP:{'$revision.auditDate',0,24}}").as("auditDate"));
         Criteria criteria = querySummaryCriteria(queryShieldModel);
         operations.add(Aggregation.match(criteria));
         operations.add(Aggregation.count().as("count"));
