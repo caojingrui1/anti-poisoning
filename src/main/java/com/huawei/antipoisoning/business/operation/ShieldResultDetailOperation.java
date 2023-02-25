@@ -17,6 +17,8 @@ import com.huawei.antipoisoning.business.entity.shield.QueryShieldModel;
 import com.huawei.antipoisoning.business.entity.shield.Revision;
 import com.huawei.antipoisoning.common.entity.MultiResponse;
 import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Sort;
@@ -48,6 +50,8 @@ public class ShieldResultDetailOperation {
 
     @Autowired
     private ScanResultDetailOperation scanResultDetailOperation;
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(ShieldResultDetailOperation.class);
 
     /**
      * 插入屏蔽申请数据
@@ -221,6 +225,7 @@ public class ShieldResultDetailOperation {
         }
         String tableName = isFull ? CollectionTableName
                 .SHIELD_RESULT_DETAIL : CollectionTableName.SHIELD_PR_RESULT_DETAIL;
+        LOGGER.info("shieldDetailOperations------------++”：{}",Aggregation.newAggregation(operations));
         return mongoTemplate.aggregate(Aggregation.newAggregation(operations), tableName, Map.class).getMappedResults();
     }
 
