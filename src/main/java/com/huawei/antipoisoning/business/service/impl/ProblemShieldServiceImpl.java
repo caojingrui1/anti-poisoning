@@ -20,6 +20,8 @@ import com.huawei.antipoisoning.business.util.AntiConstants;
 import com.huawei.antipoisoning.business.util.YamlUtil;
 import com.huawei.antipoisoning.common.entity.MultiResponse;
 import org.eclipse.jgit.util.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -42,6 +44,8 @@ public class ProblemShieldServiceImpl implements ProblemShieldService {
     private ShieldResultDetailOperation shieldResultDetailOperation;
     @Autowired
     private ScanResultDetailOperation scanResultDetailOperation;
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(ProblemShieldServiceImpl.class);
 
     /**
      * 查询我的申请和待我审批数量
@@ -537,6 +541,8 @@ public class ProblemShieldServiceImpl implements ProblemShieldService {
     @Override
     public MultiResponse poisonShieldDetail(QueryShieldModel queryShieldModel) {
         List<Map> list = shieldResultDetailOperation.shieldDetail(queryShieldModel);
+        LOGGER.info("shieldDetailOperations------------++”：{}", list);
+        LOGGER.info("shieldDetailOperations------------++”：{}", list.toString());
         List<Map> mapList = list.stream().map(map -> {
             String url = "https://gitee.com/" + map.get("project_name") + "/" + map.get("repo_name") + ".git";
             map.put("gitUrl", url);
