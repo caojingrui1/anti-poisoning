@@ -541,8 +541,6 @@ public class ProblemShieldServiceImpl implements ProblemShieldService {
     @Override
     public MultiResponse poisonShieldDetail(QueryShieldModel queryShieldModel) {
         List<Map> list = shieldResultDetailOperation.shieldDetail(queryShieldModel);
-        LOGGER.info("shieldDetailOperations------------++”：{}", list);
-        LOGGER.info("shieldDetailOperations------------++”：{}", list.toString());
         List<Map> mapList = list.stream().map(map -> {
             String url = "https://gitee.com/" + map.get("project_name") + "/" + map.get("repo_name") + ".git";
             map.put("gitUrl", url);

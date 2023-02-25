@@ -225,8 +225,6 @@ public class ShieldResultDetailOperation {
         }
         String tableName = isFull ? CollectionTableName
                 .SHIELD_RESULT_DETAIL : CollectionTableName.SHIELD_PR_RESULT_DETAIL;
-        LOGGER.info("shieldDetailOperations------------++”：{}",tableName);
-        LOGGER.info("shieldDetailOperations------------++”：{}",Aggregation.newAggregation(operations));
         return mongoTemplate.aggregate(Aggregation.newAggregation(operations), tableName, Map.class).getMappedResults();
     }
 
