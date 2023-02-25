@@ -45,7 +45,7 @@ public class ProblemShieldServiceImpl implements ProblemShieldService {
     @Autowired
     private ScanResultDetailOperation scanResultDetailOperation;
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(ShieldResultDetailOperation.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ProblemShieldServiceImpl.class);
 
     /**
      * 查询我的申请和待我审批数量
