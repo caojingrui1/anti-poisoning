@@ -231,10 +231,10 @@ public class ShieldResultDetailOperation {
     private Criteria querySummaryCriteria(QueryShieldModel queryShieldModel) {
         Criteria criteria = new Criteria();
         if (StringUtils.isNotBlank(queryShieldModel.getProjectName())) {
-            criteria.and("link.projectName").is(queryShieldModel.getProjectName());
+            criteria.and("project_name").is(queryShieldModel.getProjectName());
         }
         if (StringUtils.isNotBlank(queryShieldModel.getRepoName())) {
-            criteria.and("link.repoNameEn").is(queryShieldModel.getRepoName());
+            criteria.and("repo_name").is(queryShieldModel.getRepoName());
         }
         if (StringUtils.isNotBlank(queryShieldModel.getStartTime()) && StringUtils.isNotBlank(queryShieldModel.getEndTime())) {
             criteria.and("auditDate").gte(queryShieldModel.getStartTime())
@@ -296,8 +296,7 @@ public class ShieldResultDetailOperation {
                 Aggregation.project("rule_name", "revision.shieldType", "_id")
                         .andExpression("{$substrCP:{'$revision.auditDate',0,24}}").as("auditDate"),
                 Aggregation.match(criteria),
-                Aggregation.group("rule_name").count().as("count")
-                        .first("shieldType").as("shieldType"),
+                Aggregation.group("rule_name").count().as("count"),
                 Aggregation.sort(Sort.Direction.DESC, "count"),
                 Aggregation.limit(15)
         );
