@@ -327,8 +327,8 @@ public class PoisonServiceImpl implements PoisonService {
         try {
             LOGGER.info("get diff tree start!");
             Process proc = Runtime.getRuntime().exec(new String[]{"/bin/sh", "-c", sb.toString()}, null, null);
-            StreamConsumer errConsumer = new StreamConsumer(proc.getErrorStream(), strList);
-            StreamConsumer outputConsumer = new StreamConsumer(proc.getInputStream(), strList);
+            StreamConsumer errConsumer = new StreamConsumer(proc.getErrorStream(), strList,ConstantsArgs.ERR_CONSUMER);
+            StreamConsumer outputConsumer = new StreamConsumer(proc.getInputStream(), strList,ConstantsArgs.OUTPUT_CONSUMER);
             errConsumer.start();
             outputConsumer.start();
             proc.waitFor();
@@ -450,9 +450,16 @@ public class PoisonServiceImpl implements PoisonService {
                 .POISON_VERSION_TASK, changeBoardModel.getInfo());
         List<PoisonInspectionVo> collect = poisonTaskSummary.stream().filter(po -> ConstantsArgs.SPECIAL_PRO.contains(po.getProjectName()))
                 .collect(Collectors.toList());
+        Map<String, String> poisonIssueCount = new HashMap<>();
         //版本级防投毒问题数
-        Map<String, Long> poisonIssueCount = collect.stream().collect(Collectors
+        Map<String, Long> issueCount = collect.stream().collect(Collectors
                 .groupingBy(PoisonInspectionVo::getProjectName, Collectors.summingLong(PoisonInspectionVo::getIssueCount)));
+        Map<String, Long> poisonSolveCount = poisonTaskSummary.stream().collect(Collectors
+                .groupingBy(PoisonInspectionVo::getProjectName, Collectors.summingLong(PoisonInspectionVo::getSolveCount)));
+        issueCount.keySet().forEach(key -> {
+            long totalCount = issueCount.get(key) + poisonSolveCount.get(key);
+            poisonIssueCount.put(key, issueCount.get(key) + "/" + totalCount);
+        });
         result.put("poisonIssueCount", poisonIssueCount);
     }
 
