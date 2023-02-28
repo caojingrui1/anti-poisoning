@@ -271,7 +271,7 @@ public class ShieldResultDetailOperation {
         Aggregation aggregation = Aggregation.newAggregation(
                 // 主表条件
                 Aggregation.match(criteria1),
-                Aggregation.project("revision.shieldType", "_id").andExpression("{$substrCP:{'$revision.auditDate',0,24}}").as("auditDate"),
+                Aggregation.project("revision.shieldType", "project_name","repo_name","_id").andExpression("{$substrCP:{'$revision.auditDate',0,24}}").as("auditDate"),
                 Aggregation.match(criteria),
                 Aggregation.group("shieldType").count().as("count")
         );
@@ -293,7 +293,7 @@ public class ShieldResultDetailOperation {
         Aggregation aggregation = Aggregation.newAggregation(
                 // 主表条件
                 Aggregation.match(criteria1),
-                Aggregation.project("rule_name", "revision.shieldType", "_id")
+                Aggregation.project("rule_name","project_name","repo_name", "revision.shieldType", "_id")
                         .andExpression("{$substrCP:{'$revision.auditDate',0,24}}").as("auditDate"),
                 Aggregation.match(criteria),
                 Aggregation.group("rule_name").count().as("count"),
@@ -316,7 +316,7 @@ public class ShieldResultDetailOperation {
         boolean isFull = ConstantsArgs.HARMONY_FULL.equals(queryShieldModel.getType());
         Criteria criteria1 = queryShieldCriteria(queryShieldModel);
         operations.add(Aggregation.match(criteria1));
-        operations.add(Aggregation.project("_id").andExpression("{$substrCP:{'$revision.auditDate',0,24}}").as("auditDate"));
+        operations.add(Aggregation.project("_id","project_name","repo_name").andExpression("{$substrCP:{'$revision.auditDate',0,24}}").as("auditDate"));
         Criteria criteria = querySummaryCriteria(queryShieldModel);
         operations.add(Aggregation.match(criteria));
         operations.add(Aggregation.count().as("count"));
