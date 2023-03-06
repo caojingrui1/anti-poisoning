@@ -393,6 +393,7 @@ public class PoisonTaskOperation {
         // 总数量
         query.with(Sort.by(Sort.Direction.DESC, "_id"));
         long count = mongoTemplate.count(query, TaskEntity.class, CollectionTableName.POISON_VERSION_TASK);
+        query.fields().exclude("logs");
         List<TaskEntity> list = mongoTemplate.find(query, TaskEntity.class, CollectionTableName.POISON_VERSION_TASK);
         return new PageVo(count, list);
     }

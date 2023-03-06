@@ -311,6 +311,18 @@ public class PoisonServiceImpl implements PoisonService {
         return new MultiResponse().code(200).message("success");
     }
 
+
+    /**
+     * 查询日志
+     * @param taskEntity
+     * @return
+     */
+    @Override
+    public MultiResponse queryTaskLog(TaskEntity taskEntity) {
+        TaskEntity entity = poisonTaskOperation.queryTaskEntity(taskEntity.getScanId());
+        return new MultiResponse().code(200).message("success").result(entity);
+    }
+
     /**
      * 获取PR增量文件信息。
      *
@@ -416,6 +428,7 @@ public class PoisonServiceImpl implements PoisonService {
             return new MultiResponse().code(200).message("为查询到数据");
         }
     }
+
 
     /**
      * 开源变革防投毒门禁数据模型获取
