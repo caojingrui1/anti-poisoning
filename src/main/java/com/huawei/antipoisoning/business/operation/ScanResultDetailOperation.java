@@ -254,6 +254,7 @@ public class ScanResultDetailOperation {
             query.skip((resultModel.getPageNum() - 1) * resultModel.getPageSize());
             query.limit(resultModel.getPageSize());
         }
+        query.fields().exclude("logs");
         return mongoTemplate.find(query, TaskEntity.class);
     }
 
