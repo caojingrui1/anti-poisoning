@@ -49,22 +49,6 @@ public class AntiServiceImpl implements AntiService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AntiServiceImpl.class);
 
-//    private static final String SCANRESULTPATH = "/tools/softwareFile/report/";
-//
-//    private static final String PR_SCANRESULTPATH = "/tools/SoftwareSupplyChainSecurity-v1/pr_report/";
-//
-//    private static final String SCANTOOLPATH = "/tools/SoftwareSupplyChainSecurity-v1/openeuler_scan.py";
-//
-//    private static final String SCANTOOLFILE = "/tools/SoftwareSupplyChainSecurity-v1/";
-//
-//    private static final String REPOPATH = "/tools/softwareFile/download/";
-//
-//    private static final String PR_REPOPATH = "/tools/SoftwareSupplyChainSecurity-v1/prDownload/";
-//
-//    private static final String CONFIG_PATH = "/tools/SoftwareSupplyChainSecurity-v1/ruleYaml/";
-//
-//    private static final String DOWN_PATH = "prDownload/";
-
     private SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss:SSS");
 
     @Value("${git.username}")
