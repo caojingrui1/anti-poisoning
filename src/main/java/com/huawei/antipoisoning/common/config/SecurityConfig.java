@@ -12,27 +12,27 @@ import org.springframework.beans.factory.annotation.Value;
 @EnableWebSecurity
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
-    @Value("${spring.security.user.name}")
-    private String username;
-
-    @Value("${spring.security.user.password}")
-    private String password;
-
-    @Autowired
-    public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
-        auth.inMemoryAuthentication()
-                .withUser(username)
-                .password("{noop}" + password).roles("USER");
-    }
-
-    @Override
-    protected void configure(HttpSecurity http) throws Exception {
-        http.authorizeRequests()
-                .antMatchers("/actuator/prometheus").authenticated()
-                .anyRequest().permitAll()
-                .and()
-                .httpBasic()
-                .and()
-                .csrf().disable();
-    }
+//    @Value("${spring.security.user.name}")
+//    private String username;
+//
+//    @Value("${spring.security.user.password}")
+//    private String password;
+//
+//    @Autowired
+//    public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
+//        auth.inMemoryAuthentication()
+//                .withUser(username)
+//                .password("{noop}" + password).roles("USER");
+//    }
+//
+//    @Override
+//    protected void configure(HttpSecurity http) throws Exception {
+//        http.authorizeRequests()
+//                .antMatchers("/actuator/prometheus").authenticated()
+//                .anyRequest().permitAll()
+//                .and()
+//                .httpBasic()
+//                .and()
+//                .csrf().disable();
+//    }
 }
