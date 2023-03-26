@@ -207,4 +207,9 @@ public interface ProblemShieldService {
      * @return MultiResponse
      */
     MultiResponse getPoisonTopFifteen(QueryShieldModel queryShieldModel);
+
+    MultiResponse getScanResultByScanId(String scanId);
+
+    MultiResponse getPRScanResultByScanId(String scanId);
+
 }
