@@ -4,6 +4,9 @@ server:
 git:
   username: openlibing@163.com
   password: ENC(ebUHNmrtczMIZ9rEqRexodzsFI3fKzjQ)
+gitlab:
+  username: openlibing@163.com
+  password: ENC(ac2sDLzYl/zj9MFEwF7wmZsYjn7V1B5J)
 jasypt:
   encryptor:
     algorithm: PBEWithMD5AndDES

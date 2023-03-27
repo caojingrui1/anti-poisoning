@@ -120,6 +120,46 @@ public class HttpUtil {
     }
 
     /**
+     * GET 请求
+     *
+     * @param token 授权码
+     * @param request 请求接口url
+     * @return body
+     */
+    public String doGitlabGet(String token, String request) {
+        String body = "";
+        try {
+            // 创建post方式请求对象
+            HttpGet httpGet = new HttpGet(url + request );
+            // 设置header信息
+            // 指定报文头【Content-type】、【User-Agent】
+            httpGet.setHeader("Content-type", "application/json");
+            httpGet.setHeader("PRIVATE-TOKEN", token);
+            httpGet.setHeader("User-Agent",
+                    "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 " +
+                            "(KHTML, like Gecko) Chrome/45.0.2454.101 Safari/537.36");
+
+            // 创建httpclient对象
+            CloseableHttpClient client = HttpClients.createDefault();
+            // 执行请求操作，并拿到结果（同步阻塞）
+            CloseableHttpResponse response = client.execute(httpGet);
+            // 获取结果实体
+            HttpEntity entity = response.getEntity();
+            if (entity != null) {
+                // 按指定编码转换结果实体为String类型
+                body = EntityUtils.toString(entity, "UTF-8");
+            }
+            EntityUtils.consume(entity);
+            // 释放链接
+            response.close();
+            return body;
+        } catch (IOException e) {
+            LOGGER.error("errInfo is {}", e.getMessage());
+            return body;
+        }
+    }
+
+    /**
      * 对http返回结果进行校验，如果状态码不是200，终止并抛出异常
      *
      * @param body 响应信息

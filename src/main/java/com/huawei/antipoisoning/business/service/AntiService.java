@@ -49,7 +49,8 @@ public interface AntiService {
      * @param antiEntity 扫描任务实体
      * @param info pr信息
      * @param fileArray 差异文件数
+     * @param type 代码托管平台 gitee&gitlab
      * @return MultiResponse<List<VmsExternalCveSourceDTO>>
      */
-    MultiResponse downloadPRRepoFile(PRAntiEntity antiEntity, PullRequestInfo info, JSONArray fileArray);
+    MultiResponse downloadPRRepoFile(PRAntiEntity antiEntity, PullRequestInfo info, JSONArray fileArray, String type);
 }
