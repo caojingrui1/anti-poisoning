@@ -68,30 +68,4 @@ public class GitlabApiUtil implements Serializable {
        String changes = JSONObject.parseObject(result).get("changes").toString();
        return JSONArray.parseArray(changes);
    }
-
-    public static void main(String[] args) {
-//       Map<String, String> params = new HashMap<>();
-//       params.put("projectId", "30975");
-//       params.put("pullNumber", "76");
-//       GitlabApiUtil gitlabApiUtil = new GitlabApiUtil(params);
-////       gitlabApiUtil.getGitlabPullRequestInfo();
-//       gitlabApiUtil.getGitlabPrDiffFiles();
-        JSONObject jsonObject = new JSONObject();
-        jsonObject.put("id", 30975);
-        jsonObject.put("name", "anti-poisoning");
-        jsonObject.put("description", "防投毒");
-        jsonObject.put("web_url", "http://source.openeuler.sh/openMajun/anti-poisoning");
-        jsonObject.put("git_ssh_url", "git@source.openeuler.sh:openMajun/anti-poisoning.git");
-        jsonObject.put("git_http_url", "http://source.openeuler.sh/openMajun/anti-poisoning.git");
-        jsonObject.put("namespace", "openMaJun");
-        jsonObject.put("http_url", "http://source.openeuler.sh/openMajun/anti-poisoning.git");
-        String sss = jsonObject.toJSONString();
-
-       String filePath = "src/main/java/com/majun/gateway/GatewayMain.java";
-        try {
-            String ss = URLEncoder.encode(filePath, "UTF-8");
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        }
-    }
 }
