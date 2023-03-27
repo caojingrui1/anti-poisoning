@@ -328,6 +328,7 @@ public class PoisonPRServiceImpl implements PoisonPRService {
      * @return JSONArray
      */
     public JSONArray getGitlabPrDiffFile(PullRequestInfo prInfo) {
+        LOGGER.info("query gitlab pr diff files!");
         Map<String, String> params = new HashMap<>();
         params.put("projectId", prInfo.getProjectId());
         params.put("repo", prInfo.getRepoName());
@@ -390,7 +391,7 @@ public class PoisonPRServiceImpl implements PoisonPRService {
             info.setVersion(pullRequestInfo.get("sha").toString()); // sha值
             info.setTarget(pullRequestInfo.get("target_branch").toString()); // 目标分支
             info.setBranch(pullRequestInfo.get("source_branch").toString()); // 源分支
-            info.setProjectName(targetNameSpace); // 目标社区名
+            info.setProjectName("openMaJun".equals(targetNameSpace) ? "openMajun" : targetNameSpace); // 目标社区名
             info.setRepoName(targetRepo);
             info.setPullInfo(pullRequestInfo.get("web_url").toString()); // pr信息
             info.setGitUrl(target.get("http_url").toString()); // 目标仓库下载地址
