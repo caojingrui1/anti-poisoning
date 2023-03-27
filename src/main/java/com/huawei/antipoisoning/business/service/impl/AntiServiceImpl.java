@@ -359,7 +359,7 @@ public class AntiServiceImpl implements AntiService {
         long startTime = System.currentTimeMillis();
         String userName ;
         String pass ;
-        if (antiEntity.getRepoUrl().contains("source.openeuler.cn")) {
+        if (antiEntity.getRepoUrl().contains("source.openeuler.sh")) {
             userName = gitlabUser;
             pass = gitlabPass;
         } else {
