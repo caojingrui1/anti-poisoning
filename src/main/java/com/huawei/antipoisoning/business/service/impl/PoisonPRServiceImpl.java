@@ -14,7 +14,11 @@ import com.huawei.antipoisoning.business.entity.checkrule.CheckRuleSet;
 import com.huawei.antipoisoning.business.entity.checkrule.RuleSetModel;
 import com.huawei.antipoisoning.business.entity.checkrule.TaskRuleSetVo;
 import com.huawei.antipoisoning.business.entity.checkrule.RuleModel;
-import com.huawei.antipoisoning.business.entity.pr.*;
+import com.huawei.antipoisoning.business.entity.pr.GitlabPRInfo;
+import com.huawei.antipoisoning.business.entity.pr.PRInfo;
+import com.huawei.antipoisoning.business.entity.pr.PullRequestInfo;
+import com.huawei.antipoisoning.business.entity.pr.PRAntiEntity;
+import com.huawei.antipoisoning.business.entity.pr.PRResultEntity;
 import com.huawei.antipoisoning.business.entity.vo.PageVo;
 import com.huawei.antipoisoning.business.operation.CheckRuleOperation;
 import com.huawei.antipoisoning.business.operation.PoisonResultOperation;
@@ -26,7 +30,6 @@ import com.huawei.antipoisoning.business.util.YamlUtil;
 import com.huawei.antipoisoning.common.entity.MultiResponse;
 import com.huawei.antipoisoning.common.util.GiteeApiUtil;
 import com.huawei.antipoisoning.common.util.GitlabApiUtil;
-import org.bson.json.JsonObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -103,36 +106,35 @@ public class PoisonPRServiceImpl implements PoisonPRService {
                 }
             }
         }
-//        else {
-//            return new MultiResponse().code(400).message("taskRuleSet is error");
-//        }
-//        // 根据规则集查询规则详情
-//        PageVo allRules = checkRuleOperation.getAllRules(new RuleModel(), ruleIds);
-//        List<RuleModel> ruleModelList = allRules.getList();
-//        // 生成规则集yaml
-//        if (ruleModelList.size() == 0) {
-//            return new MultiResponse().code(400).message("rules is error");
-//        }
-//        // 加入通用规则
-//        RuleModel ruleModel = new RuleModel();
-//        ruleModel.setRuleLanguage("COMMON");
-//        PageVo commRules = checkRuleOperation.getAllRules(ruleModel, new LinkedHashSet<>());
-//        List<RuleModel> commList = commRules.getList();
-//        List<TaskRuleSetVo> ruleList = checkRuleOperation.getTaskRuleSet("",
-//                pullRequestInfo.getProjectName(), pullRequestInfo.getRepoName());
-//        List<String> languageList = new ArrayList<>();
-//        for (TaskRuleSetVo rule : ruleList) {
-//            List<CheckRuleSet> checkRuleSetList = rule.getAntiCheckRules();
-//            for (CheckRuleSet checkRuleSet : checkRuleSetList) {
-//                languageList.add(checkRuleSet.getLanguage());
-//            }
-//        }
-//        ruleModelList.addAll(commList);
-//        List<RuleModel> rulesMap = ruleModelList.stream().distinct().collect(Collectors.toList());
+        else {
+            return new MultiResponse().code(400).message("taskRuleSet is error");
+        }
+        // 根据规则集查询规则详情
+        PageVo allRules = checkRuleOperation.getAllRules(new RuleModel(), ruleIds);
+        List<RuleModel> ruleModelList = allRules.getList();
+        // 生成规则集yaml
+        if (ruleModelList.size() == 0) {
+            return new MultiResponse().code(400).message("rules is error");
+        }
+        // 加入通用规则
+        RuleModel ruleModel = new RuleModel();
+        ruleModel.setRuleLanguage("COMMON");
+        PageVo commRules = checkRuleOperation.getAllRules(ruleModel, new LinkedHashSet<>());
+        List<RuleModel> commList = commRules.getList();
+        List<TaskRuleSetVo> ruleList = checkRuleOperation.getTaskRuleSet("",
+                pullRequestInfo.getProjectName(), pullRequestInfo.getRepoName());
+        List<String> languageList = new ArrayList<>();
+        for (TaskRuleSetVo rule : ruleList) {
+            List<CheckRuleSet> checkRuleSetList = rule.getAntiCheckRules();
+            for (CheckRuleSet checkRuleSet : checkRuleSetList) {
+                languageList.add(checkRuleSet.getLanguage());
+            }
+        }
+        ruleModelList.addAll(commList);
+        List<RuleModel> rulesMap = ruleModelList.stream().distinct().collect(Collectors.toList());
         String tableName = pullRequestInfo.getProjectName() + "-" +
                 pullRequestInfo.getRepoName() + "-" + pullRequestInfo.getBranch();
-//        if (YamlUtil.getRulesMap(rulesMap, tableName)) {
-        if (true) {
+        if (YamlUtil.getRulesMap(rulesMap, tableName)) {
             // 请求下载PR代码地址参数
             PRAntiEntity prAntiEntity = new PRAntiEntity();
             prAntiEntity.setScanId(pullRequestInfo.getScanId());
@@ -145,14 +147,14 @@ public class PoisonPRServiceImpl implements PoisonPRService {
             prAntiEntity.setExecutorName(pullRequestInfo.getExecutorName());
             prAntiEntity.setExecutorId(pullRequestInfo.getExecutorId());
             StringBuffer stringBuffer = new StringBuffer();
-//            for (int i = 0; i < languageList.size(); i++) {
-//                stringBuffer.append(languageList.get(i));
-//                if (i < languageList.size() - 1) {
-//                    stringBuffer.append(" ");
-//                }
-//            }
-//            // 同步同社区同仓库的语言配置
-//            prAntiEntity.setLanguage(stringBuffer.toString());
+            for (int i = 0; i < languageList.size(); i++) {
+                stringBuffer.append(languageList.get(i));
+                if (i < languageList.size() - 1) {
+                    stringBuffer.append(" ");
+                }
+            }
+            // 同步同社区同仓库的语言配置
+            prAntiEntity.setLanguage(stringBuffer.toString());
             prAntiEntity.setIsScan(true);
             prAntiEntity.setProjectName(pullRequestInfo.getProjectName());
             prAntiEntity.setRulesName(tableName + ".yaml");
