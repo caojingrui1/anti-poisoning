@@ -346,7 +346,6 @@ public class PoisonPRServiceImpl implements PoisonPRService {
      */
     @Override
     public PullRequestInfo getGitlabPrInfo(GitlabPRInfo prInfo) {
-        LOGGER.info("get the gitlab prinfo!");
         JSONObject prObject = JSONObject.parseObject(prInfo.getPrInfo());
         // 判断触发类型 目前仅支持merge_request和note
         String eventType= prObject.getString("event_type");
