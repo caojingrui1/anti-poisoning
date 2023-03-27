@@ -269,16 +269,4 @@ public class JGitUtil implements Serializable {
             LOGGER.error("errInfo is {}", e.getMessage());
         }
     }
-
-    public static void main(String[] args) {
-//        JGitUtil gfxly = new JGitUtil("pull/2/MERGE", "", "", "master",
-//                "b19cf211470cb6841cd5f3340e62db74b61849b2", "C:\\workspace\\poison-test");
-//        gfxly.pullPr("https://gitee.com/zzyy95_1/helper.git");
-//        StringBuffer sb = gfxly.cmdOfPullRequest("C:\\workspace\\poison-test", "master");
-
-        JGitUtil jj = new JGitUtil("", "openlibing@163.com", "Jszb2022h1", "master",
-                "", "C:\\workspace\\poison-test");
-        jj.pullVersion("https://source.openeuler.sh/openMajun/majun-gateway-service.git");
-
-    }
 }

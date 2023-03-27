@@ -94,6 +94,7 @@ public class PoisonPRServiceImpl implements PoisonPRService {
         List<TaskRuleSetVo> taskRuleSet = checkRuleOperation.getTaskRuleSet("",
                 pullRequestInfo.getProjectName(), pullRequestInfo.getRepoName());
         Set<String> ruleIds = new LinkedHashSet<>();
+        LOGGER.info("taskRule is {}", taskRuleSet.size());
         if (taskRuleSet.size() == 1) {
             for (CheckRuleSet checkRuleSet : taskRuleSet.get(0).getAntiCheckRules()) {
                 RuleSetModel ruleSetModel = new RuleSetModel();
@@ -344,6 +345,7 @@ public class PoisonPRServiceImpl implements PoisonPRService {
      */
     @Override
     public PullRequestInfo getGitlabPrInfo(GitlabPRInfo prInfo) {
+        LOGGER.info("get the gitlab prinfo!");
         JSONObject prObject = JSONObject.parseObject(prInfo.getPrInfo());
         // 判断触发类型 目前仅支持merge_request和note
         String eventType= prObject.getString("event_type");
