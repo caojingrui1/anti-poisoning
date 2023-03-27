@@ -15,11 +15,7 @@ import lombok.Data;
 @Data
 public class PRInfo {
     private String projectName;
-    private String projectId; // gitlab项目ID
     private String repoName;
     private String pullNumber;
     private String accessToken;
-    private String type; // 仓库是gitee还是gitlab.
-    private String source; // gitlab pr源分支信息
-    private String target; // gitlab pr目标分支信息
 }

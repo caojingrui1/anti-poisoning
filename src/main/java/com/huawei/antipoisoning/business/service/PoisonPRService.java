@@ -6,6 +6,7 @@ package com.huawei.antipoisoning.business.service;
 
 import com.huawei.antipoisoning.business.entity.RepoInfo;
 import com.huawei.antipoisoning.business.entity.TaskEntity;
+import com.huawei.antipoisoning.business.entity.pr.GitlabPRInfo;
 import com.huawei.antipoisoning.business.entity.pr.PRAntiEntity;
 import com.huawei.antipoisoning.business.entity.pr.PRInfo;
 import com.huawei.antipoisoning.business.entity.pr.PullRequestInfo;
@@ -16,10 +17,11 @@ public interface PoisonPRService {
      * 启动扫扫描任务
      *
      * @param pullRequestInfo pr详情信息
-     * @param info pr详情信息
+     * @param giteeInfo gitee pr详情信息
+     * @param gitlabInfo gitlab pr详情信息
      * @return poisonScan
      */
-    MultiResponse poisonPRScan(PullRequestInfo pullRequestInfo, PRInfo info);
+    MultiResponse poisonPRScan(PullRequestInfo pullRequestInfo, PRInfo giteeInfo, GitlabPRInfo gitlabInfo);
 
     /**
      * 查询版本扫描任务列表信息。
@@ -60,4 +62,13 @@ public interface PoisonPRService {
      * @return MultiResponse
      */
     PullRequestInfo getPRInfo(PRInfo info);
+
+    /**
+     * 获取gitlab PR信息。
+     *
+     * @param info pr信息
+     * @return MultiResponse
+     */
+    PullRequestInfo getGitlabPrInfo(GitlabPRInfo info);
+
 }
