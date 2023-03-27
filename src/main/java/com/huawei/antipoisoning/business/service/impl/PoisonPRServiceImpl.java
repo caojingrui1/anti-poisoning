@@ -328,6 +328,7 @@ public class PoisonPRServiceImpl implements PoisonPRService {
      * @return JSONArray
      */
     public JSONArray getGitlabPrDiffFile(PullRequestInfo prInfo) {
+        LOGGER.info("query gitlab pr diff files!");
         Map<String, String> params = new HashMap<>();
         params.put("projectId", prInfo.getProjectId());
         params.put("repo", prInfo.getRepoName());
