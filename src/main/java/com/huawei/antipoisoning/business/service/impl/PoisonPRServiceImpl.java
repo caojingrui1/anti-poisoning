@@ -14,6 +14,7 @@ import com.huawei.antipoisoning.business.entity.checkrule.CheckRuleSet;
 import com.huawei.antipoisoning.business.entity.checkrule.RuleSetModel;
 import com.huawei.antipoisoning.business.entity.checkrule.TaskRuleSetVo;
 import com.huawei.antipoisoning.business.entity.checkrule.RuleModel;
+import com.huawei.antipoisoning.business.entity.pr.GitlabPRInfo;
 import com.huawei.antipoisoning.business.entity.pr.PRInfo;
 import com.huawei.antipoisoning.business.entity.pr.PullRequestInfo;
 import com.huawei.antipoisoning.business.entity.pr.PRAntiEntity;
@@ -28,6 +29,7 @@ import com.huawei.antipoisoning.business.service.PoisonPRService;
 import com.huawei.antipoisoning.business.util.YamlUtil;
 import com.huawei.antipoisoning.common.entity.MultiResponse;
 import com.huawei.antipoisoning.common.util.GiteeApiUtil;
+import com.huawei.antipoisoning.common.util.GitlabApiUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -72,19 +74,27 @@ public class PoisonPRServiceImpl implements PoisonPRService {
     @Value("${git.password}")
     private String gitPass;
 
+    @Value("${gitlab.username}")
+    private String gitlabUser;
+
+    @Value("${gitlab.password}")
+    private String gitlabPass;
+
     /**
      * 启动扫扫描任务
      *
      * @param pullRequestInfo pr详情信息
-     * @param info pr信息
+     * @param giteeInfo gitee pr详情信息
+     * @param gitlabInfo gitlab pr详情信息
      * @return poisonScan
      */
     @Override
-    public MultiResponse poisonPRScan(PullRequestInfo pullRequestInfo, PRInfo info) {
+    public MultiResponse poisonPRScan(PullRequestInfo pullRequestInfo, PRInfo giteeInfo, GitlabPRInfo gitlabInfo) {
         // 查询仓库语言和规则集
         List<TaskRuleSetVo> taskRuleSet = checkRuleOperation.getTaskRuleSet("",
                 pullRequestInfo.getProjectName(), pullRequestInfo.getRepoName());
         Set<String> ruleIds = new LinkedHashSet<>();
+        LOGGER.info("taskRule is {}", taskRuleSet.size());
         if (taskRuleSet.size() == 1) {
             for (CheckRuleSet checkRuleSet : taskRuleSet.get(0).getAntiCheckRules()) {
                 RuleSetModel ruleSetModel = new RuleSetModel();
@@ -96,7 +106,8 @@ public class PoisonPRServiceImpl implements PoisonPRService {
                     return new MultiResponse().code(400).message("ruleSet is error");
                 }
             }
-        } else {
+        }
+        else {
             return new MultiResponse().code(400).message("taskRuleSet is error");
         }
         // 根据规则集查询规则详情
@@ -149,8 +160,14 @@ public class PoisonPRServiceImpl implements PoisonPRService {
             prAntiEntity.setProjectName(pullRequestInfo.getProjectName());
             prAntiEntity.setRulesName(tableName + ".yaml");
             // 下载目标仓库代码,下载目标PR增量代码
-            JSONArray fileArray = getPRDiffFile(info);
-            antiService.downloadPRRepoFile(prAntiEntity, pullRequestInfo, fileArray);
+            JSONArray fileArray;
+            if (giteeInfo == null) {
+                fileArray = getGitlabPrDiffFile(pullRequestInfo);
+                antiService.downloadPRRepoFile(prAntiEntity, pullRequestInfo, fileArray, "gitlab");
+            } else {
+                fileArray = getPRDiffFile(giteeInfo);
+                antiService.downloadPRRepoFile(prAntiEntity, pullRequestInfo, fileArray, "gitee");
+            }
             // 防投毒扫描
             antiService.scanPRFile(pullRequestInfo.getScanId(), pullRequestInfo);
             Map<String, Object> result = new HashMap<>();
@@ -289,7 +306,7 @@ public class PoisonPRServiceImpl implements PoisonPRService {
     }
 
     /**
-     * 获取差异文件数。
+     * 获取gitee差异文件数。
      *
      * @param prInfo pr信息
      * @return JSONArray
@@ -302,5 +319,91 @@ public class PoisonPRServiceImpl implements PoisonPRService {
         params.put("accessToken", prInfo.getAccessToken());
         GiteeApiUtil giteeApiUtil = new GiteeApiUtil(params);
         return giteeApiUtil.getPrDiffFiles();
+    }
+
+    /**
+     * 获取Gitlab差异文件数。
+     *
+     * @param prInfo pr信息
+     * @return JSONArray
+     */
+    public JSONArray getGitlabPrDiffFile(PullRequestInfo prInfo) {
+        LOGGER.info("query gitlab pr diff files!");
+        Map<String, String> params = new HashMap<>();
+        params.put("projectId", prInfo.getProjectId());
+        params.put("repo", prInfo.getRepoName());
+        params.put("pullNumber", prInfo.getPullNumber());
+        params.put("accessToken", prInfo.getAccessToken());
+        GitlabApiUtil gitlabApiUtil = new GitlabApiUtil(params);
+        return gitlabApiUtil.getGitlabPrDiffFiles();
+    }
+
+    /**
+     * 获取gitlab仓库的pr门禁信息。
+     *
+     * @param prInfo pr门禁信息
+     * @return PullRequestInfo
+     */
+    @Override
+    public PullRequestInfo getGitlabPrInfo(GitlabPRInfo prInfo) {
+        JSONObject prObject = JSONObject.parseObject(prInfo.getPrInfo());
+        // 判断触发类型 目前仅支持merge_request和note
+        String eventType= prObject.getString("event_type");
+        JSONObject project = JSONObject.parseObject(prObject.getString("project")); // 项目信息
+        JSONObject mergeUser = JSONObject.parseObject(prObject.getString("user")); // pr提交用户信息
+        JSONObject source;
+        JSONObject target;
+        String pullNumber;
+        // 提交pr请求
+        if ("merge_request".equals(eventType)) {
+            JSONObject attributes = JSONObject.parseObject(prObject.getString("object_attributes"));
+            source = JSONObject.parseObject(attributes.getString("source")); // 源分支信息
+            target = JSONObject.parseObject(attributes.getString("target")); // 目标分支信息
+            pullNumber = attributes.getString("iid");
+        } else if ("note".equals(eventType)) { // 通过评论触发
+            JSONObject mergeRequest = JSONObject.parseObject(prObject.getString("merge_request"));
+            source = JSONObject.parseObject(mergeRequest.getString("source")); // 源分支信息
+            target = JSONObject.parseObject(mergeRequest.getString("target")); // 目标分支信息
+            pullNumber = mergeRequest.getString("iid");
+        } else {
+            LOGGER.debug("canot support!");
+            return null;
+        }
+        Map<String, String> params = new HashMap<>();
+        params.put("projectId", project.getString("id"));
+        params.put("pullNumber", pullNumber);
+        params.put("accessToken", prInfo.getAccessToken());
+        GitlabApiUtil gitlabApiUtil = new GitlabApiUtil(params);
+        JSONObject pullRequestInfo = gitlabApiUtil.getGitlabPullRequestInfo();
+        // 通过Giturl查询
+        PullRequestInfo info = new PullRequestInfo();
+        if (pullRequestInfo.isEmpty()) {
+            LOGGER.debug("Get the pullRequestInfo failed!");
+            return null;
+        } else {
+            String sourceRepo = source.get("name").toString();
+            String sourceNameSpace = source.get("namespace").toString();
+            String targetRepo = target.get("name").toString();
+            String targetNameSpace = target.get("namespace").toString();
+            info.setProjectId(project.getString("id")); // 项目ID
+            info.setPullNumber(pullNumber); // pr编号
+            info.setVersion(pullRequestInfo.get("sha").toString()); // sha值
+            info.setTarget(pullRequestInfo.get("target_branch").toString()); // 目标分支
+            info.setBranch(pullRequestInfo.get("source_branch").toString()); // 源分支
+            info.setProjectName("openMaJun".equals(targetNameSpace) ? "openMajun" : targetNameSpace); // 目标社区名
+            info.setRepoName(targetRepo);
+            info.setPullInfo(pullRequestInfo.get("web_url").toString()); // pr信息
+            info.setGitUrl(target.get("http_url").toString()); // 目标仓库下载地址
+            info.setMergeUrl(pullRequestInfo.get("web_url").toString()); // pr地址
+            info.setWorkspace(sourceNameSpace + "-" + sourceRepo + "-" + info.getBranch() +
+                    "-" + pullNumber);
+            info.setExecutorName(mergeUser.get("username").toString()); // pr请求发起者
+            info.setExecutorId(mergeUser.get("id").toString()); // pr请求发起者ID
+            info.setAccessToken(prInfo.getAccessToken());
+            String scanId = scanIdGenerate(info.getProjectName(),
+                    info.getRepoName(), info.getBranch());
+            info.setScanId(scanId);
+            return info;
+        }
     }
 }

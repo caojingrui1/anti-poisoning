@@ -35,6 +35,8 @@ import org.springframework.stereotype.Service;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -49,29 +51,21 @@ public class AntiServiceImpl implements AntiService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AntiServiceImpl.class);
 
-//    private static final String SCANRESULTPATH = "/tools/softwareFile/report/";
-//
-//    private static final String PR_SCANRESULTPATH = "/tools/SoftwareSupplyChainSecurity-v1/pr_report/";
-//
-//    private static final String SCANTOOLPATH = "/tools/SoftwareSupplyChainSecurity-v1/openeuler_scan.py";
-//
-//    private static final String SCANTOOLFILE = "/tools/SoftwareSupplyChainSecurity-v1/";
-//
-//    private static final String REPOPATH = "/tools/softwareFile/download/";
-//
-//    private static final String PR_REPOPATH = "/tools/SoftwareSupplyChainSecurity-v1/prDownload/";
-//
-//    private static final String CONFIG_PATH = "/tools/SoftwareSupplyChainSecurity-v1/ruleYaml/";
-//
-//    private static final String DOWN_PATH = "prDownload/";
-
     private SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss:SSS");
+
+    private static final String GITLAB = "https://source.openeuler.sh";
 
     @Value("${git.username}")
     private String gitUser;
 
     @Value("${git.password}")
     private String gitPassword;
+
+    @Value("${gitlab.username}")
+    private String gitlabUser;
+
+    @Value("${gitlab.password}")
+    private String gitlabPass;
 
     @Autowired
     private AntiOperation antiOperation;
@@ -363,7 +357,16 @@ public class AntiServiceImpl implements AntiService {
                 "-" + antiEntity.getBranch();
         antiOperation.insertScanResult(antiEntity);
         long startTime = System.currentTimeMillis();
-        JGitUtil gfxly = new JGitUtil(antiEntity.getRepoName(), gitUser, gitPassword,
+        String userName ;
+        String pass ;
+        if (antiEntity.getRepoUrl().contains("source.openeuler.sh")) {
+            userName = gitlabUser;
+            pass = gitlabPass;
+        } else {
+            userName = gitUser;
+            pass = gitPassword;
+        }
+        JGitUtil gfxly = new JGitUtil(antiEntity.getRepoName(), userName, pass,
                 antiEntity.getBranch(), null, workspace);
         int getPullCode = gfxly.pullVersion(antiEntity.getRepoUrl());
         long endTime = System.currentTimeMillis();
@@ -390,10 +393,12 @@ public class AntiServiceImpl implements AntiService {
      * @param antiEntity 扫描任务实体
      * @param info pr信息
      * @param fileArray 差异文件数
+     * @param type 代码托管平台 gitee&gitlab
      * @return MultiResponse<List<VmsExternalCveSourceDTO>>
      */
     @Override
-    public MultiResponse downloadPRRepoFile(PRAntiEntity antiEntity, PullRequestInfo info, JSONArray fileArray) {
+    public MultiResponse downloadPRRepoFile(PRAntiEntity antiEntity, PullRequestInfo info,
+                                            JSONArray fileArray, String type) {
         String createTime = DATE_FORMAT.format(System.currentTimeMillis());
         antiEntity.setCreateTime(createTime);
         // 生成任务id
@@ -402,7 +407,7 @@ public class AntiServiceImpl implements AntiService {
         long startTime = System.currentTimeMillis();
         int getPullCode = 0;
         if (fileArray.size() < 100) {
-            getPullCode = curlFile(fileArray, info);
+            getPullCode = "gitlab".equals(type) ? curlGitlabFile(fileArray, info) : curlFile(fileArray, info);
         } else {
             getPullCode = cloneRepository(info);
         }
@@ -457,6 +462,40 @@ public class AntiServiceImpl implements AntiService {
     }
 
     /**
+     * 通过curl指令下载gitlab差异文件到指定文件夹.
+     *
+     * @param fileArray 差异文件信息
+     * @param info pr信息
+     * @return int
+     */
+    public int curlGitlabFile(JSONArray fileArray, PullRequestInfo info) {
+        final int[] pullCode = {0};
+        LOGGER.info("get gitlab diff tree start!");
+        fileArray.stream().forEach(file->{
+            JSONObject json = (JSONObject) file;
+            String url = GITLAB + "/openMajun/anti-poisoning/-/raw/" + info.getBranch() +
+                    "/" + json.getString("new_path");
+            StringBuffer sb = cmdOfGitlabCurl(info, json.getString("new_path"));
+            try {
+                List<String> strList = new ArrayList<>();
+                Process proc = Runtime.getRuntime().exec(new String[]{"/bin/sh", "-c", sb.toString()}, null, null);
+                StreamConsumer errConsumer = new StreamConsumer(proc.getErrorStream(), strList,ConstantsArgs.ERR_CONSUMER);
+                StreamConsumer outputConsumer = new StreamConsumer(proc.getInputStream(), strList,ConstantsArgs.OUTPUT_CONSUMER);
+                errConsumer.start();
+                outputConsumer.start();
+                proc.waitFor();
+                errConsumer.join();
+                outputConsumer.join();
+            } catch (IOException | InterruptedException e) {
+                pullCode[0] = 1;
+                LOGGER.error("errInfo is {}", e.getMessage());
+            }
+        });
+        LOGGER.info("get gitlab diff tree end!");
+        return pullCode[0];
+    }
+
+    /**
      * 下载全量代码后拉取差异文件。
      *
      * @param info pr信息
@@ -505,6 +544,37 @@ public class AntiServiceImpl implements AntiService {
         buffer.append(AntiConstants.DOWN_PATH).append(info.getWorkspace()).append("/modify_dirs/")
                 .append(filePath).append(" >/dev/null 2>&1");
         buffer.append(" --create-dir ").append(url);
+        return buffer;
+    }
+
+    /**
+     * 通过curl方式下载gitlab文件至指定文件夹。
+     *
+     * @param info pr信息
+     * @param url 文件下载链接
+     * @return StringBuffer
+     */
+    public StringBuffer cmdOfGitlabCurl(PullRequestInfo info, String url) {
+        String filePath = info.getProjectName() + "-" + info.getRepoName() + "-" + info.getBranch() +
+                "-" + info.getPullNumber() + "/" + url;
+        StringBuffer buffer = new StringBuffer();
+        buffer.append("curl");
+        if (StringUtils.isNotEmpty(info.getAccessToken())) {
+            buffer.append(" --header 'PRIVATE-TOKEN:");
+            // 设置下载所需的用户权限
+            buffer.append(info.getAccessToken()).append("'");
+        }
+        buffer.append(" -o ");
+        // 设置文件下载存放路径
+        buffer.append(AntiConstants.DOWN_PATH).append(info.getWorkspace()).append("/modify_dirs/")
+                .append(filePath).append(" >/dev/null 2>&1");
+        try {
+            // 通过gitlab API进行代码文件下载
+            buffer.append(" --create-dir ").append(GITLAB + "/api/v4/" + info.getProjectId() + "/repository/files/" +
+                    URLEncoder.encode(url, "UTF-8") + "/raw?ref=" + info.getBranch());
+        } catch (UnsupportedEncodingException e) {
+            LOGGER.error(e.getMessage());
+        }
         return buffer;
     }
 

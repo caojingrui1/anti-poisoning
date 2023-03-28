@@ -392,6 +392,7 @@ public class PoisonTaskOperation {
         Query query = Query.query(criteria);
         // 总数量
         query.with(Sort.by(Sort.Direction.DESC, "_id"));
+        query.fields().exclude("logs");
         long count = mongoTemplate.count(query, TaskEntity.class, CollectionTableName.POISON_VERSION_TASK);
         query.fields().exclude("logs");
         List<TaskEntity> list = mongoTemplate.find(query, TaskEntity.class, CollectionTableName.POISON_VERSION_TASK);

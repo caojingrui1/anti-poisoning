@@ -8,6 +8,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.huawei.antipoisoning.business.enmu.ConstantsArgs;
 import com.huawei.antipoisoning.business.entity.RepoInfo;
 import com.huawei.antipoisoning.business.entity.TaskEntity;
+import com.huawei.antipoisoning.business.entity.pr.GitlabPRInfo;
 import com.huawei.antipoisoning.business.entity.pr.PRAntiEntity;
 import com.huawei.antipoisoning.business.entity.pr.PRInfo;
 import com.huawei.antipoisoning.business.entity.pr.PullRequestInfo;
@@ -64,6 +65,22 @@ public class PoisonPRController {
             method = RequestMethod.POST)
     public MultiResponse poisonPRScan(@RequestBody PRInfo info) throws InterruptedException, ExecutionException {
         return queuePRService(info);
+    }
+
+    /**
+     * 启动gitlab PR门禁扫描任务
+     *
+     * @param info 检查PR分支信息
+     * @return MultiResponse
+     * @throws InterruptedException 中断异常
+     * @throws ExecutionException 执行异常
+     */
+    @RequestMapping(value = "/sca-gitlab-pr",
+            produces = {"application/json"},
+            consumes = {"application/json"},
+            method = RequestMethod.POST)
+    public MultiResponse poisonGitlabPRScan(@RequestBody GitlabPRInfo info) throws InterruptedException, ExecutionException {
+        return queueGitlabPRService(info);
     }
 
     /**
@@ -125,7 +142,40 @@ public class PoisonPRController {
         }
         Future future = THREAD_SCHEDULED_EXECUTOR.submit(() -> {
             PullRequestInfo take = BLOCKING_QUEUE.take();
-            return poisonService.poisonPRScan(take, prRepoInfo);
+            return poisonService.poisonPRScan(take, prRepoInfo, null);
+        });
+        ObjectMapper objectMapper = new ObjectMapper();
+        MultiResponse response;
+        try {
+            response = objectMapper.convertValue(future.get(3, TimeUnit.SECONDS), MultiResponse.class);
+        } catch (TimeoutException e) {
+            return new MultiResponse().code(ConstantsArgs.CODE_SUCCESS)
+                    .message("create task success!").result(pullRequestInfo.getScanId());
+        }
+        return response;
+    }
+
+    /**
+     * Gitlab门禁扫描队列
+     *
+     * @param prRepoInfo 任务实体类
+     * @return MultiResponse
+     * @throws InterruptedException 中断异常
+     * @throws ExecutionException 执行异常
+     */
+    public MultiResponse queueGitlabPRService(GitlabPRInfo prRepoInfo) throws InterruptedException, ExecutionException {
+        PullRequestInfo pullRequestInfo = poisonService.getGitlabPrInfo(prRepoInfo);
+        if (Objects.isNull(pullRequestInfo) || BLOCKING_QUEUE.remainingCapacity() <= 0) {
+            LOGGER.error("Blocking queue is full.");
+        }
+        try {
+            BLOCKING_QUEUE.put(pullRequestInfo);
+        } catch (InterruptedException e) {
+            LOGGER.error("{} Blocking queue put string failed.", e.getMessage());
+        }
+        Future future = THREAD_SCHEDULED_EXECUTOR.submit(() -> {
+            PullRequestInfo take = BLOCKING_QUEUE.take();
+            return poisonService.poisonPRScan(take, null, prRepoInfo);
         });
         ObjectMapper objectMapper = new ObjectMapper();
         MultiResponse response;

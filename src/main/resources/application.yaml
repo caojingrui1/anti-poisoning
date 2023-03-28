@@ -3,20 +3,29 @@ server:
   name: anti-poisoning
 git:
   username: openlibing@163.com
+  password: ENC(ebUHNmrtczMIZ9rEqRexodzsFI3fKzjQ)
+gitlab:
+  username: openlibing@163.com
   password: ENC(ac2sDLzYl/zj9MFEwF7wmZsYjn7V1B5J)
 jasypt:
   encryptor:
     algorithm: PBEWithMD5AndDES
     iv-generator-classname: org.jasypt.iv.NoIvGenerator
-management:
-  endpoints:
-    web:
-      exposure:
-        include: prometheus
-        exclude: configprops
-  endpoint:
-    health:
-      show-details: always
-  metrics:
-    tags:
-      application: ${server.name}
+spring:
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 20MB
+      max-request-size: 20MB
+#management:
+#  endpoints:
+#    web:
+#      exposure:
+#        include: prometheus
+#        exclude: configprops
+#  endpoint:
+#    health:
+#      show-details: always
+#  metrics:
+#    tags:
+#      application: ${server.name}
