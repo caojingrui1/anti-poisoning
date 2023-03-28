@@ -394,7 +394,6 @@ public class PoisonTaskOperation {
         query.with(Sort.by(Sort.Direction.DESC, "_id"));
         query.fields().exclude("logs");
         long count = mongoTemplate.count(query, TaskEntity.class, CollectionTableName.POISON_VERSION_TASK);
-        query.fields().exclude("logs");
         List<TaskEntity> list = mongoTemplate.find(query, TaskEntity.class, CollectionTableName.POISON_VERSION_TASK);
         return new PageVo(count, list);
     }
