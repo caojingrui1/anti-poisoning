@@ -316,7 +316,7 @@ public class ProblemShieldController {
      * @param scanId   版本扫描Id
      * @return MultiResponse
      */
-    @PostMapping("/getScanResultByScanId")
+    @GetMapping("/getScanResultByScanId")
     public MultiResponse getScanResultByScanId(@RequestParam String scanId) {
         return problemShieldService.getScanResultByScanId(scanId);
     }
@@ -327,7 +327,7 @@ public class ProblemShieldController {
      * @param scanId   版本扫描Id
      * @return MultiResponse
      */
-    @PostMapping("/getPRScanResultByScanId")
+    @GetMapping("/getPRScanResultByScanId")
     public MultiResponse getPRScanResultByScanId(@RequestParam String scanId) {
         return problemShieldService.getPRScanResultByScanId(scanId);
     }
