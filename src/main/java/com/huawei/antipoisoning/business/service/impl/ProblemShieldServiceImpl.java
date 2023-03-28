@@ -533,6 +533,28 @@ public class ProblemShieldServiceImpl implements ProblemShieldService {
     }
 
     /**
+     * 根据scanId防投毒版本检查信息
+     *
+     * @param scanId   版本扫描Id
+     * @return MultiResponse
+     */
+    @Override
+    public MultiResponse getScanResultByScanId(String scanId) {
+        return new MultiResponse().code(200).result(scanResultDetailOperation.getScanResultByScanId(scanId));
+    }
+
+    /**
+     * 根据scanId防投毒pr检查信息
+     *
+     * @param scanId   版本扫描Id
+     * @return MultiResponse
+     */
+    @Override
+    public MultiResponse getPRScanResultByScanId(String scanId) {
+        return new MultiResponse().code(200).result(scanResultDetailOperation.getPRScanResultByScanId(scanId));
+    }
+
+    /**
      * 获取防投毒屏蔽详情查询
      *
      * @param queryShieldModel 查询参数体
