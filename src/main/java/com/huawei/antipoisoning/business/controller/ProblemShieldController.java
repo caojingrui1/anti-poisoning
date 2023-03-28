@@ -309,4 +309,26 @@ public class ProblemShieldController {
     public MultiResponse poisonShieldTypeMap(@RequestBody QueryShieldModel queryShieldModel) {
         return problemShieldService.poisonShieldTypeMap(queryShieldModel);
     }
+
+    /**
+     * 根据scanId防投毒版本检查信息
+     *
+     * @param scanId   版本扫描Id
+     * @return MultiResponse
+     */
+    @GetMapping("/getScanResultByScanId")
+    public MultiResponse getScanResultByScanId(@RequestParam String scanId) {
+        return problemShieldService.getScanResultByScanId(scanId);
+    }
+
+    /**
+     * 根据scanId防投毒pr检查信息
+     *
+     * @param scanId   版本扫描Id
+     * @return MultiResponse
+     */
+    @GetMapping("/getPRScanResultByScanId")
+    public MultiResponse getPRScanResultByScanId(@RequestParam String scanId) {
+        return problemShieldService.getPRScanResultByScanId(scanId);
+    }
 }

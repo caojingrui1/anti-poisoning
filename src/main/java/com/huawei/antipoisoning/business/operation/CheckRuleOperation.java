@@ -59,6 +59,9 @@ public class CheckRuleOperation {
         if (StringUtils.isNotBlank(rule.getRuleId())) {
             criteria.and("rule_id").is(rule.getRuleId());
         }
+        if (StringUtils.isNotBlank(rule.getStatus())) {
+            criteria.and("status").is(rule.getStatus());
+        }
         if (StringUtils.isNotBlank(rule.getRuleLanguage())) {
             criteria.and("rule_language").is(rule.getRuleLanguage());
         }

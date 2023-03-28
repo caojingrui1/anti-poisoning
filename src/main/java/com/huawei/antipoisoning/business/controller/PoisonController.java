@@ -105,6 +105,17 @@ public class PoisonController {
     }
 
     /**
+     * 查询日志
+     *
+     * @param taskEntity 查询参数
+     * @return queryRuleSet
+     */
+    @PostMapping(value = "poison/query/queryTaskLog")
+    public MultiResponse queryTaskLog(@RequestBody TaskEntity taskEntity) {
+        return poisonService.queryTaskLog(taskEntity);
+    }
+
+    /**
      * 删除任务
      *
      * @param taskEntity 任务实体类

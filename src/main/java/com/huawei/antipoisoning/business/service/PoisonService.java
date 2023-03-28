@@ -82,4 +82,12 @@ public interface PoisonService {
      * @return
      */
     MultiResponse poisonPrquery(AntiPoisonChangeBoardModel changeBoardModel);
+
+    /**
+     * 查询日志
+     * @param jsonObject
+     * @return
+     */
+    MultiResponse queryTaskLog(TaskEntity jsonObject);
+
 }

@@ -53,6 +53,10 @@ public class RuleModel {
     @Field("rule_desc")
     private String ruleDesc;
 
+    // 规则状态 0停用 1启用
+    @Field("status")
+    private String status;
+
     private Integer pageSize;
 
     private Integer pageNum;
