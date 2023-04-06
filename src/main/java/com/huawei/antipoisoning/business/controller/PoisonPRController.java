@@ -14,6 +14,8 @@ import com.huawei.antipoisoning.business.entity.pr.PRInfo;
 import com.huawei.antipoisoning.business.entity.pr.PullRequestInfo;
 import com.huawei.antipoisoning.business.service.PoisonPRService;
 import com.huawei.antipoisoning.common.entity.MultiResponse;
+import com.huawei.antipoisoning.common.util.SecurityUtil;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,8 +47,11 @@ public class PoisonPRController {
     private static final ThreadPoolExecutor THREAD_SCHEDULED_EXECUTOR =
             new ThreadPoolExecutor(10, 200, 0,
                     TimeUnit.SECONDS, new LinkedBlockingQueue<>(200));
-    private static int CODE_SUCCESS = 200;
-    private static int CODE_FAILED = 400;
+    private static String ASCEND = "ascend";
+    private static String MAJUN = "openMajun";
+    private static String OPEN_EULER = "openEuler";
+    private static String MIND_SPORE = "mindSpore";
+    private static String GUASS = "openGauss";
 
     @Autowired(required = false)
     private PoisonPRService poisonService;
@@ -64,7 +69,26 @@ public class PoisonPRController {
             consumes = {"application/json"},
             method = RequestMethod.POST)
     public MultiResponse poisonPRScan(@RequestBody PRInfo info) throws InterruptedException, ExecutionException {
-        return queuePRService(info);
+        // 判断是否有调用api的token许可
+        if (StringUtils.isNotEmpty(info.getApiToken())) {
+            // 根据传入的apiToken判断社区来源，进行操作日志记录
+            if (ASCEND.equals(SecurityUtil.decrypt(info.getApiToken()))) {
+                return queuePRService(info);
+            } else if (MAJUN.equals(SecurityUtil.decrypt(info.getApiToken()))) {
+                return queuePRService(info);
+            } else if (OPEN_EULER.equals(SecurityUtil.decrypt(info.getApiToken()))) {
+                return queuePRService(info);
+            } else if (GUASS.equals(SecurityUtil.decrypt(info.getApiToken()))) {
+                return queuePRService(info);
+            } else if (MIND_SPORE.equals(SecurityUtil.decrypt(info.getApiToken()))) {
+                return queuePRService(info);
+            } else {
+                return new MultiResponse().code(ConstantsArgs.CODE_FAILED)
+                        .message("create task failed, the apiToken is wrong!");
+            }
+        }
+        return new MultiResponse().code(ConstantsArgs.CODE_FAILED)
+                .message("create task failed, the apiToken is null!");
     }
 
     /**

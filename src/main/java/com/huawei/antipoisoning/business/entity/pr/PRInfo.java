@@ -18,4 +18,5 @@ public class PRInfo {
     private String repoName;
     private String pullNumber;
     private String accessToken;
+    private String apiToken;
 }
