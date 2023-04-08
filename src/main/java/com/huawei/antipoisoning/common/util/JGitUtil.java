@@ -68,7 +68,7 @@ public class JGitUtil implements Serializable {
 
         Git git = null;
         try {
-            git = Git.cloneRepository().setURI(gitUrl)
+            git = Git.cloneRepository().setURI(gitUrl).setBranch(branch)
                     .setDirectory(dir).setCredentialsProvider(provider).call();
             pullMsg = "检出代码成功 success";
         } catch (org.eclipse.jgit.api.errors.TransportException e) {
@@ -268,13 +268,5 @@ public class JGitUtil implements Serializable {
         } catch (Exception e) {
             LOGGER.error("errInfo is {}", e.getMessage());
         }
-    }
-
-    public static void main(String[] args) {
-        JGitUtil gfxly = new JGitUtil("pull/2/MERGE", "", "", "master",
-                "b19cf211470cb6841cd5f3340e62db74b61849b2", "C:\\workspace\\poison-test");
-        gfxly.pullPr("https://gitee.com/zzyy95_1/helper.git");
-        StringBuffer sb = gfxly.cmdOfPullRequest("C:\\workspace\\poison-test", "master");
-
     }
 }

@@ -15,6 +15,7 @@ import lombok.Data;
 @Data
 public class PullRequestInfo {
     private String projectName;
+    private String projectId;
     private String repoName;
     private String pullNumber;
     private String accessToken;

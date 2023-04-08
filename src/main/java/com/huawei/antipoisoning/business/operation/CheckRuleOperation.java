@@ -72,6 +72,7 @@ public class CheckRuleOperation {
                     .compile("^.*" + escapeSpecialWord(rule.getRuleDesc()) + ".*$", Pattern.CASE_INSENSITIVE);
             criteria.and("rule_desc").regex(pattern);
         }
+        criteria.and("status").is("1");
         Query query = Query.query(criteria);
         // 总数量
         long count = mongoTemplate.count(query, CollectionTableName.ANTI_CHECK_RULE);
@@ -202,6 +203,7 @@ public class CheckRuleOperation {
      */
     public RuleResultDetailsVo queryRuleSetConfig(RuleSetModel ruleSetModel) {
         Criteria criteria = new Criteria();
+        criteria.and("status").is("1");
         if (ruleSetModel.getRuleIds().size() > 0) {
             if ("disenable".equals(ruleSetModel.getType())) {
                 criteria.and("rule_id").nin(ruleSetModel.getRuleIds());

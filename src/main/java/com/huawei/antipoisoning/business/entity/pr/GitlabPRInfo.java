@@ -4,19 +4,17 @@
 
 package com.huawei.antipoisoning.business.entity.pr;
 
+import com.alibaba.fastjson.JSONObject;
 import lombok.Data;
 
 /**
- * pr门禁信息，由jenkins任务传入。
+ * gitlab pr门禁信息，由jenkins任务传入。
  *
  * @author zyx
- * @since 2022-09-28
+ * @since 2023-03-24
  */
 @Data
-public class PRInfo {
-    private String projectName;
-    private String repoName;
-    private String pullNumber;
+public class GitlabPRInfo {
+    private String prInfo;
     private String accessToken;
-    private String apiToken;
 }
