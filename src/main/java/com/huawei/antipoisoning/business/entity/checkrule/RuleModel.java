@@ -57,6 +57,10 @@ public class RuleModel {
     @Field("status")
     private String status;
 
+    // 标签，区分规则大类
+    @Field("tag")
+    private String tag;
+
     private Integer pageSize;
 
     private Integer pageNum;
