@@ -102,6 +102,9 @@ public class AntiOperation {
         if (antiEntity.getIsScan() != null) {
             update.set("is_scan", antiEntity.getIsScan());
         }
+        if (antiEntity.getIsPass() != null) {
+            update.set("is_pass", antiEntity.getIsPass());
+        }
         if (antiEntity.getIsDownloaded() != null) {
             update.set("is_downloaded", antiEntity.getIsDownloaded());
         }
