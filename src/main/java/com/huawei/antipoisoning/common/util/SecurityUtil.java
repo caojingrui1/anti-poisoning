@@ -5,13 +5,17 @@
 package com.huawei.antipoisoning.common.util;
 
 import org.jasypt.util.text.BasicTextEncryptor;
+import org.springframework.context.annotation.Configuration;
 
 /**
  * 加密解密
  *
  * @since: 2022/6/1 13:56
  */
+@Configuration
 public class SecurityUtil {
+    private static final String securityPass =
+            System.getenv("jasypt.encryptor.password");
 
     /**
      * 解密
@@ -21,7 +25,7 @@ public class SecurityUtil {
      */
     public static String decrypt(String data){
         BasicTextEncryptor basicTextEncryptor=new BasicTextEncryptor();
-        basicTextEncryptor.setPassword(System.getProperty("jasypt.encryptor.password"));
+        basicTextEncryptor.setPassword(securityPass);
         return basicTextEncryptor.decrypt(data);
     }
 
@@ -33,7 +37,7 @@ public class SecurityUtil {
      */
     public static String encrypt(String data){
         BasicTextEncryptor basicTextEncryptor=new BasicTextEncryptor();
-        basicTextEncryptor.setPassword(System.getProperty("jasypt.encryptor.password"));
+        basicTextEncryptor.setPassword(securityPass);
         return basicTextEncryptor.encrypt(data);
     }
 }
