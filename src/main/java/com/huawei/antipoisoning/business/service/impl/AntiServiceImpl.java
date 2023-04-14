@@ -39,7 +39,9 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 下载仓库、扫描
@@ -54,6 +56,9 @@ public class AntiServiceImpl implements AntiService {
     private SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss:SSS");
 
     private static final String GITLAB = "https://source.openeuler.sh";
+
+    private static final String INC_URL = ("prod".equals(ConstantsArgs.DB_ENV)
+            ? ConstantsArgs.MAJUN_URL  : ConstantsArgs.MAJUN_BETA_URL) + ConstantsArgs.MAJUN_POISON_INC;
 
     @Value("${git.username}")
     private String gitUser;
@@ -220,6 +225,7 @@ public class AntiServiceImpl implements AntiService {
      */
     @Override
     public MultiResponse scanPRFile(String scanId, PullRequestInfo info) {
+        Map<String, Object> responseResult = new HashMap<>();
         PRAntiEntity prAntiEntity = antiOperation.queryPRAntiEntity(scanId);
         PRTaskEntity prTaskEntity = poisonTaskOperation.queryPRTaskEntity(scanId);
         // 扫描指定仓库 下载后放入文件夹 扫描 产生报告
@@ -300,7 +306,10 @@ public class AntiServiceImpl implements AntiService {
                     antiOperation.updatePRScanResult(prAntiEntity);
                     // 更新门禁级结果
                     poisonTaskOperation.updatePRTask(prAntiEntity, prTaskEntity);
-                    return MultiResponse.success(ConstantsArgs.CODE_SUCCESS, "success", results);
+                    responseResult.put("url", INC_URL + info.getScanId() +
+                            "/" + prAntiEntity.getProjectName() + "/" + prAntiEntity.getRepoName());
+                    responseResult.put("isPass", prAntiEntity.getIsPass());
+                    return MultiResponse.success(ConstantsArgs.CODE_SUCCESS, "success", responseResult);
                 } else {
                     // 扫描是否成功
                     prAntiEntity.setIsSuccess(false);

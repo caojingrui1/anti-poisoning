@@ -50,9 +50,6 @@ import java.util.stream.Collectors;
 public class PoisonPRServiceImpl implements PoisonPRService {
     private static final Logger LOGGER = LoggerFactory.getLogger(PoisonPRServiceImpl.class);
 
-    private static final String INC_URL = ("prod".equals(ConstantsArgs.DB_ENV)
-            ? ConstantsArgs.MAJUN_URL  : ConstantsArgs.MAJUN_BETA_URL) + ConstantsArgs.MAJUN_POISON_INC;
-
     @Autowired
     private AntiService antiService;
 
@@ -90,6 +87,7 @@ public class PoisonPRServiceImpl implements PoisonPRService {
      */
     @Override
     public MultiResponse poisonPRScan(PullRequestInfo pullRequestInfo, PRInfo giteeInfo, GitlabPRInfo gitlabInfo) {
+        MultiResponse response;
         // 查询仓库语言和规则集
         List<TaskRuleSetVo> taskRuleSet = checkRuleOperation.getTaskRuleSet("",
                 pullRequestInfo.getProjectName(), pullRequestInfo.getRepoName());
@@ -163,18 +161,14 @@ public class PoisonPRServiceImpl implements PoisonPRService {
             JSONArray fileArray;
             if (giteeInfo == null) {
                 fileArray = getGitlabPrDiffFile(pullRequestInfo);
-                antiService.downloadPRRepoFile(prAntiEntity, pullRequestInfo, fileArray, "gitlab");
+                response = antiService.downloadPRRepoFile(prAntiEntity, pullRequestInfo, fileArray, "gitlab");
             } else {
                 fileArray = getPRDiffFile(giteeInfo);
-                antiService.downloadPRRepoFile(prAntiEntity, pullRequestInfo, fileArray, "gitee");
+                response = antiService.downloadPRRepoFile(prAntiEntity, pullRequestInfo, fileArray, "gitee");
             }
             // 防投毒扫描
-            antiService.scanPRFile(pullRequestInfo.getScanId(), pullRequestInfo);
-            Map<String, Object> result = new HashMap<>();
-            result.put("url", INC_URL + pullRequestInfo.getScanId() +
-                    "/" + prAntiEntity.getProjectName() + "/" + prAntiEntity.getRepoName());
-            result.put("isPass", prAntiEntity.getIsPass());
-            return new MultiResponse().code(ConstantsArgs.CODE_SUCCESS).result(result);
+            response = antiService.scanPRFile(pullRequestInfo.getScanId(), pullRequestInfo);
+            return response;
         } else {
             return new MultiResponse().code(ConstantsArgs.CODE_FAILED).message("create rule yaml is error");
         }
