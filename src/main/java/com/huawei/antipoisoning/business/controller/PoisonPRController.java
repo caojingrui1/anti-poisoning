@@ -8,10 +8,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.huawei.antipoisoning.business.enmu.ConstantsArgs;
 import com.huawei.antipoisoning.business.entity.RepoInfo;
 import com.huawei.antipoisoning.business.entity.TaskEntity;
-import com.huawei.antipoisoning.business.entity.pr.GitlabPRInfo;
-import com.huawei.antipoisoning.business.entity.pr.PRAntiEntity;
-import com.huawei.antipoisoning.business.entity.pr.PRInfo;
-import com.huawei.antipoisoning.business.entity.pr.PullRequestInfo;
+import com.huawei.antipoisoning.business.entity.pr.*;
 import com.huawei.antipoisoning.business.service.PoisonPRService;
 import com.huawei.antipoisoning.common.entity.MultiResponse;
 import com.huawei.antipoisoning.common.util.SecurityUtil;
@@ -109,18 +106,17 @@ public class PoisonPRController {
     /**
      * 查询扫描结果状态。
      *
-     * @param scanId 任务ID
-     * @param apiToken 社区访问防投毒apiToken
+     * @param queryInfo 查询参数
      * @return MultiResponse
      */
     @RequestMapping(value = "/query-pr-results-status",
             produces = {"application/json"},
             consumes = {"application/json"},
             method = RequestMethod.POST)
-    public MultiResponse queryPRResultsStatus(@RequestParam String scanId, @RequestParam String apiToken) {
-        if (StringUtils.isNotEmpty(apiToken)) {
-            if (poisonService.checkApiToken(apiToken)) {
-                return poisonService.queryPRResultsStatus(scanId);
+    public MultiResponse queryPRResultsStatus(@RequestBody QueryInfo queryInfo) {
+        if (StringUtils.isNotEmpty(queryInfo.getApiToken())) {
+            if (poisonService.checkApiToken(queryInfo.getApiToken())) {
+                return poisonService.queryPRResultsStatus(queryInfo.getScanId());
             } else {
                 return new MultiResponse().code(ConstantsArgs.CODE_FAILED)
                         .message("query task status failed, the apiToken is wrong!");
