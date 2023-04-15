@@ -30,6 +30,7 @@ import com.huawei.antipoisoning.business.util.YamlUtil;
 import com.huawei.antipoisoning.common.entity.MultiResponse;
 import com.huawei.antipoisoning.common.util.GiteeApiUtil;
 import com.huawei.antipoisoning.common.util.GitlabApiUtil;
+import com.huawei.antipoisoning.common.util.SecurityUtil;
 import org.apache.commons.collections4.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,6 +54,11 @@ public class PoisonPRServiceImpl implements PoisonPRService {
 
     private static final String INC_URL = ("prod".equals(ConstantsArgs.DB_ENV)
             ? ConstantsArgs.MAJUN_URL  : ConstantsArgs.MAJUN_BETA_URL) + ConstantsArgs.MAJUN_POISON_INC;
+    private static String ASCEND = "ascend";
+    private static String MAJUN = "openMajun";
+    private static String OPEN_EULER = "openEuler";
+    private static String MIND_SPORE = "mindSpore";
+    private static String GUASS = "openGauss";
 
     @Autowired
     private AntiService antiService;
@@ -80,6 +86,29 @@ public class PoisonPRServiceImpl implements PoisonPRService {
 
     @Value("${gitlab.password}")
     private String gitlabPass;
+
+    /**
+     * 校验apitoken有效性。
+     *
+     * @param apiToken apitoken
+     * @return boolean
+     */
+    @Override
+    public boolean checkApiToken(String apiToken) {
+        if (ASCEND.equals(SecurityUtil.decrypt(apiToken))) {
+            return true;
+        } else if (MAJUN.equals(SecurityUtil.decrypt(apiToken))) {
+            return true;
+        } else if (OPEN_EULER.equals(SecurityUtil.decrypt(apiToken))) {
+            return true;
+        } else if (GUASS.equals(SecurityUtil.decrypt(apiToken))) {
+            return true;
+        } else if (MIND_SPORE.equals(SecurityUtil.decrypt(apiToken))) {
+            return true;
+        } else {
+            return false;
+        }
+    }
 
     /**
      * 启动扫扫描任务
@@ -206,11 +235,10 @@ public class PoisonPRServiceImpl implements PoisonPRService {
      * 查询版本扫描任务结果详情信息。
      *
      * @param scanId 任务ID
-     * @param apiToken 社区访问防投毒apiToken
      * @return MultiResponse
      */
     @Override
-    public MultiResponse queryPRResultsStatus(String scanId, String apiToken) {
+    public MultiResponse queryPRResultsStatus(String scanId) {
         Map<String, Object> responseResult = new HashMap<>();
         List<PRAntiEntity> prAntiEntities = poisonResultOperation.queryPRByScanId(scanId);
         if (CollectionUtils.isNotEmpty(prAntiEntities)) {

@@ -151,7 +151,7 @@ public class PoisonResultOperation {
     public List<PRAntiEntity> queryPRByScanId(String scanId) {
         Criteria criteria = new Criteria();
         if (StringUtils.isNotBlank(scanId)) {
-            criteria.and("task_id").is(scanId);
+            criteria.and("scan_id").is(scanId);
         }
         return mongoTemplate.find(Query.query(criteria), PRAntiEntity.class, CollectionTableName.POISON_PR_TASK);
     }

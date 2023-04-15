@@ -45,11 +45,6 @@ public class PoisonPRController {
     private static final ThreadPoolExecutor THREAD_SCHEDULED_EXECUTOR =
             new ThreadPoolExecutor(10, 200, 0,
                     TimeUnit.SECONDS, new LinkedBlockingQueue<>(200));
-    private static String ASCEND = "ascend";
-    private static String MAJUN = "openMajun";
-    private static String OPEN_EULER = "openEuler";
-    private static String MIND_SPORE = "mindSpore";
-    private static String GUASS = "openGauss";
 
     @Autowired(required = false)
     private PoisonPRService poisonService;
@@ -70,15 +65,7 @@ public class PoisonPRController {
         // 判断是否有调用api的token许可
         if (StringUtils.isNotEmpty(info.getApiToken())) {
             // 根据传入的apiToken判断社区来源，进行操作日志记录
-            if (ASCEND.equals(SecurityUtil.decrypt(info.getApiToken()))) {
-                return queuePRService(info);
-            } else if (MAJUN.equals(SecurityUtil.decrypt(info.getApiToken()))) {
-                return queuePRService(info);
-            } else if (OPEN_EULER.equals(SecurityUtil.decrypt(info.getApiToken()))) {
-                return queuePRService(info);
-            } else if (GUASS.equals(SecurityUtil.decrypt(info.getApiToken()))) {
-                return queuePRService(info);
-            } else if (MIND_SPORE.equals(SecurityUtil.decrypt(info.getApiToken()))) {
+            if (poisonService.checkApiToken(info.getApiToken())) {
                 return queuePRService(info);
             } else {
                 return new MultiResponse().code(ConstantsArgs.CODE_FAILED)
@@ -131,7 +118,17 @@ public class PoisonPRController {
             consumes = {"application/json"},
             method = RequestMethod.POST)
     public MultiResponse queryPRResultsStatus(@RequestParam String scanId, @RequestParam String apiToken) {
-        return poisonService.queryPRResultsStatus(scanId, apiToken);
+        if (StringUtils.isNotEmpty(apiToken)) {
+            if (poisonService.checkApiToken(apiToken)) {
+                return poisonService.queryPRResultsStatus(scanId);
+            } else {
+                return new MultiResponse().code(ConstantsArgs.CODE_FAILED)
+                        .message("query task status failed, the apiToken is wrong!");
+            }
+        }
+
+        return new MultiResponse().code(ConstantsArgs.CODE_FAILED)
+                .message("query task status failed, the apiToken is null!");
     }
 
     /**
