@@ -14,6 +14,14 @@ import com.huawei.antipoisoning.common.entity.MultiResponse;
 
 public interface PoisonPRService {
     /**
+     * 校验apitoken有效性。
+     *
+     * @param apiToken apitoken
+     * @return boolean
+     */
+    boolean checkApiToken(String apiToken);
+
+    /**
      * 启动扫扫描任务
      *
      * @param pullRequestInfo pr详情信息
