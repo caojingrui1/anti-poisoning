@@ -19,12 +19,10 @@ import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -122,6 +120,21 @@ public class PoisonPRController {
     }
 
     /**
+     * 查询扫描结果状态。
+     *
+     * @param scanId 任务ID
+     * @param apiToken 社区访问防投毒apiToken
+     * @return MultiResponse
+     */
+    @RequestMapping(value = "/query-pr-results-status",
+            produces = {"application/json"},
+            consumes = {"application/json"},
+            method = RequestMethod.POST)
+    public MultiResponse queryPRResultsStatus(@RequestParam String scanId, @RequestParam String apiToken) {
+        return poisonService.queryPRResultsStatus(scanId, apiToken);
+    }
+
+    /**
      * 查询扫描结果详情信息。
      *
      * @param prAntiEntity 参数
@@ -170,11 +183,13 @@ public class PoisonPRController {
         });
         ObjectMapper objectMapper = new ObjectMapper();
         MultiResponse response;
+        Map<String, Object> responseResult = new HashMap<>();
         try {
             response = objectMapper.convertValue(future.get(3, TimeUnit.SECONDS), MultiResponse.class);
         } catch (TimeoutException e) {
+            responseResult.put("scanId", pullRequestInfo.getScanId());
             return new MultiResponse().code(ConstantsArgs.CODE_SUCCESS)
-                    .message("create task success!").result(pullRequestInfo.getScanId());
+                    .message("create task success!").result(responseResult);
         }
         return response;
     }
