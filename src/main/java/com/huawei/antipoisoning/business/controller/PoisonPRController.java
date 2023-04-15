@@ -120,7 +120,7 @@ public class PoisonPRController {
     public MultiResponse queryPRResultsStatus(@RequestParam String scanId, @RequestParam String apiToken) {
         if (StringUtils.isNotEmpty(apiToken)) {
             if (poisonService.checkApiToken(apiToken)) {
-                return poisonService.queryPRResultsStatus(scanId, apiToken);
+                return poisonService.queryPRResultsStatus(scanId);
             } else {
                 return new MultiResponse().code(ConstantsArgs.CODE_FAILED)
                         .message("query task status failed, the apiToken is wrong!");

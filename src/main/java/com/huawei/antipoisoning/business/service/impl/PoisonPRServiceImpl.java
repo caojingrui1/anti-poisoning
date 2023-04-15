@@ -235,11 +235,10 @@ public class PoisonPRServiceImpl implements PoisonPRService {
      * 查询版本扫描任务结果详情信息。
      *
      * @param scanId 任务ID
-     * @param apiToken 社区访问防投毒apiToken
      * @return MultiResponse
      */
     @Override
-    public MultiResponse queryPRResultsStatus(String scanId, String apiToken) {
+    public MultiResponse queryPRResultsStatus(String scanId) {
         Map<String, Object> responseResult = new HashMap<>();
         List<PRAntiEntity> prAntiEntities = poisonResultOperation.queryPRByScanId(scanId);
         if (CollectionUtils.isNotEmpty(prAntiEntities)) {
