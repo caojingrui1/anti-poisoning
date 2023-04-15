@@ -74,7 +74,6 @@ public class CheckRuleOperation {
                     .compile("^.*" + escapeSpecialWord(rule.getRuleDesc()) + ".*$", Pattern.CASE_INSENSITIVE);
             criteria.and("rule_desc").regex(pattern);
         }
-        criteria.and("status").is("1");
         Query query = Query.query(criteria);
         // 总数量
         long count = mongoTemplate.count(query, CollectionTableName.ANTI_CHECK_RULE);
