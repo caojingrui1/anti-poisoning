@@ -40,6 +40,15 @@ public interface PoisonPRService {
     MultiResponse queryPRResultsDetail(PRAntiEntity prAntiEntity);
 
     /**
+     * 查询扫描结果状态。
+     *
+     * @param scanId 任务ID
+     * @param apiToken 社区访问防投毒apiToken
+     * @return MultiResponse
+     */
+    MultiResponse queryPRResultsStatus(String scanId, String apiToken);
+
+    /**
      * 删除防投毒任务以及相关规则集
      *
      * @param taskEntity 删除参数体

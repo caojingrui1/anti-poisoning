@@ -12,6 +12,7 @@ import com.huawei.antipoisoning.business.entity.checkrule.TaskRuleSetVo;
 import com.huawei.antipoisoning.business.entity.checkrule.RuleResultDetailsVo;
 import com.huawei.antipoisoning.business.entity.vo.PageVo;
 import com.huawei.antipoisoning.common.entity.MultiResponse;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,6 +26,7 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Component;
 
+import java.security.cert.Certificate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -121,6 +123,21 @@ public class CheckRuleOperation {
         mongoTemplate.insert(ruleModel, CollectionTableName.ANTI_CHECK_RULE);
     }
 
+    public void updateRule(RuleModel ruleModel) {
+        Criteria criteria = Criteria.where("_id").is(ruleModel.getId());
+        Update update = new Update();
+        update.set("rule_name", ruleModel.getRuleName());
+        update.set("rule_language", ruleModel.getRuleLanguage());
+        update.set("revise_opinion", ruleModel.getReviseOpinion());
+        update.set("file_ids", ruleModel.getFileIds());
+        update.set("right_example", ruleModel.getRightExample());
+        update.set("error_example", ruleModel.getErrorExample());
+        update.set("rule_desc", ruleModel.getRuleDesc());
+        update.set("tag", ruleModel.getTag());
+        update.set("status", ruleModel.getStatus());
+        mongoTemplate.updateFirst(Query.query(criteria), update, CollectionTableName.ANTI_CHECK_RULE);
+    }
+
     /**
      * 对语言进行分组获取总数
      *
@@ -157,6 +174,20 @@ public class CheckRuleOperation {
         }
         if (StringUtils.isNotBlank(ruleSetModel.getProjectName())) {
             criteria.and("project_name").is(ruleSetModel.getProjectName());
+        }
+        return mongoTemplate.find(Query.query(criteria), RuleSetModel.class, CollectionTableName.ANTI_CHECK_RULE_SET);
+    }
+
+    /**
+     * 根据条件查询规则集信息
+     *
+     * @param removeIds 查询参数
+     * @return queryRuleSet
+     */
+    public List<RuleSetModel> queryRuleSetByRuleId(List<String> removeIds) {
+        Criteria criteria = new Criteria();
+        if (CollectionUtils.isNotEmpty(removeIds)) {
+            criteria.and("rule_ids").in(removeIds);
         }
         return mongoTemplate.find(Query.query(criteria), RuleSetModel.class, CollectionTableName.ANTI_CHECK_RULE_SET);
     }

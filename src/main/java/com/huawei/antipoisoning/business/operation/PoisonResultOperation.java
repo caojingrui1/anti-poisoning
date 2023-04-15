@@ -8,6 +8,7 @@ import com.huawei.antipoisoning.business.enmu.CollectionTableName;
 import com.huawei.antipoisoning.business.entity.AntiEntity;
 import com.huawei.antipoisoning.business.entity.ResultEntity;
 import com.huawei.antipoisoning.business.entity.TaskEntity;
+import com.huawei.antipoisoning.business.entity.pr.PRAntiEntity;
 import com.huawei.antipoisoning.business.entity.pr.PRResultEntity;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -139,6 +140,20 @@ public class PoisonResultOperation {
     public List<PRResultEntity> queryPRResultEntity(String scanId) {
         Query query = Query.query(new Criteria("scan_id").is(scanId));
         return mongoTemplate.find(query, PRResultEntity.class, CollectionTableName.SCAN_PR_RESULT_DETAILS);
+    }
+
+    /**
+     * 根据scanId查询门禁扫描任务信息。
+     *
+     * @param scanId 扫描id
+     * @return List<PRAntiEntity>
+     */
+    public List<PRAntiEntity> queryPRByScanId(String scanId) {
+        Criteria criteria = new Criteria();
+        if (StringUtils.isNotBlank(scanId)) {
+            criteria.and("task_id").is(scanId);
+        }
+        return mongoTemplate.find(Query.query(criteria), PRAntiEntity.class, CollectionTableName.POISON_PR_TASK);
     }
 
     /**

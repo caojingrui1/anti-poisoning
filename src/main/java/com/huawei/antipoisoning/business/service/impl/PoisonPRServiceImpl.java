@@ -30,6 +30,7 @@ import com.huawei.antipoisoning.business.util.YamlUtil;
 import com.huawei.antipoisoning.common.entity.MultiResponse;
 import com.huawei.antipoisoning.common.util.GiteeApiUtil;
 import com.huawei.antipoisoning.common.util.GitlabApiUtil;
+import org.apache.commons.collections4.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,6 +50,9 @@ import java.util.stream.Collectors;
 @Service
 public class PoisonPRServiceImpl implements PoisonPRService {
     private static final Logger LOGGER = LoggerFactory.getLogger(PoisonPRServiceImpl.class);
+
+    private static final String INC_URL = ("prod".equals(ConstantsArgs.DB_ENV)
+            ? ConstantsArgs.MAJUN_URL  : ConstantsArgs.MAJUN_BETA_URL) + ConstantsArgs.MAJUN_POISON_INC;
 
     @Autowired
     private AntiService antiService;
@@ -196,6 +200,28 @@ public class PoisonPRServiceImpl implements PoisonPRService {
     public MultiResponse queryPRResultsDetail(PRAntiEntity prAntiEntity) {
         List<PRResultEntity> resultEntity = poisonResultOperation.queryPRResultEntity(prAntiEntity.getScanId());
         return new MultiResponse().code(200).result(resultEntity);
+    }
+
+    /**
+     * 查询版本扫描任务结果详情信息。
+     *
+     * @param scanId 任务ID
+     * @param apiToken 社区访问防投毒apiToken
+     * @return MultiResponse
+     */
+    @Override
+    public MultiResponse queryPRResultsStatus(String scanId, String apiToken) {
+        Map<String, Object> responseResult = new HashMap<>();
+        List<PRAntiEntity> prAntiEntities = poisonResultOperation.queryPRByScanId(scanId);
+        if (CollectionUtils.isNotEmpty(prAntiEntities)) {
+            PRAntiEntity prAntiEntity = prAntiEntities.get(0);
+            if (prAntiEntity.getIsPass() != null) {
+                responseResult.put("url", INC_URL + prAntiEntity.getScanId() +
+                        "/" + prAntiEntity.getProjectName() + "/" + prAntiEntity.getRepoName());
+                responseResult.put("isPass", prAntiEntity.getIsPass());
+            }
+        }
+        return new MultiResponse().code(200).result(responseResult);
     }
 
     /**
