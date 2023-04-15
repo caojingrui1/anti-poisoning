@@ -30,6 +30,8 @@ import com.huawei.antipoisoning.business.util.YamlUtil;
 import com.huawei.antipoisoning.common.entity.MultiResponse;
 import com.huawei.antipoisoning.common.util.GiteeApiUtil;
 import com.huawei.antipoisoning.common.util.GitlabApiUtil;
+import com.huawei.antipoisoning.common.util.SecurityUtil;
+import org.apache.commons.collections4.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,6 +51,14 @@ import java.util.stream.Collectors;
 @Service
 public class PoisonPRServiceImpl implements PoisonPRService {
     private static final Logger LOGGER = LoggerFactory.getLogger(PoisonPRServiceImpl.class);
+
+    private static final String INC_URL = ("prod".equals(ConstantsArgs.DB_ENV)
+            ? ConstantsArgs.MAJUN_URL  : ConstantsArgs.MAJUN_BETA_URL) + ConstantsArgs.MAJUN_POISON_INC;
+    private static String ASCEND = "ascend";
+    private static String MAJUN = "openMajun";
+    private static String OPEN_EULER = "openEuler";
+    private static String MIND_SPORE = "mindSpore";
+    private static String GUASS = "openGauss";
 
     @Autowired
     private AntiService antiService;
@@ -76,6 +86,29 @@ public class PoisonPRServiceImpl implements PoisonPRService {
 
     @Value("${gitlab.password}")
     private String gitlabPass;
+
+    /**
+     * 校验apitoken有效性。
+     *
+     * @param apiToken apitoken
+     * @return boolean
+     */
+    @Override
+    public boolean checkApiToken(String apiToken) {
+        if (ASCEND.equals(SecurityUtil.decrypt(apiToken))) {
+            return true;
+        } else if (MAJUN.equals(SecurityUtil.decrypt(apiToken))) {
+            return true;
+        } else if (OPEN_EULER.equals(SecurityUtil.decrypt(apiToken))) {
+            return true;
+        } else if (GUASS.equals(SecurityUtil.decrypt(apiToken))) {
+            return true;
+        } else if (MIND_SPORE.equals(SecurityUtil.decrypt(apiToken))) {
+            return true;
+        } else {
+            return false;
+        }
+    }
 
     /**
      * 启动扫扫描任务
@@ -196,6 +229,27 @@ public class PoisonPRServiceImpl implements PoisonPRService {
     public MultiResponse queryPRResultsDetail(PRAntiEntity prAntiEntity) {
         List<PRResultEntity> resultEntity = poisonResultOperation.queryPRResultEntity(prAntiEntity.getScanId());
         return new MultiResponse().code(200).result(resultEntity);
+    }
+
+    /**
+     * 查询版本扫描任务结果详情信息。
+     *
+     * @param scanId 任务ID
+     * @return MultiResponse
+     */
+    @Override
+    public MultiResponse queryPRResultsStatus(String scanId) {
+        Map<String, Object> responseResult = new HashMap<>();
+        List<PRAntiEntity> prAntiEntities = poisonResultOperation.queryPRByScanId(scanId);
+        if (CollectionUtils.isNotEmpty(prAntiEntities)) {
+            PRAntiEntity prAntiEntity = prAntiEntities.get(0);
+            if (prAntiEntity.getIsPass() != null) {
+                responseResult.put("url", INC_URL + prAntiEntity.getScanId() +
+                        "/" + prAntiEntity.getProjectName() + "/" + prAntiEntity.getRepoName());
+                responseResult.put("isPass", prAntiEntity.getIsPass());
+            }
+        }
+        return new MultiResponse().code(200).result(responseResult);
     }
 
     /**

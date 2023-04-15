@@ -82,4 +82,20 @@ public interface CheckRuleService {
      * @return getTaskRule
      */
     MultiResponse getTaskRule(TaskRuleSetVo taskRuleSetVo);
+
+    /**
+     * 新增规则。
+     *
+     * @param ruleModel 规则
+     * @return MultiResponse
+     */
+    MultiResponse createRule(RuleModel ruleModel);
+
+    /**
+     * 修改规则。
+     *
+     * @param ruleModel 规则
+     * @return MultiResponse
+     */
+    MultiResponse updateRule(RuleModel ruleModel);
 }

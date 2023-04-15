@@ -41,6 +41,28 @@ public class CheckRuleController {
     }
 
     /**
+     * 新增规则
+     *
+     * @param ruleModel 规则
+     * @return MultiResponse
+     */
+    @PostMapping(value = "/create/rule")
+    public MultiResponse createRule(@RequestBody RuleModel ruleModel) {
+        return checkRuleService.createRule(ruleModel);
+    }
+
+    /**
+     * 更新规则
+     *
+     * @param ruleModel 规则
+     * @return MultiResponse
+     */
+    @PostMapping(value = "/update/rule")
+    public MultiResponse updateRule(@RequestBody RuleModel ruleModel) {
+        return checkRuleService.updateRule(ruleModel);
+    }
+
+    /**
      * 规则界面获取左侧导航栏
      *
      * @return getAllRulesConfig

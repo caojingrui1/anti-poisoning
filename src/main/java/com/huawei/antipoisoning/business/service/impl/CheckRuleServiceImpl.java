@@ -18,10 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -191,5 +188,41 @@ public class CheckRuleServiceImpl implements CheckRuleService {
             return new MultiResponse().code(400).message("data is null");
         }
         return new MultiResponse().code(200).message("success").result(taskRuleSet);
+    }
+
+    @Override
+    public MultiResponse createRule(RuleModel ruleModel) {
+        List<RuleModel> ruleModels = new ArrayList<>();
+        ruleModel.setRuleId(ruleModel.getRuleLanguage() + "_" + ruleModel.getRuleName());
+        ruleModels.add(ruleModel);
+        checkRuleOperation.createRule(ruleModels);
+        return new MultiResponse().code(200).message("add rule success");
+    }
+
+    @Override
+    public MultiResponse updateRule(RuleModel ruleModel) {
+        checkRuleOperation.updateRule(ruleModel);
+        if ("0".equals(ruleModel.getStatus())) { // 停用规则
+            List<String> removeIds = new ArrayList<>();
+            removeIds.add(ruleModel.getRuleId());
+            stopRule(removeIds);
+        }
+        return new MultiResponse().code(200).message("update rule success");
+    }
+
+    /**
+     * 规则停用后更新所有关联规则集，删除该停用规则id。仅系统管理员具备该权限，操作后不可逆。
+     *
+     * @param removeIds 需要移除的规则Id
+     * @return MultiResponse
+     */
+    public String stopRule(List<String> removeIds) {
+        // 根据ruleId查询在使用该规则的规则集，移除该规则ID，更新规则集
+        List<RuleSetModel> ruleSetModels = checkRuleOperation.queryRuleSetByRuleId(removeIds);
+        ruleSetModels.stream().forEach(ruleSetModel -> {
+            ruleSetModel.getRuleIds().remove(removeIds);
+            checkRuleOperation.updateRuleSetToRuleIds(ruleSetModel.getId(), ruleSetModel.getRuleIds());
+        });
+        return "stop the rule success!";
     }
 }

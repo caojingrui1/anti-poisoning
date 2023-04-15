@@ -8,10 +8,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.huawei.antipoisoning.business.enmu.ConstantsArgs;
 import com.huawei.antipoisoning.business.entity.RepoInfo;
 import com.huawei.antipoisoning.business.entity.TaskEntity;
-import com.huawei.antipoisoning.business.entity.pr.GitlabPRInfo;
-import com.huawei.antipoisoning.business.entity.pr.PRAntiEntity;
-import com.huawei.antipoisoning.business.entity.pr.PRInfo;
-import com.huawei.antipoisoning.business.entity.pr.PullRequestInfo;
+import com.huawei.antipoisoning.business.entity.pr.*;
 import com.huawei.antipoisoning.business.service.PoisonPRService;
 import com.huawei.antipoisoning.common.entity.MultiResponse;
 import com.huawei.antipoisoning.common.util.SecurityUtil;
@@ -19,12 +16,10 @@ import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -47,11 +42,6 @@ public class PoisonPRController {
     private static final ThreadPoolExecutor THREAD_SCHEDULED_EXECUTOR =
             new ThreadPoolExecutor(10, 200, 0,
                     TimeUnit.SECONDS, new LinkedBlockingQueue<>(200));
-    private static String ASCEND = "ascend";
-    private static String MAJUN = "openMajun";
-    private static String OPEN_EULER = "openEuler";
-    private static String MIND_SPORE = "mindSpore";
-    private static String GUASS = "openGauss";
 
     @Autowired(required = false)
     private PoisonPRService poisonService;
@@ -72,15 +62,7 @@ public class PoisonPRController {
         // 判断是否有调用api的token许可
         if (StringUtils.isNotEmpty(info.getApiToken())) {
             // 根据传入的apiToken判断社区来源，进行操作日志记录
-            if (ASCEND.equals(SecurityUtil.decrypt(info.getApiToken()))) {
-                return queuePRService(info);
-            } else if (MAJUN.equals(SecurityUtil.decrypt(info.getApiToken()))) {
-                return queuePRService(info);
-            } else if (OPEN_EULER.equals(SecurityUtil.decrypt(info.getApiToken()))) {
-                return queuePRService(info);
-            } else if (GUASS.equals(SecurityUtil.decrypt(info.getApiToken()))) {
-                return queuePRService(info);
-            } else if (MIND_SPORE.equals(SecurityUtil.decrypt(info.getApiToken()))) {
+            if (poisonService.checkApiToken(info.getApiToken())) {
                 return queuePRService(info);
             } else {
                 return new MultiResponse().code(ConstantsArgs.CODE_FAILED)
@@ -119,6 +101,30 @@ public class PoisonPRController {
             method = RequestMethod.POST)
     public MultiResponse queryPRResults(@RequestBody RepoInfo repoInfo) {
         return poisonService.queryResults(repoInfo);
+    }
+
+    /**
+     * 查询扫描结果状态。
+     *
+     * @param queryInfo 查询参数
+     * @return MultiResponse
+     */
+    @RequestMapping(value = "/query-pr-results-status",
+            produces = {"application/json"},
+            consumes = {"application/json"},
+            method = RequestMethod.POST)
+    public MultiResponse queryPRResultsStatus(@RequestBody QueryInfo queryInfo) {
+        if (StringUtils.isNotEmpty(queryInfo.getApiToken())) {
+            if (poisonService.checkApiToken(queryInfo.getApiToken())) {
+                return poisonService.queryPRResultsStatus(queryInfo.getScanId());
+            } else {
+                return new MultiResponse().code(ConstantsArgs.CODE_FAILED)
+                        .message("query task status failed, the apiToken is wrong!");
+            }
+        }
+
+        return new MultiResponse().code(ConstantsArgs.CODE_FAILED)
+                .message("query task status failed, the apiToken is null!");
     }
 
     /**
@@ -170,11 +176,13 @@ public class PoisonPRController {
         });
         ObjectMapper objectMapper = new ObjectMapper();
         MultiResponse response;
+        Map<String, Object> responseResult = new HashMap<>();
         try {
             response = objectMapper.convertValue(future.get(3, TimeUnit.SECONDS), MultiResponse.class);
         } catch (TimeoutException e) {
+            responseResult.put("scanId", pullRequestInfo.getScanId());
             return new MultiResponse().code(ConstantsArgs.CODE_SUCCESS)
-                    .message("create task success!").result(pullRequestInfo.getScanId());
+                    .message("create task success!").result(responseResult);
         }
         return response;
     }

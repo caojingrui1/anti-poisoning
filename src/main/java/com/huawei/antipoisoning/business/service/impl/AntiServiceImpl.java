@@ -57,9 +57,6 @@ public class AntiServiceImpl implements AntiService {
 
     private static final String GITLAB = "https://source.openeuler.sh";
 
-    private static final String INC_URL = ("prod".equals(ConstantsArgs.DB_ENV)
-            ? ConstantsArgs.MAJUN_URL  : ConstantsArgs.MAJUN_BETA_URL) + ConstantsArgs.MAJUN_POISON_INC;
-
     @Value("${git.username}")
     private String gitUser;
 
@@ -306,9 +303,7 @@ public class AntiServiceImpl implements AntiService {
                     antiOperation.updatePRScanResult(prAntiEntity);
                     // 更新门禁级结果
                     poisonTaskOperation.updatePRTask(prAntiEntity, prTaskEntity);
-                    responseResult.put("url", INC_URL + info.getScanId() +
-                            "/" + prAntiEntity.getProjectName() + "/" + prAntiEntity.getRepoName());
-                    responseResult.put("isPass", prAntiEntity.getIsPass());
+                    responseResult.put("scanId", info.getScanId());
                     return MultiResponse.success(ConstantsArgs.CODE_SUCCESS, "success", responseResult);
                 } else {
                     // 扫描是否成功
