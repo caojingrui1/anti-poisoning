@@ -28,6 +28,8 @@ import java.util.stream.Collectors;
 public class CheckRuleServiceImpl implements CheckRuleService {
     private static final Logger LOGGER = LoggerFactory.getLogger(CheckRuleServiceImpl.class);
 
+    private SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss:SSS");
+
     @Autowired
     private CheckRuleOperation checkRuleOperation;
 
@@ -192,8 +194,11 @@ public class CheckRuleServiceImpl implements CheckRuleService {
 
     @Override
     public MultiResponse createRule(RuleModel ruleModel) {
+        String createTime = DATE_FORMAT.format(System.currentTimeMillis());
         List<RuleModel> ruleModels = new ArrayList<>();
         ruleModel.setRuleId(ruleModel.getRuleLanguage() + "_" + ruleModel.getRuleName());
+        ruleModel.setCreateTime(createTime);
+        ruleModel.setUpdateTime(createTime);
         ruleModels.add(ruleModel);
         checkRuleOperation.createRule(ruleModels);
         return new MultiResponse().code(200).message("add rule success");
@@ -201,6 +206,8 @@ public class CheckRuleServiceImpl implements CheckRuleService {
 
     @Override
     public MultiResponse updateRule(RuleModel ruleModel) {
+        String updateTime = DATE_FORMAT.format(System.currentTimeMillis());
+        ruleModel.setUpdateTime(updateTime);
         checkRuleOperation.updateRule(ruleModel);
         if ("0".equals(ruleModel.getStatus())) { // 停用规则
             List<String> removeIds = new ArrayList<>();
