@@ -179,6 +179,7 @@ public class CheckRuleOperation {
      */
     public List<RuleModel> getAllRulesConfig() {
         List<AggregationOperation> operations = new ArrayList<>();
+        operations.add(Aggregation.match(Criteria.where("status").is("1")));
         operations.add(Aggregation.group("rule_language")
                 .first("rule_language").as("rule_language")
                 .count().as("count"));
