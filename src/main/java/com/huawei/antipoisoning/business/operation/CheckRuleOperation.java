@@ -34,9 +34,9 @@ import java.util.ArrayList;
 import java.util.regex.Pattern;
 
 /**
- * 扫描结果包裹数据存档
+ * 规则操作类。
  *
- * @since: 2022/5/31 17:01
+ * @since: 2023/01/31 17:01
  */
 @Component
 public class CheckRuleOperation {
