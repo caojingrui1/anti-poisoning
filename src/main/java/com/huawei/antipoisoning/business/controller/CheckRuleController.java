@@ -10,17 +10,13 @@ import com.huawei.antipoisoning.business.entity.checkrule.RuleSetModel;
 import com.huawei.antipoisoning.business.entity.checkrule.TaskRuleSetVo;
 import com.huawei.antipoisoning.business.service.CheckRuleService;
 import com.huawei.antipoisoning.business.service.impl.FileDownloadDelegateImpl;
-import com.huawei.antipoisoning.common.entity.FileResponse;
 import com.huawei.antipoisoning.common.entity.MultiResponse;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.Resource;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.GetMapping;
-
-import java.nio.charset.StandardCharsets;
 
 /**
  * 防投毒规则维护
@@ -46,6 +42,17 @@ public class CheckRuleController {
     @PostMapping(value = "/query/rules")
     public MultiResponse getAllRules(@RequestBody RuleModel ruleModel) {
         return checkRuleService.getAllRules(ruleModel);
+    }
+
+    /**
+     * 根据条件获取所有的规则
+     *
+     * @param ruleModel 查询参数
+     * @return getAllRules
+     */
+    @PostMapping(value = "/query/export/rules")
+    public MultiResponse getExportRules(@RequestBody RuleModel ruleModel) {
+        return checkRuleService.getExportRules(ruleModel);
     }
 
     /**
@@ -168,21 +175,5 @@ public class CheckRuleController {
     @PostMapping(value = "/get/taskRule")
     public MultiResponse getTaskRule(@RequestBody TaskRuleSetVo taskRuleSetVo) {
         return checkRuleService.getTaskRule(taskRuleSetVo);
-    }
-
-    /**
-     * 根据语言导出规则
-     *
-     * @param ruleModel 查询参数
-     * @return Resource
-     */
-    @PostMapping(value = "/export/rule")
-    public Resource exportRule(@RequestBody RuleModel ruleModel) {
-        String tableName = "防投毒规则集_" + System.currentTimeMillis();
-        byte[] bytes = fileDownloadDelegate.exportRuleByLanguage(ruleModel);
-        if (bytes.length == 0) {
-            bytes = "no file to download".getBytes(StandardCharsets.UTF_8);
-        }
-        return new FileResponse(bytes, tableName + ".xlsx");
     }
 }

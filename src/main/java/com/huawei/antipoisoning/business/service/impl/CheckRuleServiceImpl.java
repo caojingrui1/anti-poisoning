@@ -46,6 +46,18 @@ public class CheckRuleServiceImpl implements CheckRuleService {
     }
 
     /**
+     * 根据条件获取规则
+     *
+     * @param ruleModel 查询参数
+     * @return getAllRules
+     */
+    @Override
+    public MultiResponse getExportRules(RuleModel ruleModel) {
+        return new MultiResponse().code(200).message("success")
+                .result(checkRuleOperation.getAllPoisonRule(ruleModel));
+    }
+
+    /**
      * 自定义规则集
      *
      * @param ruleSetModel 自定义实体类

@@ -22,6 +22,8 @@ public interface CheckRuleService {
      */
     MultiResponse getAllRules(RuleModel ruleModel);
 
+    MultiResponse getExportRules(RuleModel ruleModel);
+
     /**
      * 自定义规则集
      *
