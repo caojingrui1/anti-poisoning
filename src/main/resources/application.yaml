@@ -17,19 +17,6 @@ spring:
       enabled: true
       max-file-size: 20MB
       max-request-size: 20MB
-servicecomb:
-  service:
-    environment: acceptance
-  rest:
-    address: 0.0.0.0:${server.port}?sslEnabled=false
-  config:
-    client:
-      serverUri: https://cse.cn-south-1.myhuaweicloud.com
-      refreshMode: 1
-      refresh_interval: 5000
-  credentials:
-    akskCustomCipher: default
-    project: cn-south-1
 #management:
 #  endpoints:
 #    web:
