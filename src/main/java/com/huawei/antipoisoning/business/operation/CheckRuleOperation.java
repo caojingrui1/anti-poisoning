@@ -26,17 +26,17 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Component;
 
-import java.security.cert.Certificate;
-import java.util.ArrayList;
+
+import java.util.Set;
 import java.util.List;
 import java.util.Objects;
-import java.util.Set;
+import java.util.ArrayList;
 import java.util.regex.Pattern;
 
 /**
- * 扫描结果包裹数据存档
+ * 规则操作类。
  *
- * @since: 2022/5/31 17:01
+ * @since: 2023/01/31 17:01
  */
 @Component
 public class CheckRuleOperation {
@@ -87,6 +87,34 @@ public class CheckRuleOperation {
         return new PageVo(count, codeCheckRuleVos);
     }
 
+
+    /**
+     * 根据条件获取规则详情
+     *
+     * @param rule    查询参数
+     * @return getAllRules
+     */
+    public List<RuleModel> getAllPoisonRule(RuleModel rule) {
+        Criteria criteria = new Criteria();
+        if (StringUtils.isNotBlank(rule.getRuleLanguage())) {
+            criteria.and("rule_language").is(rule.getRuleLanguage());
+        }
+        if (StringUtils.isNotBlank(rule.getRuleName())) {
+            Pattern pattern = Pattern
+                    .compile("^.*" + escapeSpecialWord(rule.getRuleName()) + ".*$", Pattern.CASE_INSENSITIVE);
+            criteria.and("rule_name").regex(pattern);
+        }
+        if (StringUtils.isNotBlank(rule.getRuleDesc())) {
+            Pattern pattern = Pattern
+                    .compile("^.*" + escapeSpecialWord(rule.getRuleDesc()) + ".*$", Pattern.CASE_INSENSITIVE);
+            criteria.and("rule_desc").regex(pattern);
+        }
+        criteria.and("status").is("1");
+        Query query = Query.query(criteria);
+        return mongoTemplate.find(query, RuleModel.class,
+                CollectionTableName.ANTI_CHECK_RULE);
+    }
+
     /**
      * 对特殊字符进行转义
      *
@@ -123,6 +151,11 @@ public class CheckRuleOperation {
         mongoTemplate.insert(ruleModel, CollectionTableName.ANTI_CHECK_RULE);
     }
 
+    /**
+     * 更新规则。
+     *
+     * @param ruleModel 规则实体类
+     */
     public void updateRule(RuleModel ruleModel) {
         Criteria criteria = Criteria.where("_id").is(ruleModel.getId());
         Update update = new Update();
@@ -135,6 +168,7 @@ public class CheckRuleOperation {
         update.set("rule_desc", ruleModel.getRuleDesc());
         update.set("tag", ruleModel.getTag());
         update.set("status", ruleModel.getStatus());
+        update.set("update_time", ruleModel.getUpdateTime());
         mongoTemplate.updateFirst(Query.query(criteria), update, CollectionTableName.ANTI_CHECK_RULE);
     }
 
@@ -145,6 +179,7 @@ public class CheckRuleOperation {
      */
     public List<RuleModel> getAllRulesConfig() {
         List<AggregationOperation> operations = new ArrayList<>();
+        operations.add(Aggregation.match(Criteria.where("status").is("1")));
         operations.add(Aggregation.group("rule_language")
                 .first("rule_language").as("rule_language")
                 .count().as("count"));

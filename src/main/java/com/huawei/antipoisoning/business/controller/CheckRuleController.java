@@ -9,13 +9,14 @@ import com.huawei.antipoisoning.business.entity.checkrule.RuleModel;
 import com.huawei.antipoisoning.business.entity.checkrule.RuleSetModel;
 import com.huawei.antipoisoning.business.entity.checkrule.TaskRuleSetVo;
 import com.huawei.antipoisoning.business.service.CheckRuleService;
+import com.huawei.antipoisoning.business.service.impl.FileDownloadDelegateImpl;
 import com.huawei.antipoisoning.common.entity.MultiResponse;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.GetMapping;
 
 /**
  * 防投毒规则维护
@@ -29,6 +30,9 @@ public class CheckRuleController {
     @Autowired
     private CheckRuleService checkRuleService;
 
+    @Autowired
+    private FileDownloadDelegateImpl fileDownloadDelegate;
+
     /**
      * 根据条件获取所有的规则
      *
@@ -38,6 +42,17 @@ public class CheckRuleController {
     @PostMapping(value = "/query/rules")
     public MultiResponse getAllRules(@RequestBody RuleModel ruleModel) {
         return checkRuleService.getAllRules(ruleModel);
+    }
+
+    /**
+     * 根据条件获取所有的规则
+     *
+     * @param ruleModel 查询参数
+     * @return getAllRules
+     */
+    @PostMapping(value = "/query/export/rules")
+    public MultiResponse getExportRules(@RequestBody RuleModel ruleModel) {
+        return checkRuleService.getExportRules(ruleModel);
     }
 
     /**
