@@ -72,6 +72,10 @@ public class RuleModel {
     @Field("tag")
     private String tag;
 
+    // 对应修复指南章节名称
+    @Field("link_name")
+    private String linkName;
+
     /**
      * 更新时间
      */
