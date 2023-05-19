@@ -167,6 +167,7 @@ public class CheckRuleOperation {
         update.set("error_example", ruleModel.getErrorExample());
         update.set("rule_desc", ruleModel.getRuleDesc());
         update.set("tag", ruleModel.getTag());
+        update.set("link_name", ruleModel.getLinkName());
         update.set("status", ruleModel.getStatus());
         update.set("update_time", ruleModel.getUpdateTime());
         mongoTemplate.updateFirst(Query.query(criteria), update, CollectionTableName.ANTI_CHECK_RULE);
