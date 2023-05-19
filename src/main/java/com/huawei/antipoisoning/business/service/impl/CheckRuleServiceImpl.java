@@ -206,6 +206,9 @@ public class CheckRuleServiceImpl implements CheckRuleService {
 
     @Override
     public MultiResponse createRule(RuleModel ruleModel) {
+        if (!checkRuleParam(ruleModel)) {
+            return new MultiResponse().code(400).message("the param has null, please check!");
+        }
         String createTime = DATE_FORMAT.format(System.currentTimeMillis());
         List<RuleModel> ruleModels = new ArrayList<>();
         ruleModel.setRuleId(ruleModel.getRuleLanguage() + "_" + ruleModel.getRuleName());
@@ -218,6 +221,9 @@ public class CheckRuleServiceImpl implements CheckRuleService {
 
     @Override
     public MultiResponse updateRule(RuleModel ruleModel) {
+        if (!checkRuleParam(ruleModel)) {
+            return new MultiResponse().code(400).message("the param has null, please check!");
+        }
         String updateTime = DATE_FORMAT.format(System.currentTimeMillis());
         ruleModel.setUpdateTime(updateTime);
         checkRuleOperation.updateRule(ruleModel);
@@ -227,6 +233,21 @@ public class CheckRuleServiceImpl implements CheckRuleService {
             stopRule(removeIds);
         }
         return new MultiResponse().code(200).message("update rule success");
+    }
+
+    /**
+     * 检查规则实体类是否满足要求.
+     *
+     * @param ruleModel 规则实体
+     * @return boolean
+     */
+    public boolean checkRuleParam(RuleModel ruleModel) {
+        if (StringUtils.isEmpty(ruleModel.getRuleName())
+                || StringUtils.isEmpty(ruleModel.getRuleDesc())
+                || StringUtils.isEmpty(ruleModel.getRuleLanguage())) {
+            return false;
+        }
+        return true;
     }
 
     /**
