@@ -120,7 +120,7 @@ public class HttpUtil {
     }
 
     /**
-     * GET 请求
+     * gitlab GET 请求
      *
      * @param token 授权码
      * @param request 请求接口url
@@ -143,6 +143,50 @@ public class HttpUtil {
             CloseableHttpClient client = HttpClients.createDefault();
             // 执行请求操作，并拿到结果（同步阻塞）
             CloseableHttpResponse response = client.execute(httpGet);
+            // 获取结果实体
+            HttpEntity entity = response.getEntity();
+            if (entity != null) {
+                // 按指定编码转换结果实体为String类型
+                body = EntityUtils.toString(entity, "UTF-8");
+            }
+            EntityUtils.consume(entity);
+            // 释放链接
+            response.close();
+            return body;
+        } catch (IOException e) {
+            LOGGER.error("errInfo is {}", e.getMessage());
+            return body;
+        }
+    }
+
+    /**
+     * gitlab post 请求
+     *
+     * @param token 授权码
+     * @param params 参数对象
+     * @param request 请求接口
+     * @return body
+     */
+    public String doGitlabPost(String token, JSONObject params, String request) {
+        String body = "";
+        try {
+            // 创建post方式请求对象
+            HttpPost httpPost = new HttpPost(url + request);
+            // 装填参数
+            StringEntity stringEntity = new StringEntity(params.toString(), "utf-8");
+            stringEntity.setContentEncoding(new BasicHeader(HTTP.CONTENT_TYPE,
+                    "application/json"));
+            // 设置参数到请求对象中
+            httpPost.setEntity(stringEntity);
+            // 设置header信息
+            // 指定报文头【Content-type】、【User-Agent】
+            httpPost.setHeader("Content-type", "application/json");
+            httpPost.setHeader("PRIVATE-TOKEN", token);
+            httpPost.setHeader("User-Agent", "Mozilla/4.0 (compatible; MSIE 5.0; Windows NT; DigExt)");
+            // 创建httpclient对象
+            CloseableHttpClient client = HttpClients.createDefault();
+            // 执行请求操作，并拿到结果（同步阻塞）
+            CloseableHttpResponse response = client.execute(httpPost);
             // 获取结果实体
             HttpEntity entity = response.getEntity();
             if (entity != null) {

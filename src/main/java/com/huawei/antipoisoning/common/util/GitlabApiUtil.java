@@ -9,9 +9,6 @@ import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.lang.StringUtils;
 
 import java.io.Serializable;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
-import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -68,4 +65,20 @@ public class GitlabApiUtil implements Serializable {
        String changes = JSONObject.parseObject(result).get("changes").toString();
        return JSONArray.parseArray(changes);
    }
+
+    /**
+     * 评论PR信息。
+     *
+     * @return JSONObject
+     */
+    public JSONObject noteGitlabPullRequestInfo(JSONObject requestParam) {
+        String path = getPr + "/" + params.get("projectId") + "/merge_requests/" + params.get("pullNumber") + "/notes";
+        String token = "";
+        if (!StringUtils.isEmpty(params.get("accessToken"))) {
+            token = params.get("accessToken");
+        }
+        HttpUtil httpUtil = new HttpUtil(URL);
+        String result = httpUtil.doGitlabPost(token, requestParam, path);
+        return JSONObject.parseObject(result);
+    }
 }
