@@ -471,8 +471,8 @@ public class PoisonPRServiceImpl implements PoisonPRService {
         GitlabApiUtil gitlabApiUtil = new GitlabApiUtil(params);
         JSONObject body = new JSONObject();
         String content = "<table><tr><th>scan result</th><th>scan link</th></tr>" +
-                "<tr><th>" + JSONObject.parseObject(result.toString()).getString("isPass") +
-                "</th><th>" + JSONObject.parseObject(result.toString()).getString("url") + "</th></tr>" +
+                "<tr><th>" + ((HashMap) result).get("isPass") +
+                "</th><th>" + ((HashMap) result).get("url") + "</th></tr>" +
                 "</table>";
         body.put("body", content);
         gitlabApiUtil.noteGitlabPullRequestInfo(body);
