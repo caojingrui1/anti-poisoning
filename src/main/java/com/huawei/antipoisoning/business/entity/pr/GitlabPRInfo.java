@@ -4,7 +4,6 @@
 
 package com.huawei.antipoisoning.business.entity.pr;
 
-import com.alibaba.fastjson.JSONObject;
 import lombok.Data;
 
 /**

@@ -87,4 +87,11 @@ public interface PoisonPRService {
      */
     PullRequestInfo getGitlabPrInfo(GitlabPRInfo info);
 
+    /**
+     * 评论gitlab pr
+     * @param pullRequestInfo pr信息
+     * @param result 结果信息
+     * @return MultiResponse
+     */
+    MultiResponse noteGitlab(PullRequestInfo pullRequestInfo, Object result);
 }
