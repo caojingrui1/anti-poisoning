@@ -37,12 +37,15 @@ class YaraScan(object):
             all_files = [os.path.join(root, file) for file in files]
             for one_file in all_files:
                 _check_name = os.path.relpath(one_file, self.source_dir).lower()
+                skip = False
                 for exclude in exclude_list:
                     if exclude in _check_name:
-                        print(f"Skip{one_file}. (match {exclude})")
+                        print(f"Skip {one_file}. (match {exclude})")
+                        skip = True
                         break
-                    else:
-                        self.all_files.append(one_file)
+                if not skip:
+                    self.all_files.append(one_file)
+
         print("Found files:", len(self.all_files))
 
     def generate_tasks(self):
@@ -188,7 +191,8 @@ class YaraScan(object):
                     )
                     result['hash'] = md5(line_content.encode()).hexdigest()
                     # 对于同一个触发点，不需要报告多次，使用hash去重
-                    if not any(x for x in self.result if x['hash'] == result['hash']):
+                    if not any(x for x in self.result if
+                               x['suspiciousFileName'] == result['suspiciousFileName'] and x['hash'] == result['hash']):
                         self.result.append(result)
 
     AROUND_COUNT = 3
