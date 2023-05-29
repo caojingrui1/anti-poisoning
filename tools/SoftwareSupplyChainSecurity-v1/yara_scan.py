@@ -150,7 +150,8 @@ class YaraScan(object):
                     result['keyLogInfo'] = f'{line_number} : {piece}'
                     result['hash'] = md5(line_content.encode()).hexdigest()
                     # 对于同一个触发点，不需要报告多次，使用hash去重
-                    if not any(x for x in self.result if x['hash'] == result['hash']):
+                    if not any(x for x in self.result if
+                               x['suspiciousFileName'] == result['suspiciousFileName'] and x['hash'] == result['hash']):
                         self.result.append(result)
             else:
                 # 3. 如果匹配结果里有 _CORE，就按照 _CORE 的个数拆分为 N 个漏洞
