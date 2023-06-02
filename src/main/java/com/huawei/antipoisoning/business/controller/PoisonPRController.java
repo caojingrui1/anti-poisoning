@@ -4,14 +4,18 @@
 
 package com.huawei.antipoisoning.business.controller;
 
+import com.alibaba.fastjson.JSONObject;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.huawei.antipoisoning.business.enmu.ConstantsArgs;
 import com.huawei.antipoisoning.business.entity.RepoInfo;
 import com.huawei.antipoisoning.business.entity.TaskEntity;
-import com.huawei.antipoisoning.business.entity.pr.*;
+import com.huawei.antipoisoning.business.entity.pr.GitlabPRInfo;
+import com.huawei.antipoisoning.business.entity.pr.PRAntiEntity;
+import com.huawei.antipoisoning.business.entity.pr.PRInfo;
+import com.huawei.antipoisoning.business.entity.pr.PullRequestInfo;
+import com.huawei.antipoisoning.business.entity.pr.QueryInfo;
 import com.huawei.antipoisoning.business.service.PoisonPRService;
 import com.huawei.antipoisoning.common.entity.MultiResponse;
-import com.huawei.antipoisoning.common.util.SecurityUtil;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -123,6 +127,43 @@ public class PoisonPRController {
             }
         }
 
+        return new MultiResponse().code(ConstantsArgs.CODE_FAILED)
+                .message("query task status failed, the apiToken is null!");
+    }
+
+    /**
+     * 评论gitlab pr。
+     *
+     * @param params 调用参数
+     * @return MultiResponse
+     */
+    @RequestMapping(value = "/note-gitlab-pr",
+            produces = {"application/json"},
+            consumes = {"application/json"},
+            method = RequestMethod.POST)
+    public MultiResponse noteGitlabPr(@RequestBody JSONObject params) {
+        String scanId = params.getString("scanId");
+        String apiToken = params.getString("apiToken");
+        if (StringUtils.isNotEmpty(apiToken) && StringUtils.isNotEmpty(scanId)) {
+            if (poisonService.checkApiToken(apiToken)) {
+                // judge the response code is 200
+                MultiResponse response = poisonService.queryPRResultsStatus(scanId);
+                if (response.getCode() == 200) {
+                    // get the response url , then set the url to note
+                    GitlabPRInfo prRepoInfo = new GitlabPRInfo();
+                    prRepoInfo.setPrInfo(params.getString("prInfo"));
+                    prRepoInfo.setAccessToken(params.getString("accessToken"));
+                    PullRequestInfo pullRequestInfo = poisonService.getGitlabPrInfo(prRepoInfo);
+                    return poisonService.noteGitlab(pullRequestInfo, response.getResult());
+                } else {
+                    return new MultiResponse().code(ConstantsArgs.CODE_FAILED)
+                            .message("query task status failed, the apiToken is wrong!");
+                }
+            } else {
+                return new MultiResponse().code(ConstantsArgs.CODE_FAILED)
+                        .message("query task status failed, the apiToken is wrong!");
+            }
+        }
         return new MultiResponse().code(ConstantsArgs.CODE_FAILED)
                 .message("query task status failed, the apiToken is null!");
     }

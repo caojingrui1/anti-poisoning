@@ -454,4 +454,28 @@ public class PoisonPRServiceImpl implements PoisonPRService {
             return info;
         }
     }
+
+    /**
+     * 评论 gitlab
+     * @param pullRequestInfo pr信息
+     * @param result 结果信息
+     * @return MultiResponse
+     */
+    @Override
+    public MultiResponse noteGitlab(PullRequestInfo pullRequestInfo, Object result) {
+        Map<String, String> params = new HashMap<>();
+        params.put("projectId", pullRequestInfo.getProjectId());
+        params.put("repo", pullRequestInfo.getRepoName());
+        params.put("pullNumber", pullRequestInfo.getPullNumber());
+        params.put("accessToken", pullRequestInfo.getAccessToken());
+        GitlabApiUtil gitlabApiUtil = new GitlabApiUtil(params);
+        JSONObject body = new JSONObject();
+        String content = "<table><tr><th>scan result</th><th>scan link</th></tr>" +
+                "<tr><th>" + ((HashMap) result).get("isPass") +
+                "</th><th>" + ((HashMap) result).get("url") + "</th></tr>" +
+                "</table>";
+        body.put("body", content);
+        gitlabApiUtil.noteGitlabPullRequestInfo(body);
+        return MultiResponse.success(200, "note success");
+    }
 }
