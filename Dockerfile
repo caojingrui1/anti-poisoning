@@ -22,8 +22,8 @@ ARG PUBLIC_USER
 ARG PUBLIC_PASSWORD
 RUN git clone https://$PUBLIC_USER:$PUBLIC_PASSWORD@github.com/Open-Infra-Ops/plugins  $PROJECT_HOME/plugins \
     && cp $PROJECT_HOME/plugins/armorrasp/rasp.tgz $PROJECT_HOME \
-    && chown -R root:root $PROJECT_HOME/rasp.tgz && chmod 755 -R /EaseSearch/rasp.tgz \
-    && tar zxf $PROJECT_HOMErasp.tgz \
+    && chown -R root:root $PROJECT_HOME/rasp.tgz && chmod 755 -R $PROJECT_HOME/rasp.tgz \
+    && tar zxf $PROJECT_HOME/rasp.tgz \
     && rm -rf $PROJECT_HOME/plugins 
 
 
