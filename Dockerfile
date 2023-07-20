@@ -17,6 +17,16 @@ RUN git clone -b master http://source.openeuler.sh/openMajun/anti-poisoning.git 
 WORKDIR $PROJECT_HOME/
 RUN mvn clean install -s setting-new.xml
 
+# install RASP
+ARG PUBLIC_USER
+ARG PUBLIC_PASSWORD
+RUN git clone https://$PUBLIC_USER:$PUBLIC_PASSWORD@github.com/Open-Infra-Ops/plugins  $PROJECT_HOME/plugins \
+    && cp $PROJECT_HOME/plugins/armorrasp/rasp.tgz $PROJECT_HOME \
+    && chown -R root:root $PROJECT_HOME/rasp.tgz && chmod 755 -R /EaseSearch/rasp.tgz \
+    && tar zxf $PROJECT_HOMErasp.tgz \
+    && rm -rf $PROJECT_HOME/plugins 
+
+
 # 设置编码
 ENV LANG C.UTF-8
 # 设置时区
@@ -24,4 +34,4 @@ ENV TZ=Asia/Shanghai
 
 WORKDIR $PROJECT_HOME/tools/SoftwareSupplyChainSecurity-v1/
 
-ENTRYPOINT /usr/bin/java -jar -Xms2600m -Xmx2600m $PROJECT_HOME/target/$PROJECT_NAME-0.0.1-SNAPSHOT.jar --logging.file.name=$PROJECT_HOME/tools/SoftwareSupplyChainSecurity-v1/service.out
+ENTRYPOINT /usr/bin/java -javaagent:$PROJECT_HOME/rasp/rasp.jar -jar -Xms2600m -Xmx2600m $PROJECT_HOME/target/$PROJECT_NAME-0.0.1-SNAPSHOT.jar --logging.file.name=$PROJECT_HOME/tools/SoftwareSupplyChainSecurity-v1/service.out
